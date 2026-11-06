@@ -98,5 +98,86 @@ class IPhone(unittest.TestCase):
 
 
 
+class Respaldo(unittest.TestCase):
+    """El Mac recibe como lo haría el iPhone: código, huella firmada, archivo firmado y verificado, y fin."""
+
+    def test_recibe_verifica_y_ordena(self):
+        import hashlib, hmac, http.client, ssl, time
+        sys.path.insert(0, os.path.join(RAIZ, "bin"))
+        import respaldo
+        with tempfile.TemporaryDirectory() as tmp:
+            destino = os.path.join(tmp, "Respaldos")
+            os.makedirs(destino)
+            progreso = os.path.join(tmp, "progreso.jsonl")
+            open(progreso, "w").close()
+            entrada = os.path.join(tmp, "entrada.json")
+            with open(entrada, "w") as f:
+                json.dump({"destino": destino}, f)
+            entorno = {**os.environ, "HOME": tmp, "DESPEJA_DATOS": os.path.join(tmp, "datos"), "DESPEJA_PROGRESO": progreso}
+            proc = subprocess.Popen([sys.executable, os.path.join(RAIZ, "bin", "respaldo.py"), "recibir", entrada, os.path.join(tmp, "salida.json")], env=entorno)
+            try:
+                codigo = None
+                for _ in range(100):
+                    for linea in open(progreso):
+                        e = json.loads(linea)
+                        if e.get("t") == "esperando":
+                            codigo = e["codigo"].replace("-", "")
+                    if codigo:
+                        break
+                    time.sleep(0.1)
+                self.assertIsNotNone(codigo)
+                puerto = None
+                for _ in range(50):   # el puerto: el que abrió el proceso (en la prueba no hay Bonjour)
+                    salida = subprocess.run(["lsof", "-Pan", "-p", str(proc.pid), "-iTCP", "-sTCP:LISTEN"], capture_output=True, text=True).stdout
+                    m = [l.split()[-2].rsplit(":", 1)[1] for l in salida.splitlines()[1:]]
+                    if m:
+                        puerto = int(m[0])
+                        break
+                    time.sleep(0.1)
+                if puerto is None:
+                    self.skipTest("sin lsof para encontrar el puerto")
+                ctx = ssl.create_default_context()
+                ctx.check_hostname, ctx.verify_mode = False, ssl.CERT_NONE
+                clave = respaldo.llave(codigo)
+                c = http.client.HTTPSConnection("127.0.0.1", puerto, context=ctx, timeout=20)
+                c.request("GET", "/hola")
+                hola = json.loads(c.getresponse().read())
+                der = c.sock.getpeercert(binary_form=True)
+                self.assertEqual(hola["huella"], hashlib.sha256(der).hexdigest())
+                self.assertEqual(hola["firma"], respaldo.firma(clave, "hola", hola["huella"]))
+                datos = "una foto de Ana Pérez".encode()
+                sha = hashlib.sha256(datos).hexdigest()
+                cab = {"X-Despeja-Id": "ABC/L0/001", "X-Despeja-Sha256": sha, "X-Despeja-Nombre": "IMG_0001.HEIC",
+                       "X-Despeja-Fecha": "2025-03-14T10:00:00Z", "Content-Length": str(len(datos))}
+                # Sin la firma correcta no entra nada.
+                c.request("POST", "/archivo", body=datos, headers={**cab, "X-Despeja-Firma": "0" * 64})
+                r = c.getresponse(); r.read()
+                self.assertEqual(r.status, 403)
+                f = respaldo.firma(clave, "archivo", "ABC/L0/001", sha, len(datos), "IMG_0001.HEIC", "2025-03-14T10:00:00Z")
+                c.request("POST", "/archivo", body=datos, headers={**cab, "X-Despeja-Firma": f})
+                self.assertTrue(json.loads(c.getresponse().read())["ok"])
+                self.assertTrue(os.path.isfile(os.path.join(destino, "2025", "03", "IMG_0001.HEIC")))
+                # Un archivo que no calza con su SHA-256 se descarta.
+                malo = {**cab, "X-Despeja-Id": "ABC/L0/002", "X-Despeja-Nombre": "IMG_0002.HEIC"}
+                f2 = respaldo.firma(clave, "archivo", "ABC/L0/002", sha, len(datos), "IMG_0002.HEIC", "2025-03-14T10:00:00Z")
+                c.request("POST", "/archivo", body=b"x" * len(datos), headers={**malo, "X-Despeja-Firma": f2})
+                r = c.getresponse(); r.read()
+                self.assertEqual(r.status, 422)
+                self.assertFalse(os.path.exists(os.path.join(destino, "2025", "03", "IMG_0002.HEIC")))
+                cuerpo = json.dumps({"ids": ["ABC/L0/001", "ABC/L0/002"]}).encode()
+                h = hashlib.sha256(cuerpo).hexdigest()
+                c.request("POST", "/tiene", body=cuerpo, headers={"X-Despeja-Firma": respaldo.firma(clave, "tiene", h)})
+                self.assertEqual(json.loads(c.getresponse().read())["tiene"], ["ABC/L0/001"])
+                c.request("POST", "/fin", body=b"", headers={"X-Despeja-Firma": respaldo.firma(clave, "fin")})
+                c.getresponse().read()
+                proc.wait(timeout=20)
+                with open(os.path.join(tmp, "salida.json")) as f:
+                    s = json.load(f)
+                self.assertEqual((s["ok"], s["recibidos"], s["motivo"]), (True, 1, "listo"))
+            finally:
+                if proc.poll() is None:
+                    proc.kill()
+
+
 if __name__ == "__main__":
     unittest.main()

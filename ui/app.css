@@ -22,7 +22,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
 .chip { font-size: 13px; color: var(--texto-suave); }
 .espacio { height: 12px; border-radius: 6px; background: var(--panel-2); overflow: hidden; margin: 12px 0 8px; }
 .espacio > span { display: block; height: 100%; width: var(--medida); background: var(--acento); border-radius: 6px; }
-.espacio.poco > span { background: var(--peligro, #c0392b); }
+
 .cifras { margin: 0; font-variant-numeric: tabular-nums; }
 .aviso { margin: 10px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--panel-2); }
 .nota { margin: 12px 0 0; font-size: 13px; color: var(--texto-suave); }
@@ -36,3 +36,22 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
 .resumen-fotos div { padding: 12px; border-radius: 10px; background: var(--panel-2); }
 .resumen-fotos dt { font-size: 13px; color: var(--texto-suave); }
 .resumen-fotos dd { margin: 2px 0 0; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* Plan, respaldo y liberar espacio */
+.pz-boton.pz-chico { padding: 2px 10px; min-height: 28px; font-size: 13px; }
+.apps li { grid-template-columns: minmax(0, 1fr) 24% auto auto; }
+.apps .quitar { opacity: 0; transition: opacity .15s; }
+.apps li:hover .quitar, .apps .quitar:focus-visible { opacity: 1; }
+@media (pointer: coarse) { .apps .quitar { opacity: 1; } }
+.plan { margin: 12px 0 0; padding-left: 22px; }
+.plan li { margin: 0 0 14px; }
+.plan .paso-titulo { display: flex; gap: 8px; align-items: baseline; justify-content: space-between; flex-wrap: wrap; }
+.plan p { margin: 4px 0 6px; }
+.guia { margin: 6px 0 0; padding: 8px 10px; border-left: 3px solid var(--acento); background: var(--panel-2); border-radius: 6px; font-size: 14px; }
+.codigo { margin: 14px 0; font: 600 34px/1.2 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: .12em; text-align: center; }
+.codigo-campo { font: 600 22px/1.2 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; }
+.destino { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
+.hecho { margin: 10px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--panel-2); font-weight: 600; }
+.error { color: var(--rojo); margin: 8px 0 0; }
+.lista-macs { display: grid; gap: 8px; margin-top: 8px; }
+.espacio.poco > span { background: var(--rojo); }

@@ -24,7 +24,12 @@
    "sistema",
    "claro",
    "oscuro"
-  ]
+  ],
+  "carpeta": {
+   "tipo": "texto",
+   "max": 4000,
+   "interfaz": false
+  }
  },
  "empaquetado": {
   "descripcion": "Deja tu iPhone solo con lo necesario: catastro, respaldo y limpieza, con tu propia IA.",
@@ -52,6 +57,69 @@
    "datos": {},
    "responde": "iphoneApps",
    "limite": 900
+  },
+  "respaldoRecibir": {
+   "script": "respaldo.py",
+   "args": [
+    "recibir"
+   ],
+   "entrada": "archivo",
+   "datos": {},
+   "inyectar": {
+    "destino": "carpetaActual"
+   },
+   "limite": "trabajo",
+   "progreso": "respaldoProgreso",
+   "responde": "respaldoTerminado"
+  },
+  "respaldoDetener": {
+   "script": "respaldo.py",
+   "args": [
+    "detener"
+   ],
+   "datos": {},
+   "responde": "respaldoDetenido",
+   "limite": 15
+  },
+  "iphoneDesinstalar": {
+   "script": "iphone.py",
+   "args": [
+    "desinstalar"
+   ],
+   "entrada": "archivo",
+   "datos": {
+    "id": {
+     "tipo": "texto",
+     "max": 200
+    }
+   },
+   "eco": [
+    "id"
+   ],
+   "responde": "appDesinstalada",
+   "limite": 120
+  },
+  "iosRevisar": {
+   "script": "plan.py",
+   "args": [
+    "ios"
+   ],
+   "datos": {},
+   "responde": "iosRevisado",
+   "limite": 60
+  },
+  "planArmar": {
+   "script": "plan.py",
+   "args": [
+    "armar"
+   ],
+   "entrada": "archivo",
+   "datos": {},
+   "inyectar": {
+    "idioma": "idiomaUI"
+   },
+   "responde": "planListo",
+   "limite": 400
   }
  },
  "ios": {
@@ -68,5 +136,8 @@
   "bonjour": [
    "despeja"
   ]
+ },
+ "ia": {
+  "ayuda": "Revisa en Ajustes → Tu IA."
  }
 }

@@ -115,5 +115,46 @@
   "capturas": 1290,
   "tamano": 31400000000,
   "soloEnIcloud": 0
+ },
+ "ios": {
+  "ok": true,
+  "actual": "26.2",
+  "ultima": "27.2",
+  "hay": true
+ },
+ "resumen": {
+  "respaldadas": 0,
+  "enElIphone": 0,
+  "bytes": 0
+ },
+ "plan": {
+  "resumen": "Tu iPhone tiene menos de 3% libre y todavía no hay nada respaldado: lo urgente es sacar las fotos del teléfono.",
+  "pasos": [
+   {
+    "tipo": "respaldar_fotos",
+    "titulo": "Respalda tus fotos con Despeja",
+    "detalle": "Así puedes borrarlas del iPhone sin riesgo.",
+    "libera_gb": null
+   },
+   {
+    "tipo": "borrar_respaldadas",
+    "titulo": "Borra del iPhone lo ya respaldado",
+    "detalle": "Es lo que más espacio devuelve.",
+    "libera_gb": null
+   },
+   {
+    "tipo": "desinstalar_app",
+    "titulo": "Evalúa desinstalar Galería Ficticia",
+    "detalle": "Es la app más pesada y no parece esencial. Tú decides.",
+    "libera_gb": 0.7,
+    "app_id": "com.ejemplo.fotos"
+   },
+   {
+    "tipo": "actualizar_ios",
+    "titulo": "Actualiza a iOS 27.2 cuando tengas espacio",
+    "detalle": "Conviene tener unos 6 GB libres antes.",
+    "libera_gb": null
+   }
+  ]
  }
 }

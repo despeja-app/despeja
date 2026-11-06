@@ -5,6 +5,7 @@
 import AppKit
 import PiezaHost
 import PiezaActualizaciones
+import PiezaTrabajos
 
 @main
 enum DespejaApp {
@@ -17,8 +18,20 @@ enum DespejaApp {
             p.actualizaciones = .init(revisar: Actualizaciones.revisar, revisarCadaRato: Actualizaciones.revisarCadaRato,
                 seguir: Actualizaciones.seguir, instalar: Actualizaciones.instalar, aviso: Actualizaciones.aviso,
                 disponible: { Actualizaciones.disponible })
-            // La app: lo nativo propio, p. ej. p.registrar("exportar") { d in … } (con su caso en simular() de ui/app.js y el mismo
-            // en escritorio/src/main.js), y los menús con p.menus (README de «host-mac»).
+            // Dónde quedan los respaldos (con marcador: la sigue aunque la muevan); los scripts la reciben por «carpetaActual».
+            let destino = CarpetaElegida()
+            destino.textoFalta = "Elige dónde guardar los respaldos."
+            p.carpeta = destino
+            p.registrar("elegirDestino") { _ in
+                destino.elegir(mensaje: Idioma.t("Elige dónde guardar las fotos y videos del iPhone"), boton: Idioma.t("Guardar aquí")) { _ in p.enviarEstado() }
+            }
+            p.estado = { base, listo in
+                var e = base
+                if let u = destino.actual() { e["destino"] = ["nombre": u.lastPathComponent, "ruta": u.path] }
+                listo(e)
+            }
+            // Pieza «trabajos»: el respaldo corre mientras late y avisa su avance a la interfaz.
+            Procesador.lectorProgreso = { aviso in let l = LectorProgreso(prefijo: Host.id, aviso: aviso); return (l.url.path, l.empezar, l.terminar) }
         }
     }
 }

@@ -3,13 +3,16 @@
 administrador). El mismo canal que usa el Finder: usbmuxd (USB o Wi-Fi) → lockdownd con TLS y el registro de emparejamiento.
 
   iphone.py estado <salida.json>   → {ok, iphone: {nombre, tipo, ios, build, conexion, capacidad, libre}} o {ok: false, codigo}
-  iphone.py apps <salida.json>     → {ok, apps: [{id, nombre, version, tamano}], total}
+  iphone.py apps <salida.json>     → {ok, apps: [{id, nombre, version, tamano}], total} (queda en catastro.json para el plan)
+  iphone.py desinstalar <entrada {id}> <salida.json> → {ok, id} — solo una app que está en la última lista revisada
 
 Códigos de error: «sin_iphone» (no hay ninguno conectado ni en la misma red), «sin_confianza» (el iPhone todavía no confía en
 este Mac: conéctalo por cable, desbloquéalo y toca «Confiar»), «bloqueado» (desbloquéalo) y «conexion».
 Aprendido en la prueba de concepto (poc/HALLAZGOS.md): en iOS 26 el espacio se pide clave por clave (el dominio entero no
 responde) y el tamaño de los datos de cada app llega en 0, así que aquí solo va el de la app.
 """
+import datetime
+import json
 import os
 import plistlib
 import socket
@@ -176,7 +179,7 @@ class IPhone:
 
 
 def _con_iphone(f):
-    def envuelta(_d):
+    def envuelta(*extra):
         try:
             p = IPhone()
         except Falla as e:
@@ -184,7 +187,7 @@ def _con_iphone(f):
         except (OSError, ssl.SSLError, plistlib.InvalidFileException, KeyError, ValueError):
             return {"ok": False, "codigo": "conexion", "error": "No pude hablar con el iPhone. Desbloquéalo e intenta de nuevo."}
         try:
-            return f(p)
+            return f(p, *extra[1:]) if f.__code__.co_argcount > 1 else f(p)
         except Falla as e:
             return {"ok": False, "codigo": e.codigo, "error": str(e)}
         except (OSError, ssl.SSLError, plistlib.InvalidFileException, KeyError, ValueError):
@@ -230,8 +233,62 @@ def apps(p):
         if r.get("Status") == "Complete" or "Error" in r or len(lista) > 5000:
             break
     lista.sort(key=lambda a: a["tamano"], reverse=True)
-    return {"ok": True, "apps": lista, "total": sum(a["tamano"] for a in lista)}
+    r = {"ok": True, "apps": lista, "total": sum(a["tamano"] for a in lista)}
+    guardar_catastro({"apps": lista, "apps_total": r["total"], "apps_revisadas": nucleo_ahora()})
+    return r
+
+
+def ruta_catastro():
+    return os.path.join(nucleo.carpeta_datos(), "catastro.json")
+
+
+def leer_catastro():
+    try:
+        with open(ruta_catastro(), encoding="utf-8") as f:
+            d = json.load(f)
+        return d if isinstance(d, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def guardar_catastro(cambios):
+    d = leer_catastro()
+    d.update(cambios)
+    os.makedirs(nucleo.carpeta_datos(), exist_ok=True)
+    nucleo.escribir_json(ruta_catastro(), d)
+
+
+def nucleo_ahora():
+    return datetime.datetime.now().astimezone().isoformat(timespec="seconds")
+
+
+def desinstalar(d):
+    ident = d.get("id")
+    conocidas = {a["id"] for a in leer_catastro().get("apps", []) if isinstance(a, dict)}
+    if not isinstance(ident, str) or ident not in conocidas:
+        return {"ok": False, "codigo": "datos", "error": "Esa app no está en la lista revisada. Revisa las apps de nuevo."}
+    return _desinstalar(ident)
+
+
+@_con_iphone
+def _desinstalar_en(p, ident):
+    c = p.servicio("com.apple.mobile.installation_proxy")
+    c.enviar({"Command": "Uninstall", "ApplicationIdentifier": ident})
+    while True:
+        r = c.recibir()
+        if "Error" in r:
+            return {"ok": False, "codigo": "fallo", "error": "El iPhone no dejó desinstalar esa app."}
+        if r.get("Status") == "Complete":
+            break
+    d = leer_catastro()
+    d["apps"] = [a for a in d.get("apps", []) if a.get("id") != ident]
+    guardar_catastro(d)
+    return {"ok": True, "id": ident}
+
+
+def _desinstalar(ident):
+    return _desinstalar_en(None, ident)   # el primer argumento es la entrada (no se usa)
 
 
 if __name__ == "__main__":
-    nucleo.script({"estado": estado, "apps": apps}, __doc__)
+    nucleo.script({"estado": estado, "apps": apps, "desinstalar": desinstalar}, __doc__)

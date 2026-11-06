@@ -65,6 +65,25 @@ assert.equal(await page.locator("#apps .apps li").count(), 10);
 await page.click("#todas-apps");
 assert.equal(await page.locator("#apps .apps li").count(), 12);
 await capturar(page, "3-principal-en");
+// El aviso de iOS, el plan de la IA y desinstalar (con confirmación).
+await page.waitForSelector("#ios-nuevo");
+await page.click("#armar-plan");
+await page.waitForSelector("#plan .plan li");
+assert.equal(await page.locator("#plan .plan li").count(), 4);
+await page.click('#plan [data-desinstalar="com.ejemplo.fotos"]');
+await page.waitForSelector("[role=alertdialog]");
+await page.click('[data-pz-confirmar="si"]');
+await page.waitForFunction(() => !document.querySelector('#plan [data-desinstalar="com.ejemplo.fotos"]'));
+// Recibir del iPhone: carpeta, código, avance y detener.
+await page.click("#elegir-destino");
+await page.click("#recibir");
+await page.waitForSelector(".codigo");
+assert.equal((await page.textContent(".codigo")).trim(), "K7P4-M2QX");
+await capturar(page, "3b-codigo-en");
+await page.waitForSelector("text=128 files received and verified");
+await page.click("#detener-recibir");
+await page.waitForSelector("#recibir-tarjeta .hecho");
+await capturar(page, "3c-plan-respaldo-en");
 await page.click("#abrir-ajustes");
 await page.waitForSelector("[role=dialog]");
 await capturar(page, "4-ajustes-en");
@@ -84,8 +103,23 @@ page = await abrir("?idioma=es&sin-iphone");
 await page.waitForSelector("#sin-iphone #buscar");
 await capturar(page, "6-sin-iphone");
 
-// 5. La pantalla del iPhone (?iphone): fotos y videos.
+// 5. La pantalla del iPhone (?iphone): buscar el Mac, código (uno malo y el bueno), respaldar, borrar; y fotos y videos.
 page = await abrir("?idioma=en&iphone", 390);
+await page.click("#buscar-mac");
+await page.click("[data-mac]");
+await page.fill("#codigo", "aaaa1111");
+await page.click("#conectar");
+await page.waitForSelector("#enviar .error");
+await page.fill("#codigo", "k7p4m2qx");
+assert.equal(await page.inputValue("#codigo"), "K7P4-M2QX");
+await page.click("#conectar");
+await page.click("#respaldar");
+await page.waitForSelector("#liberar #borrar-respaldadas");
+await capturar(page, "7a-iphone-respaldado-en");
+await page.click("#borrar-respaldadas");
+await page.click('[data-pz-confirmar="si"]');
+await page.waitForSelector("#liberar .hecho");
+await capturar(page, "7b-iphone-borrado-en");
 await page.click("#revisar-fotos");
 await page.waitForSelector(".resumen-fotos");
 assert.match(await page.textContent(".resumen-fotos"), /8,412/);

@@ -1,6 +1,16 @@
 {
  "formato": 1,
  "acciones": {
+  "iosRevisar": {
+   "script": "plan.py",
+   "args": [
+    "ios"
+   ],
+   "datos": {},
+   "responde": "iosRevisado",
+   "limite": 60,
+   "pieza": "app"
+  },
   "iphoneApps": {
    "script": "iphone.py",
    "args": [
@@ -9,6 +19,25 @@
    "datos": {},
    "responde": "iphoneApps",
    "limite": 900,
+   "pieza": "app"
+  },
+  "iphoneDesinstalar": {
+   "script": "iphone.py",
+   "args": [
+    "desinstalar"
+   ],
+   "entrada": "archivo",
+   "datos": {
+    "id": {
+     "tipo": "texto",
+     "max": 200
+    }
+   },
+   "eco": [
+    "id"
+   ],
+   "responde": "appDesinstalada",
+   "limite": 120,
    "pieza": "app"
   },
   "iphoneEstado": {
@@ -32,6 +61,20 @@
    "limite": 30,
    "pieza": "ia"
   },
+  "planArmar": {
+   "script": "plan.py",
+   "args": [
+    "armar"
+   ],
+   "entrada": "archivo",
+   "datos": {},
+   "inyectar": {
+    "idioma": "idiomaUI"
+   },
+   "responde": "planListo",
+   "limite": 400,
+   "pieza": "app"
+  },
   "probarIA": {
    "script": "ia.py",
    "args": [
@@ -51,6 +94,31 @@
    "responde": "iaProbada",
    "limite": 150,
    "pieza": "ia"
+  },
+  "respaldoDetener": {
+   "script": "respaldo.py",
+   "args": [
+    "detener"
+   ],
+   "datos": {},
+   "responde": "respaldoDetenido",
+   "limite": 15,
+   "pieza": "app"
+  },
+  "respaldoRecibir": {
+   "script": "respaldo.py",
+   "args": [
+    "recibir"
+   ],
+   "entrada": "archivo",
+   "datos": {},
+   "inyectar": {
+    "destino": "carpetaActual"
+   },
+   "limite": "trabajo",
+   "progreso": "respaldoProgreso",
+   "responde": "respaldoTerminado",
+   "pieza": "app"
   }
  }
 }
