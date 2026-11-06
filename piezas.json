@@ -196,10 +196,10 @@
    },
    "generados": {
     ".github/workflows/publicar.yml": "42e96f465997c3458c8292d8416f02e1813827669814625306697c3f309e8c2c",
-    "app/Info.plist": "0995ca72ccb119546c008d07eba295300663e8849fb935af4a0c7477559fc9be",
+    "app/Info.plist": "7fdc795f51b050eb76602ebb7635d80d6ead2d48836895a6f3a2737e3e82dc0b",
     "app/Package.swift": "2d04c3f6eeabfed4f949f83937615357900a5f7c94d4e9717540f4b5d1744b44",
     "build.sh": "1dd347c343903442a6c1336e2dc11455be131819b381036c037d554a175df830",
-    "herramientas/empaquetar.sh": "8ff4c3f8d9188f870f9a7b78342084f4eff32f45db7ceeea7dda08c9df0f6224",
+    "herramientas/empaquetar.sh": "ff98f4ba12d138ece4f51324374b0635362d23cbf3ffb8bd0a2e1f9549a3c8f8",
     "instalar.sh": "d7ce2eb79e6b17f6434eee1bbb11b3cad2be5a37bbccaf57cdcaf3ba712d8813"
    }
   },

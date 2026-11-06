@@ -7,3 +7,13 @@ Lo que cambia para quien usa Despeja, en palabras simples. Las descargas de cada
 ## Sin publicar · Unreleased
 <!-- Una línea por cambio que se nota, en lenguaje de persona («Ahora puedes…»), en español · *e inglés*. Al publicar una
 versión (subir «version» en app.json), estas líneas pasan a «## X.Y.Z». -->
+
+## 0.2.0
+- Tu Mac ve tu iPhone por cable o Wi-Fi: espacio libre, apps de la más pesada a la más liviana y si hay un iOS más nuevo. ·
+  *Your Mac sees your iPhone via cable or Wi-Fi: free space, apps by size and whether a newer iOS is out.*
+- Respalda tus fotos y videos en tu Mac, cifrados por tu Wi-Fi y verificados uno por uno, y borra del iPhone solo lo verificado. ·
+  *Back up your photos and videos to your Mac, encrypted over Wi-Fi and verified one by one, and delete from the iPhone only what's verified.*
+- «Analizar mi iPhone» agrupa fotos repetidas y parecidas, capturas, ráfagas, memes y videos grandes para borrarlos de una vez. ·
+  *“Analyze my iPhone” groups duplicate and similar photos, screenshots, bursts, memes and large videos to delete them at once.*
+- Tu IA arma un plan y sugiere apps que podrían sobrar; las desinstalas desde el Mac con casillas. ·
+  *Your AI makes a plan and suggests apps you might not need; uninstall them from the Mac with checkboxes.*
