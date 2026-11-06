@@ -65,6 +65,15 @@ assert.equal(await page.locator("#apps .apps li").count(), 10);
 await page.click("#todas-apps");
 assert.equal(await page.locator("#apps .apps li").count(), 12);
 await capturar(page, "3-principal-en");
+// Lo que tu IA cree que podría sobrar: elegir dos y desinstalarlas de una vez.
+await page.waitForSelector(".sugeridas [data-elegir]");
+await page.check('[data-elegir="com.ejemplo.taxi"]');
+await page.check('[data-elegir="com.ejemplo.tienda"]');
+await page.waitForSelector("#desinstalar-elegidas:has-text('Uninstall 2')");
+await capturar(page, "3a-sugeridas-en");
+await page.click("#desinstalar-elegidas");
+await page.click('[data-pz-confirmar="si"]');
+await page.waitForFunction(() => !document.querySelector('[data-elegir="com.ejemplo.taxi"]') && !document.querySelector('[data-elegir="com.ejemplo.tienda"]'));
 // El aviso de iOS, el plan de la IA y desinstalar (con confirmación).
 await page.waitForSelector("#ios-nuevo");
 await page.click("#armar-plan");

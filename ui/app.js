@@ -20,6 +20,7 @@
     macs: null, buscandoMac: false, mac: "", codigoEscrito: "", conectando: false, macConectado: "", errorMac: "",
     respaldando: false, avance: null, finEnvio: null, resumen: null, borrando: false, finBorrado: null,
     // iPhone: analizar y limpiar por grupos
+    sugeridas: null, sugiriendo: false, elegidas: new Set(), desinstalando: [],
     analizando: false, analisisAvance: null, grupos: null, grupo: null, items: [], totalGrupo: 0, cargando: false,
     grande: null, borrandoGrupo: false };
   // ?iphone en la vista previa muestra la pantalla del iPhone.
@@ -109,7 +110,7 @@
     else {
       const max = a.apps[0] ? a.apps[0].tamano || 1 : 1;
       const lista = E.todasLasApps ? a.apps : a.apps.slice(0, 10);
-      cuerpo = `<p class="cifras" data-sin-traducir>${esc(Tp("{n} apps ocupan {t}", { n: entero(a.apps.length), t: tamano(a.total) }))}</p>
+      cuerpo = sugerencias(a) + `<p class="cifras" data-sin-traducir>${esc(Tp("{n} apps ocupan {t}", { n: entero(a.apps.length), t: tamano(a.total) }))}</p>
         <ul class="apps">${lista.map((x) => `<li><span class="nombre" data-sin-traducir>${esc(x.nombre)}</span>
           <span class="medida" data-medida="${Math.max(2, Math.round((x.tamano / max) * 100))}" aria-hidden="true"></span>
           <span class="tam" data-sin-traducir>${esc(tamano(x.tamano))}</span>
@@ -119,6 +120,27 @@
         <p class="nota">Es lo que ocupa cada app. Lo que guarda adentro (chats, caché) iOS no lo informa: lo veremos aparte.</p>`;
     }
     return `<section class="tarjeta" id="apps"><h2>Apps</h2>${cuerpo}</section>`;
+  }
+
+  /** Lo que tu IA cree que podría sobrar, para elegir y desinstalar de una vez. */
+  function sugerencias(a) {
+    const nombreIA = (E.ias.find((x) => x.id === E.config.ia) || {}).nombre || Tp("Tu IA");
+    if (E.sugiriendo) return `<div class="sugeridas"><p class="suave" aria-busy="true" data-sin-traducir>${esc(Tp("{ia} está viendo qué apps podrían sobrar…", { ia: nombreIA }))}</p></div>`;
+    const porId = new Map(a.apps.map((x) => [x.id, x]));
+    const lista = (E.sugeridas || []).filter((x) => porId.has(x.id));
+    if (!E.sugeridas) return E.config.ia ? `<div class="pz-pie izquierda"><button type="button" class="pz-boton" id="sugerir">¿Cuáles podrían sobrar?</button></div>` : "";
+    if (!lista.length) return `<p class="nota">Tu IA no encontró apps que claramente sobren.</p>`;
+    const elegidas = lista.filter((x) => E.elegidas.has(x.id));
+    const bytes = elegidas.reduce((t, x) => t + porId.get(x.id).tamano, 0);
+    return `<div class="sugeridas"><h3>Podrías no necesitar</h3>
+      <ul>${lista.map((x) => { const app = porId.get(x.id); const ocupada = E.desinstalando.includes(x.id);
+        return `<li><label><input type="checkbox" data-elegir="${esc(x.id)}"${E.elegidas.has(x.id) ? " checked" : ""}${ocupada ? " disabled" : ""}>
+          <span><b data-sin-traducir>${esc(app.nombre)}</b> <span class="suave" data-sin-traducir>· ${esc(tamano(app.tamano))}</span><br>
+          <span class="suave" data-sin-traducir>${esc(x.motivo)}</span></span></label></li>`; }).join("")}</ul>
+      <div class="pz-pie"><button type="button" class="pz-boton pz-principal pz-peligro" id="desinstalar-elegidas"${elegidas.length && !E.desinstalando.length ? "" : " disabled"} data-sin-traducir>${esc(E.desinstalando.length
+        ? Tp("Desinstalando… quedan {n}", { n: entero(E.desinstalando.length) })
+        : elegidas.length ? Tp("Desinstalar {n} ({b})", { n: entero(elegidas.length), b: tamano(bytes) }) : Tp("Elige las que quieras desinstalar"))}</button></div>
+      <p class="nota">iOS no le dice a nadie cuánto usas cada app: esto es una sugerencia de tu IA según el tipo de app. Para que iOS quite solo las que de verdad no usas (y guarde sus datos): Ajustes → App Store → Descargar apps sin usar.</p></div>`;
   }
 
   function tarjetaFotos() {
@@ -354,6 +376,8 @@
     // Mac: plan, desinstalar, respaldo
     else if (b.id === "armar-plan") { E.armando = true; E.planError = null; pintar(); host.enviar("planArmar"); }
     else if (b.dataset.desinstalar) desinstalar(b.dataset.desinstalar);
+    else if (b.id === "sugerir") sugerir();
+    else if (b.id === "desinstalar-elegidas") desinstalarElegidas();
     else if (b.id === "elegir-destino") host.enviar("elegirDestino");
     else if (b.id === "recibir") {
       Object.assign(E, { recibiendo: true, codigo: "", recibidos: 0, bytesRecibidos: 0, finRespaldo: null, conectado: false });
@@ -387,6 +411,12 @@
       host.enviar("grupoMarcar", { grupo: E.grupo, todas });
     } else if (b.id === "borrar-grupo") borrarGrupo();
   });
+  document.addEventListener("change", (ev) => {
+    const id = ev.target.dataset && ev.target.dataset.elegir;
+    if (!id) return;
+    if (ev.target.checked) E.elegidas.add(id); else E.elegidas.delete(id);
+    pintar();
+  });
   document.addEventListener("input", (ev) => {
     if (ev.target.id !== "codigo") return;
     // Se escribe como se ve en el Mac (K7P4-M2QX): mayúsculas y el guion solo.
@@ -407,6 +437,18 @@
     const si = await ui.confirmar({ titulo: "¿Desinstalar {app}?", valores: { app: nombre }, peligro: true, si: "Desinstalar",
       texto: "Se borra del iPhone junto con lo que guarda adentro. Si tiene datos que no están en la nube, se pierden. La puedes volver a bajar de la App Store." });
     if (si) { toast("Desinstalando {app}…", { valores: { app: nombre } }); host.enviar("iphoneDesinstalar", { id }); }
+  }
+  function sugerir() { if (!E.config.ia || E.sugiriendo) return; E.sugiriendo = true; pintar(); host.enviar("appsSugerir"); }
+  async function desinstalarElegidas() {
+    const porId = new Map(((E.apps && E.apps.apps) || []).map((x) => [x.id, x]));
+    const ids = [...E.elegidas].filter((id) => porId.has(id));
+    if (!ids.length) return;
+    const si = await ui.confirmar({ titulo: "¿Desinstalar {n} apps?", valores: { n: entero(ids.length) }, peligro: true, si: "Desinstalar",
+      texto: "Se borran del iPhone junto con lo que guardan adentro. Lo que no esté en la nube de cada app se pierde. Las puedes volver a bajar de la App Store." });
+    if (!si) return;
+    E.desinstalando = ids.slice();
+    pintar();
+    host.enviar("iphoneDesinstalar", { id: E.desinstalando[0] });   // de a una: el iPhone desinstala en orden
   }
   function abrirGrupo(k) {
     Object.assign(E, { grupo: k, items: [], totalGrupo: (E.grupos[k] || {}).n || 0, cargando: true });
@@ -457,16 +499,26 @@
     iphoneEstado(r) {
       E.buscando = false;
       if (r && r.ok && r.iphone) {
-        if (!E.iphone) host.enviar("iosRevisar");   // una vez por conexión: ¿hay una versión de iOS más nueva?
+        if (!E.iphone) {
+          host.enviar("iosRevisar");   // una vez por conexión: ¿hay una versión de iOS más nueva?
+          // Y las apps solas (tarda unos minutos): al terminar, tu IA sugiere cuáles podrían sobrar.
+          if (!E.apps && !E.revisandoApps) { E.revisandoApps = true; host.enviar("iphoneApps"); }
+        }
         E.iphone = r.iphone;
         E.sinIphone = false;
       }
       else { E.iphone = null; E.apps = null; E.sinIphone = r || {}; }
       pintar();
     },
+    appsSugeridas(r) {
+      E.sugiriendo = false;
+      if (r && r.ok) E.sugeridas = r.apps || [];
+      else toast(r && r.plantilla ? Tp(r.plantilla, r.valores || {}) : (r && r.error) || "No se pudo.", { error: true, traducido: !!(r && r.plantilla) });
+      pintar();
+    },
     iphoneApps(r) {
       E.revisandoApps = false;
-      if (r && r.ok) E.apps = { apps: r.apps || [], total: r.total || 0 };
+      if (r && r.ok) { E.apps = { apps: r.apps || [], total: r.total || 0 }; if (!E.sugeridas) sugerir(); }
       else toast((r && r.error) || "No pude revisar las apps.", { error: true });
       pintar();
     },
@@ -480,6 +532,16 @@
       pintar();
     },
     appDesinstalada(r) {
+      const enCola = E.desinstalando.length > 0;
+      if (enCola) {
+        E.desinstalando = E.desinstalando.filter((id) => id !== (r && r.id));
+        if (r && r.id) E.elegidas.delete(r.id);
+        if (r && r.ok && E.apps) { E.apps.apps = E.apps.apps.filter((x) => x.id !== r.id); E.apps.total = E.apps.apps.reduce((t, x) => t + x.tamano, 0); }
+        if (r && !r.ok) toast((r && r.error) || "No se pudo.", { error: true });
+        if (E.desinstalando.length) host.enviar("iphoneDesinstalar", { id: E.desinstalando[0] });
+        else { toast("Listo: se desinstalaron las apps elegidas."); host.enviar("iphoneEstado"); }
+        return pintar();
+      }
       if (r && r.ok) {
         const app = ((E.apps && E.apps.apps) || []).find((x) => x.id === r.id);
         if (E.apps) { E.apps.apps = E.apps.apps.filter((x) => x.id !== r.id); E.apps.total = E.apps.apps.reduce((t, x) => t + x.tamano, 0); }
@@ -601,6 +663,7 @@
       case "iphoneApps": return c.luego(600, () => c.responder("iphoneApps", { ok: true, apps: DEMO.apps,
         total: DEMO.apps.reduce((t, a) => t + a.tamano, 0) }));
       case "fotosResumen": return c.luego(400, () => c.responder("fotosResumen", DEMO.fotos));
+      case "appsSugerir": return c.luego(500, () => c.responder("appsSugeridas", { ok: true, apps: DEMO.sugeridas }));
       case "iosRevisar": return c.luego(200, () => c.responder("iosRevisado", DEMO.ios));
       case "planArmar": return c.luego(700, () => c.responder("planListo", { ok: true, plan: DEMO.plan }));
       case "iphoneDesinstalar": return c.luego(500, () => c.responder("appDesinstalada", { ok: true, id: d.id }));

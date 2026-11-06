@@ -1,6 +1,20 @@
 {
  "formato": 1,
  "acciones": {
+  "appsSugerir": {
+   "script": "plan.py",
+   "args": [
+    "sugerir"
+   ],
+   "entrada": "archivo",
+   "datos": {},
+   "inyectar": {
+    "idioma": "idiomaUI"
+   },
+   "responde": "appsSugeridas",
+   "limite": 300,
+   "pieza": "app"
+  },
   "iosRevisar": {
    "script": "plan.py",
    "args": [

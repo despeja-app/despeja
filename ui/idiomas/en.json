@@ -289,6 +289,18 @@
   "Van a «Eliminados recientemente» por 30 días: ahí todavía las puedes recuperar. iOS te va a preguntar una vez más.": "They go to “Recently Deleted” for 30 days: you can still recover them there. iOS will ask you once more.",
   "Borrar": "Delete",
   "Se borraron {n} ({b}). Están en «Eliminados recientemente».": "{n} were deleted ({b}). They're in “Recently Deleted”.",
-  "Ya estoy analizando.": "I'm already analyzing."
+  "Ya estoy analizando.": "I'm already analyzing.",
+  "{ia} está viendo qué apps podrían sobrar…": "{ia} is checking which apps you might not need…",
+  "¿Cuáles podrían sobrar?": "Which ones might I not need?",
+  "Tu IA no encontró apps que claramente sobren.": "Your AI didn't find apps that are clearly unnecessary.",
+  "Podrías no necesitar": "You might not need",
+  "Desinstalando… quedan {n}": "Uninstalling… {n} left",
+  "Desinstalar {n} ({b})": "Uninstall {n} ({b})",
+  "Elige las que quieras desinstalar": "Choose the ones you want to uninstall",
+  "iOS no le dice a nadie cuánto usas cada app: esto es una sugerencia de tu IA según el tipo de app. Para que iOS quite solo las que de verdad no usas (y guarde sus datos): Ajustes → App Store → Descargar apps sin usar.": "iOS doesn't tell anyone how much you use each app: this is your AI's suggestion based on the kind of app. To have iOS remove only the ones you really don't use (and keep their data): Settings → App Store → Offload Unused Apps.",
+  "¿Desinstalar {n} apps?": "Uninstall {n} apps?",
+  "Se borran del iPhone junto con lo que guardan adentro. Lo que no esté en la nube de cada app se pierde. Las puedes volver a bajar de la App Store.": "They're removed from the iPhone along with what they store inside. Anything not in each app's cloud is lost. You can download them again from the App Store.",
+  "Listo: se desinstalaron las apps elegidas.": "Done: the chosen apps were uninstalled.",
+  "Revisa las apps primero.": "Check the apps first."
  }
 }

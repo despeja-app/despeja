@@ -3,6 +3,7 @@
 
   plan.py ios <salida.json>                        → {ok, actual, ultima, hay}: ¿hay una versión de iOS más nueva para este iPhone?
   plan.py armar <entrada {idioma}> <salida.json>   → {ok, plan: {resumen, pasos: [...]}, catastro}
+  plan.py sugerir <entrada {idioma}> <salida.json> → {ok, apps: [{id, motivo}]}: las que la IA cree que podrían sobrar
 
 El catastro sale de lo que ya se revisó (catastro.json: espacio, apps) y de lo respaldado (respaldo/indice.json). A la IA va solo
 eso: tamaños y nombres de apps, nunca fotos, nombres de archivos ni nada del contenido. Su respuesta se valida antes de mostrarse:
@@ -134,5 +135,39 @@ def armar(d):
     return {"ok": True, "plan": plan, "catastro": c}
 
 
+SUGERIR = """Eres el asistente de Despeja. iOS no informa cuánto se usa cada app, así que no lo sabes: solo puedes juzgar por
+el tipo de app y su tamaño. De esta lista de apps instaladas en un iPhone con poco espacio, elige las que MUY probablemente no son
+necesarias para la mayoría de las personas o tienen alternativa en el navegador (máximo 8). Nunca sugieras: bancos, billeteras,
+pagos, salud, autenticación o claves, mensajería principal (WhatsApp, Mensajes), trabajo, ni apps del sistema.
+Responde SOLO con un JSON (sin texto antes ni después, sin ```), en {idioma}:
+{{"apps": [{{"app_id": "<id exacto de la lista>", "motivo": "<una frase corta: por qué podría sobrar>"}}]}}
+Apps (id, nombre, GB):
+{datos}"""
+
+
+def sugerir(d):
+    apps = iphone.leer_catastro().get("apps", [])
+    if not apps:
+        return {"ok": False, "codigo": "sin_apps", "error": "Revisa las apps primero."}
+    idioma = "inglés" if d.get("idioma") == "en" else "español de Chile neutro"
+    lista = [{"id": a["id"], "nombre": a["nombre"], "gb": round(a["tamano"] / 1e9, 2)} for a in apps[:80]]
+    texto, error = ia.preguntar(SUGERIR.format(idioma=idioma, datos=json.dumps(lista, ensure_ascii=False)), timeout=240)
+    if error:
+        return {"ok": False, "codigo": error.get("codigo"), "error": ia.frase(error), "plantilla": error.get("plantilla"), "valores": error.get("valores")}
+    m = re.search(r"\{.*\}", texto or "", re.S)
+    try:
+        r = json.loads(m.group(0)) if m else {}
+    except ValueError:
+        r = {}
+    ids = {a["id"] for a in lista}
+    salida, vistos = [], set()
+    for x in (r.get("apps") if isinstance(r, dict) and isinstance(r.get("apps"), list) else [])[:8]:
+        if isinstance(x, dict) and x.get("app_id") in ids and x["app_id"] not in vistos and isinstance(x.get("motivo"), str):
+            vistos.add(x["app_id"])
+            salida.append({"id": x["app_id"], "motivo": x["motivo"].strip()[:200]})
+    iphone.guardar_catastro({"sugeridas": salida})
+    return {"ok": True, "apps": salida}
+
+
 if __name__ == "__main__":
-    nucleo.script({"ios": ios, "armar": armar}, __doc__)
+    nucleo.script({"ios": ios, "armar": armar, "sugerir": sugerir}, __doc__)
