@@ -262,14 +262,14 @@
   {
    "archivo": "img/iphone.png",
    "alt": {
-    "es": "Despeja en el iPhone: respaldar en el Mac y el resumen de fotos",
-    "en": "Despeja on the iPhone: back up to the Mac and the photo summary"
+    "es": "Despeja en el iPhone: lo que puedes liberar, agrupado",
+    "en": "Despeja on the iPhone: what you can free up, grouped"
    },
    "ancho": 390,
    "alto": 844,
    "demo": "?idioma=es&iphone",
    "tocar": [
-    "#revisar-fotos"
+    "#analizar"
    ]
   }
  ],

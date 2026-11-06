@@ -12,6 +12,7 @@ Cómo se protege lo que viaja por el Wi-Fi:
   200.000 vueltas) con la que el Mac firma la huella de su certificado (así el iPhone sabe que habla con ESTE Mac y no con otro
   en la misma red) y el iPhone firma cada archivo que manda (así solo el iPhone con el código puede dejar algo en tu carpeta).
 - Cada archivo llega con su SHA-256: si lo que se escribió no calza, se descarta y el iPhone no lo marca como respaldado.
+`POST /resumen` (firmado): el resumen del análisis del iPhone (cuántas fotos y cuánto ocupa cada grupo) para el plan de tu IA.
 Eventos (DESPEJA_PROGRESO, una línea JSON cada uno): {"t": "esperando", "codigo"}, {"t": "conectado"}, {"t": "archivo", "n",
 "bytes"}, {"t": "fin", "motivo"}. Mientras corre, toca DESPEJA_LATIDO cada 5 s (pieza «trabajos»: si deja de latir, el host lo corta).
 """
@@ -113,6 +114,19 @@ class Sesion:
         return bool(x and x.get("destino") == self.destino and os.path.isfile(x.get("ruta", "")) and os.path.getsize(x["ruta"]) == x.get("bytes"))
 
 
+GRUPOS = ("repetidas", "parecidas", "capturas", "rafagas", "videosRepetidos", "borrosas", "utiles", "videos", "comprimir", "live")
+
+
+def guardar_resumen(d):
+    """El resumen del análisis del iPhone (cuántas y cuánto por grupo) queda en catastro.json para el plan de la IA. Solo números."""
+    import iphone
+    limpio = {}
+    for k, v in (d.get("grupos") or {}).items() if isinstance(d, dict) else []:
+        if k in GRUPOS and isinstance(v, dict):
+            limpio[k] = {c: int(v[c]) for c in ("n", "bytes", "marcadas", "bytesMarcadas") if isinstance(v.get(c), int) and not isinstance(v.get(c), bool) and 0 <= v[c] < 10 ** 14}
+    iphone.guardar_catastro({"fotos": limpio, "fotos_fecha": datetime.datetime.now().astimezone().isoformat(timespec="seconds")})
+
+
 def evento(**e):
     ruta = os.environ.get("DESPEJA_PROGRESO")
     if ruta:
@@ -203,6 +217,15 @@ def manejador(sesion, huella):
                     d = json.loads(crudo or b"{}")
                     ids = [i for i in d.get("ids", []) if isinstance(i, str)][:200000]
                     return self.responder(200, {"ok": True, "tiene": [i for i in ids if sesion.tiene(i)]})
+                if self.path == "/resumen":
+                    n = int(self.headers.get("Content-Length") or 0)
+                    if not 0 <= n <= 256 * 1024:
+                        return self.responder(400, {"ok": False, "codigo": "datos"})
+                    crudo = self.rfile.read(n)
+                    if not self.autorizado("resumen", hashlib.sha256(crudo).hexdigest()):
+                        return self.responder(403, {"ok": False, "codigo": "firma"})
+                    guardar_resumen(json.loads(crudo or b"{}"))
+                    return self.responder(200, {"ok": True})
                 if self.path == "/archivo":
                     return self.archivo()
                 if self.path == "/fin":

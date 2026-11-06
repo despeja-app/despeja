@@ -1,15 +1,12 @@
 // La app de iPhone de Despeja (pieza «host-ios»): las manos. La interfaz es la misma de ui/ (plataforma «movil»); aquí va lo
 // nativo: las fotos con PhotoKit. Nada sale del iPhone sin que la persona lo pida.
+import Photos
 import SwiftUI
 
 @main
 struct DespejaApp: App {
     init() {
         Host.arrancar(.init(sitio: "https://despeja-app.github.io/despeja/", codigo: "https://github.com/despeja-app/despeja")) { p in
-            // El permiso de Fotos se pide recién cuando la persona toca «Revisar mis fotos» (nunca al abrir).
-            p.registrar("fotosResumen") { _ in
-                Fotos.resumen { r in p.llamar("fotosResumen", r) }
-            }
             // Respaldo en el Mac (Respaldo.swift): buscar, conectar con el código, respaldar, detener y borrar lo verificado.
             let r = Respaldo.shared
             p.registrar("respaldoEstado") { _ in p.llamar("respaldoEstado", r.resumen()) }
@@ -30,6 +27,12 @@ struct DespejaApp: App {
             p.registrar("respaldoParar") { _ in r.pararRespaldo() }
             // Analizar y limpiar (Limpieza.swift): grupos con lo que se propone borrar, ver, marcar y borrar.
             let l = Limpieza.shared
+            p.registrar("limpiezaEstado") { _ in
+                // Pedir permiso de Fotos aquí no: solo se carga si ya lo dio antes
+                guard PHPhotoLibrary.authorizationStatus(for: .readWrite) == .authorized || PHPhotoLibrary.authorizationStatus(for: .readWrite) == .limited,
+                      let r = l.cargar() else { return }
+                p.llamar("analisisListo", r)
+            }
             p.registrar("analizar") { _ in
                 p.ocupar()
                 Task {

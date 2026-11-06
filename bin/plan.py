@@ -66,7 +66,10 @@ def catastro():
     gb = lambda b: round((b or 0) / 1e9, 2)
     salida = {"apps": [{"id": a["id"], "nombre": a["nombre"], "gb": gb(a["tamano"])} for a in c.get("apps", [])[:60]],
               "apps_revisadas": c.get("apps_revisadas"), "respaldado_gb": gb(respaldado()["bytes"]),
-              "ios_actual": c.get("ios_actual"), "ios_ultima": c.get("ios_ultima")}
+              "ios_actual": c.get("ios_actual"), "ios_ultima": c.get("ios_ultima"),
+              # Lo que el análisis del iPhone encontró (solo cuántas y cuántos GB por grupo); lo manda la app del iPhone al conectarse.
+              "fotos_analizadas": {k: {"n": v.get("n", 0), "gb": gb(v.get("bytes")), "gb_marcado": gb(v.get("bytesMarcadas"))}
+                                   for k, v in (c.get("fotos") or {}).items()}}
     if e.get("ok"):
         p = e["iphone"]
         salida.update({"capacidad_gb": gb(p["capacidad"]), "libre_gb": gb(p["libre"]), "ios_actual": p["ios"]})
@@ -85,6 +88,10 @@ Reglas:
   principal), y dilo como sugerencia: la persona decide. Recuerda que desinstalar borra los datos de esa app en el iPhone.
 - Si hay menos de 10% libre, lo primero es liberar espacio. Si hay una versión de iOS más nueva, di cuánto espacio libre conviene
   tener para instalarla (unos 6 GB) y el paso actualizar_ios.
+- fotos_analizadas (si viene) es lo que encontró el análisis en el iPhone: repetidas, parecidas, capturas, ráfagas,
+  videosRepetidos, borrosas, utiles (memes y documentos), videos (grandes), comprimir (gb = ahorro estimado comprimiendo) y live
+  (gb = ahorro quitando el video de las Live Photos). Úsalo para decir cuánto libera cada paso. El tipo de esos pasos es «otro» y
+  el título dice qué grupo revisar en la pestaña Limpiar de Despeja en el iPhone.
 - respaldar_fotos y borrar_respaldadas se hacen con la app de Despeja en el iPhone; whatsapp y eliminados_recientemente son pasos
   que la persona hace en su iPhone (Despeja la guía).
 Datos del iPhone (JSON):

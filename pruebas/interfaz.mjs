@@ -57,7 +57,7 @@ await page.click(".pieza-bv [data-bv-fin]:not([data-bv-fin=despues])");
 await page.waitForSelector("#iphone");
 
 // 2. El iPhone y sus apps de punta a punta (en la vista previa responde simular(), como lo haría la app).
-assert.match(await page.textContent("#iphone"), /1\.9 GB free/);
+assert.match(await page.textContent("#iphone"), /1\.9 GB\s+free of 64 GB/);
 assert.match(await page.textContent("#iphone"), /running low on space/);
 await page.click("#revisar-apps");
 await page.waitForSelector("#apps .apps li");
@@ -113,7 +113,7 @@ await page.waitForSelector("#sin-iphone #buscar");
 await capturar(page, "6-sin-iphone");
 
 // 5. La pantalla del iPhone (?iphone): buscar el Mac, código (uno malo y el bueno), respaldar, borrar; y fotos y videos.
-page = await abrir("?idioma=en&iphone", 390);
+page = await abrir("?idioma=en&iphone", 375);
 // Analizar: grupos con lo propuesto, abrir uno, desmarcar, ver en grande y borrar lo marcado.
 await page.click("#analizar");
 await page.waitForSelector("#limpiar .grupos li");
@@ -157,7 +157,8 @@ await page.click('.cuadros [data-video="k1"]');
 await page.click("#procesar-grupo");
 await page.click('[data-pz-confirmar="si"]');
 await page.waitForSelector("#limpiar .grupos");
-// Contactos y calendario.
+// Contactos y calendario (pestaña «Orden»).
+await page.click('[data-tab="orden"]');
 await page.click("#revisar-contactos");
 await page.waitForSelector("#juntar-contactos");
 await page.check("[data-incompleto]");
@@ -166,6 +167,7 @@ await page.click("#revisar-calendario");
 await page.waitForSelector("#borrar-calendario");
 await sinDesborde(page, "contactos y calendario a 390 px");
 await capturar(page, "6e-iphone-orden-en");
+await page.click('[data-tab="respaldo"]');
 await page.click("#buscar-mac");
 await page.click("[data-mac]");
 await page.fill("#codigo", "aaaa1111");
@@ -181,11 +183,7 @@ await page.click("#borrar-respaldadas");
 await page.click('[data-pz-confirmar="si"]');
 await page.waitForSelector("#liberar .hecho");
 await capturar(page, "7b-iphone-borrado-en");
-await page.click("#revisar-fotos");
-await page.waitForSelector(".resumen-fotos");
-assert.match(await page.textContent(".resumen-fotos"), /8,412/);
 await sinDesborde(page, "iPhone a 390 px");
-await capturar(page, "7-iphone-fotos-en");
 assert.deepEqual(await faltantes(page), [], "textos sin traducir en la pantalla del iPhone");
 
 await navegador.close();

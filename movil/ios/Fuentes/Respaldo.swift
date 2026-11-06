@@ -122,6 +122,7 @@ final class Respaldo: NSObject {
             clave = k
             huella = h
             macNombre = (j["nombre"] as? String).map { String($0.prefix(60)) }
+            await mandarResumen(servidor: url, clave: k)
             return ["ok": true, "mac": macNombre ?? mac]
         } catch {
             servidor = nil
@@ -215,6 +216,16 @@ final class Respaldo: NSObject {
             }
         }
         return nil
+    }
+
+    /// El resumen del análisis (solo cuántas y cuánto por grupo, nunca fotos ni nombres) va al Mac para que tu IA lo use en el plan.
+    private func mandarResumen(servidor: URL, clave: SymmetricKey) async {
+        let g = Limpieza.shared.resumen()
+        guard !g.isEmpty, let cuerpo = try? JSONSerialization.data(withJSONObject: ["grupos": g]) else { return }
+        var q = URLRequest(url: servidor.appendingPathComponent("resumen"))
+        q.httpMethod = "POST"
+        q.setValue(Respaldo.firma(clave, ["resumen", Respaldo.sha(cuerpo)]), forHTTPHeaderField: "X-Despeja-Firma")
+        _ = try? await sesion.upload(for: q, from: cuerpo)
     }
 
     private func terminarEnMac(servidor: URL, clave: SymmetricKey) async {

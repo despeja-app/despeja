@@ -1,107 +1,159 @@
-/* Despeja: lo propio de la interfaz. Los colores son los tokens de la pieza «tema» (tema.css: --fondo, --panel, --texto,
-   --texto-suave, --linea, --acento…); un color nuevo va como par --x-claro/--x-oscuro con light-dark(). Botones, diálogos y filas
-   son los de «componentes» (.pz-boton, .pz-principal, .pz-campo, .pz-pie…). Lo propio de Despeja va al final. */
+/* Despeja: lo propio de la interfaz. Los colores son los tokens de la pieza «tema» (tema.css); aquí van el acento y lo propio.
+   Idea: «despejado» como el cielo después de la lluvia. Un solo protagonista, la cifra de espacio (libre en el Mac, liberable en
+   el iPhone), en números redondeados; todo lo demás callado. En el iPhone: listas agrupadas como en Ajustes y tres pestañas abajo. */
+:root {
+  --acento-claro: #0b6e99;  --acento-oscuro: #63bde0;          /* cielo de cordillera */
+  --sobre-acento-claro: #ffffff; --sobre-acento-oscuro: #06202b;
+  --fondo-claro: #eef2f3;   --fondo-oscuro: #0d161b;
+  --panel-claro: #ffffff;   --panel-oscuro: #15212a;
+  --panel-2-claro: #e6ecee; --panel-2-oscuro: #1c2b35;
+  --linea-claro: #d6dee2;   --linea-oscuro: #263843;
+  --cifras: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, sans-serif;
+  --tabbar: calc(56px + env(safe-area-inset-bottom));
+}
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--fondo); color: var(--texto); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--fondo); color: var(--texto); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+  padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left); }
 @media (pointer: coarse), (max-width: 760px) { :root { --pz-boton-alto: var(--pz-tactil); --pz-chip-alto: var(--pz-tactil); } }
-.barra { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--linea); background: var(--panel); }
-.barra h1 { margin: 0; font-size: 18px; }
-.contenido { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
-.contenido h2 { margin: 0 0 4px; font-size: 20px; }
-.suave { color: var(--texto-suave); margin: 0 0 8px; }
-.resultado { margin-top: 16px; padding: 12px 14px; border-radius: var(--radio-chico, 8px); background: var(--panel-2); font-weight: 600; }
-.pantalla-idioma { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
-.pantalla-idioma > .pieza-bv { width: min(460px, 100%); padding: 24px; border: 1px solid var(--linea); border-radius: 12px; background: var(--panel); }
+:where(h1, h2, h3, p) { margin: 0; }
+.suave { color: var(--texto-suave); }
+.nota { margin-top: 10px; font-size: 13px; color: var(--texto-suave); }
+.error { margin-top: 8px; color: var(--rojo); }
 
-/* Despeja: tarjetas, espacio y listas. El acento es el de la pieza «tema». */
-body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
-.tarjeta { margin: 0 0 16px; padding: 18px; border: 1px solid var(--linea); border-radius: 14px; background: var(--panel); }
-.tarjeta h2 { margin: 0 0 8px; font-size: 18px; }
-.tarjeta.vacia { text-align: left; }
+/* Barra de arriba: en el iPhone, título grande al estilo iOS y respetando la muesca */
+.barra { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: calc(10px + env(safe-area-inset-top)) 16px 10px; background: color-mix(in srgb, var(--fondo) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px); }
+.barra h1 { font-size: 17px; font-weight: 650; }
+.iphone .barra h1 { font-size: 28px; font-weight: 700; letter-spacing: -.01em; }
+.iphone .barra { padding-top: calc(6px + env(safe-area-inset-top)); }
+.iphone .contenido.grupo .barra h1, .iphone .barra.chica h1 { font-size: 17px; }
+.pz-boton.pz-chico { min-height: 30px; padding: 3px 12px; font-size: 13px; }
+
+.contenido { max-width: 640px; margin: 0 auto; padding: 8px 16px 40px; display: grid; gap: 14px; }
+.contenido.con-tabs { padding-bottom: calc(var(--tabbar) + 24px); }
+.contenido.mac { max-width: 1080px; padding: 16px 24px 48px; }
+@media (min-width: 900px) { .contenido.mac { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; } }
+.columna { display: grid; gap: 14px; min-width: 0; }
+
+/* Tarjetas: una sola forma, sin sombras; la jerarquía la dan el tamaño y el aire */
+.tarjeta { padding: 16px; border-radius: 16px; background: var(--panel); border: 1px solid var(--linea); min-width: 0; }
+.tarjeta.sin-marco { padding: 0; background: none; border: 0; }
+.tarjeta h2 { font-size: 17px; font-weight: 650; margin-bottom: 8px; }
+.tarjeta > p + p, .tarjeta > p + .pz-pie, .tarjeta > .suave { margin-top: 6px; }
+h2.sub { font-size: 13px; font-weight: 600; color: var(--texto-suave); margin: 18px 4px 6px; }
+.pz-pie { margin-top: 12px; }
+.pz-pie.izquierda { justify-content: flex-start; flex-wrap: wrap; }
 .fila-titulo { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .chip { font-size: 13px; color: var(--texto-suave); }
-.espacio { height: 12px; border-radius: 6px; background: var(--panel-2); overflow: hidden; margin: 12px 0 8px; }
-.espacio > span { display: block; height: 100%; width: var(--medida); background: var(--acento); border-radius: 6px; }
 
-.cifras { margin: 0; font-variant-numeric: tabular-nums; }
-.aviso { margin: 10px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--panel-2); }
-.nota { margin: 12px 0 0; font-size: 13px; color: var(--texto-suave); }
-.pasos { margin: 8px 0; padding-left: 20px; }
-.apps { list-style: none; margin: 12px 0 0; padding: 0; }
-.apps li { display: grid; grid-template-columns: minmax(0, 1fr) 30% auto; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid var(--linea); }
-.apps .nombre { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.apps .medida { height: 6px; border-radius: 3px; background: linear-gradient(to right, var(--acento) var(--medida), transparent var(--medida)); }
-.apps .tam { font-variant-numeric: tabular-nums; color: var(--texto-suave); font-size: 14px; }
-.resumen-fotos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 8px 0 0; }
-.resumen-fotos div { padding: 12px; border-radius: 10px; background: var(--panel-2); }
-.resumen-fotos dt { font-size: 13px; color: var(--texto-suave); }
-.resumen-fotos dd { margin: 2px 0 0; font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
-
-/* Plan, respaldo y liberar espacio */
-.pz-boton.pz-chico { padding: 2px 10px; min-height: 28px; font-size: 13px; }
-.apps li { grid-template-columns: minmax(0, 1fr) 24% auto auto; }
-.apps .quitar { opacity: 0; transition: opacity .15s; }
-.apps li:hover .quitar, .apps .quitar:focus-visible { opacity: 1; }
-@media (pointer: coarse) { .apps .quitar { opacity: 1; } }
-.plan { margin: 12px 0 0; padding-left: 22px; }
-.plan li { margin: 0 0 14px; }
-.plan .paso-titulo { display: flex; gap: 8px; align-items: baseline; justify-content: space-between; flex-wrap: wrap; }
-.plan p { margin: 4px 0 6px; }
-.guia { margin: 6px 0 0; padding: 8px 10px; border-left: 3px solid var(--acento); background: var(--panel-2); border-radius: 6px; font-size: 14px; }
-.codigo { margin: 14px 0; font: 600 34px/1.2 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: .12em; text-align: center; }
-.codigo-campo { font: 600 22px/1.2 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: .1em; text-transform: uppercase; }
-.destino { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
-.hecho { margin: 10px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--panel-2); font-weight: 600; }
-.error { color: var(--rojo); margin: 8px 0 0; }
-.lista-macs { display: grid; gap: 8px; margin-top: 8px; }
+/* El protagonista: la cifra */
+.cifras { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.cifra-grande { font: 700 40px/1.05 var(--cifras); letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.cifra-grande.poca { color: var(--rojo); }
+.heroe { display: grid; gap: 2px; padding: 8px 4px 4px; }
+.heroe-cifra { font: 700 44px/1.05 var(--cifras); letter-spacing: -.02em; color: var(--verde); font-variant-numeric: tabular-nums; }
+.heroe-texto { color: var(--texto-suave); }
+.espacio { height: 10px; border-radius: 5px; background: var(--panel-2); overflow: hidden; margin: 12px 0 4px; }
+.espacio > span { display: block; height: 100%; width: var(--medida); background: var(--acento); border-radius: 5px; transition: width .3s; }
 .espacio.poco > span { background: var(--rojo); }
+.aviso { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: var(--panel-2); font-size: 14px; }
+.hecho { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: var(--verde-suave); color: var(--texto); font-weight: 600; }
+.pasos { margin: 8px 0 0; padding-left: 20px; }
+.pasos li + li { margin-top: 4px; }
 
-/* Limpiar: grupos y cuadrícula para elegir */
-.grupos { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
-.fila-grupo { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; text-align: left; padding: 12px 14px;
-  border: 1px solid var(--linea); border-radius: 12px; background: var(--fondo); color: var(--texto); font: inherit; cursor: pointer; }
-.fila-grupo:hover { border-color: var(--acento); }
-.fila-grupo:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+/* Listas agrupadas (grupos de limpieza), como Ajustes del iPhone */
+.grupos { list-style: none; margin: 0; padding: 0; border-radius: 14px; overflow: hidden; background: var(--panel); border: 1px solid var(--linea); }
+.grupos li + li { border-top: 1px solid var(--linea); }
+.fila-grupo { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto 12px; column-gap: 10px; align-items: center; text-align: left;
+  padding: 12px 14px; border: 0; background: none; color: var(--texto); font: inherit; cursor: pointer; min-height: 60px; }
+.fila-grupo:hover { background: var(--hover); }
+.fila-grupo:focus-visible { outline: 2px solid var(--acento); outline-offset: -2px; }
 .g-titulo { font-weight: 600; }
-.g-cifras { color: var(--texto-suave); font-variant-numeric: tabular-nums; text-align: right; }
-.g-propuesta { grid-column: 1 / -1; color: var(--acento); font-size: 14px; }
-.contenido.grupo { padding-bottom: 96px; }
-.pz-pie.izquierda { justify-content: flex-start; }
-.cuadros { list-style: none; margin: 12px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; }
-.cuadro { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: var(--panel-2); }
+.g-cifras { color: var(--texto-suave); font-variant-numeric: tabular-nums; font-size: 14px; }
+.g-flecha { width: 8px; height: 8px; border: solid var(--tenue); border-width: 2px 2px 0 0; transform: rotate(45deg); grid-row: 1 / 3; grid-column: 3; }
+.g-propuesta { grid-column: 1 / 3; color: var(--acento); font-size: 14px; }
+
+/* Cuadrícula para elegir */
+.contenido.grupo { padding-bottom: calc(96px + env(safe-area-inset-bottom)); }
+.cuadros { list-style: none; margin: 4px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 3px; }
+@media (max-width: 420px) { .cuadros { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.cuadro { position: relative; aspect-ratio: 1; overflow: hidden; background: var(--panel-2); }
 .cuadro-elegir { all: unset; display: block; width: 100%; height: 100%; cursor: pointer; }
 .cuadro-elegir:focus-visible { outline: 3px solid var(--acento); outline-offset: -3px; }
 .cuadro img, .cuadro .sin-img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.cuadro.marcada img { opacity: .55; }
+.cuadro.marcada img { opacity: .5; }
 .cuadro .check { position: absolute; right: 6px; bottom: 6px; width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff; background: rgba(0,0,0,.25); }
-.cuadro.marcada .check { background: var(--rojo); border-color: #fff; }
+.cuadro.marcada .check { background: var(--rojo); }
 .cuadro.marcada .check::after { content: ""; position: absolute; left: 6px; top: 2px; width: 6px; height: 11px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
 .cuadro .etiqueta { position: absolute; left: 6px; bottom: 6px; padding: 1px 6px; border-radius: 6px; background: rgba(0,0,0,.6); color: #fff; font-size: 12px; }
-.cuadro .etiqueta.queda { top: 6px; bottom: auto; background: var(--acento); color: var(--sobre-acento, #fff); }
-.cuadro-ver { position: absolute; top: 4px; right: 4px; width: 28px; height: 28px; border: 0; border-radius: 50%; background: rgba(0,0,0,.45); color: #fff; font-size: 15px; cursor: pointer; }
-.barra-borrar { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: var(--panel); border-top: 1px solid var(--linea); display: flex; justify-content: center; }
-.barra-borrar .pz-boton { width: min(520px, 100%); }
-img.grande { display: block; max-width: 100%; max-height: 70vh; margin: 0 auto; border-radius: 8px; }
-.sugeridas { margin: 12px 0 16px; padding: 12px 14px; border-radius: 12px; background: var(--panel-2); }
+.cuadro .etiqueta.queda { top: 6px; bottom: auto; background: var(--acento); color: var(--sobre-acento); }
+.cuadro-ver { position: absolute; top: 4px; right: 4px; width: 30px; height: 30px; border: 0; border-radius: 50%; background: rgba(0,0,0,.45); color: #fff; font-size: 14px; cursor: pointer; }
+.barra-borrar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--panel) 92%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--linea); display: flex; justify-content: center; }
+.barra-borrar .pz-boton { width: min(520px, 100%); min-height: 48px; font-size: 16px; }
+.procesando { width: min(520px, 100%); }
+.procesando p { margin: 4px 0 8px; font-size: 14px; }
+img.grande { display: block; max-width: 100%; max-height: 70vh; margin: 0 auto; border-radius: 10px; }
+
+/* Uno por uno */
+.contenido.uno { justify-items: center; }
+.tarjeta-uno { position: relative; width: min(520px, 100%); border-radius: 16px; overflow: hidden; background: #000; touch-action: pan-y; user-select: none; }
+.tarjeta-uno img { display: block; width: 100%; max-height: min(58vh, 520px); object-fit: contain; pointer-events: none; }
+.tarjeta-uno.marcada { outline: 3px solid var(--rojo); outline-offset: -3px; }
+.tarjeta-uno .estado { position: absolute; left: 10px; bottom: 10px; padding: 3px 10px; border-radius: 8px; background: rgba(0,0,0,.65); color: #fff; font-size: 14px; }
+.tarjeta-uno .etiqueta.queda { position: absolute; left: 10px; top: 10px; padding: 3px 10px; border-radius: 8px; background: var(--acento); color: var(--sobre-acento); font-size: 13px; }
+.tarjeta-uno .play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 72px; height: 72px; border: 0; border-radius: 50%;
+  background: rgba(0,0,0,.6); color: #fff; font-size: 28px; padding-left: 6px; cursor: pointer; }
+.botones-uno { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: min(520px, 100%); }
+.botones-uno .pz-boton { min-height: 52px; font-size: 16px; }
+
+/* Pestañas del iPhone */
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: grid; grid-template-columns: repeat(3, 1fr);
+  padding: 4px 8px env(safe-area-inset-bottom); background: color-mix(in srgb, var(--panel) 92%, transparent);
+  backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px); border-top: 1px solid var(--linea); }
+.tabbar button { display: grid; justify-items: center; gap: 2px; padding: 6px 0 4px; border: 0; background: none; color: var(--texto-suave); font: 500 11px/1.2 system-ui, sans-serif; cursor: pointer; min-height: 50px; }
+.tabbar button[aria-current="page"] { color: var(--acento); }
+.tabbar button:focus-visible { outline: 2px solid var(--acento); outline-offset: -4px; border-radius: 10px; }
+.tab-icono { width: 24px; height: 24px; background: currentColor; -webkit-mask: var(--icono) center / contain no-repeat; mask: var(--icono) center / contain no-repeat; }
+.tab-limpiar { --icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3l1.8 4.6L18 9l-4.2 1.4L12 15l-1.8-4.6L6 9l4.2-1.4z'/%3E%3Cpath d='M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z'/%3E%3C/svg%3E"); }
+.tab-respaldo { --icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='12' rx='2'/%3E%3Cpath d='M8 20h8M12 16v4M12 7v5M9.5 9.5L12 7l2.5 2.5'/%3E%3C/svg%3E"); }
+.tab-orden { --icono: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='8' r='3.5'/%3E%3Cpath d='M3 20c.8-3.5 3.2-5.5 6-5.5s5.2 2 6 5.5M16 6h5M16 10h5M18 14h3'/%3E%3C/svg%3E"); }
+
+/* Mac: apps, plan, respaldo */
+.apps { list-style: none; margin: 10px 0 0; padding: 0; }
+.apps li { display: grid; grid-template-columns: minmax(0, 1fr) 22% auto auto; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid var(--linea); }
+.apps .nombre { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.apps .medida { height: 6px; border-radius: 3px; background: linear-gradient(to right, var(--acento) var(--medida), var(--panel-2) var(--medida)); }
+.apps .tam { font-variant-numeric: tabular-nums; color: var(--texto-suave); font-size: 14px; min-width: 56px; text-align: right; }
+.apps .quitar { opacity: 0; transition: opacity .15s; }
+.apps li:hover .quitar, .apps .quitar:focus-visible { opacity: 1; }
+@media (pointer: coarse) { .apps .quitar { opacity: 1; } }
+.sugeridas { margin: 4px 0 14px; padding: 12px 14px; border-radius: 12px; background: var(--panel-2); }
 .sugeridas h3 { margin: 0 0 6px; font-size: 15px; }
 .sugeridas ul { list-style: none; margin: 0; padding: 0; }
 .sugeridas li label { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 8px 0; cursor: pointer; }
-.sugeridas input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--acento); }
+.sugeridas input, .lista-chica input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--acento); }
+.plan { margin: 10px 0 0; padding-left: 22px; }
+.plan li { margin: 0 0 14px; }
+.plan .paso-titulo { display: flex; gap: 8px; align-items: baseline; justify-content: space-between; flex-wrap: wrap; }
+.plan p { margin: 4px 0 6px; }
+.guia { margin-top: 6px; padding: 8px 10px; border-left: 3px solid var(--acento); background: var(--panel-2); border-radius: 6px; font-size: 14px; }
+.codigo { margin: 16px 0; font: 700 38px/1.1 var(--cifras); letter-spacing: .1em; text-align: center; font-variant-numeric: tabular-nums; }
+.codigo-campo { font: 700 24px/1.2 var(--cifras); letter-spacing: .1em; text-transform: uppercase; text-align: center; }
+.destino { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
+.lista-macs { display: grid; gap: 8px; margin-top: 8px; }
+.lista-chica { list-style: none; margin: 6px 0 8px; padding: 0; font-size: 14px; }
+.lista-chica li { padding: 6px 0; border-top: 1px solid var(--linea); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lista-chica label { display: flex; gap: 10px; align-items: center; cursor: pointer; }
+.resumen-fotos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 8px 0 0; }
+.resumen-fotos div { padding: 12px; border-radius: 12px; background: var(--panel-2); }
+.resumen-fotos dt { font-size: 13px; color: var(--texto-suave); }
+.resumen-fotos dd { margin: 2px 0 0; font: 700 24px/1.1 var(--cifras); font-variant-numeric: tabular-nums; }
 
-/* Ahorrar sin borrar, uno por uno, contactos y calendario */
-h3.sub { margin: 16px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--texto-suave); }
-.lista-chica { list-style: none; margin: 4px 0 8px; padding: 0; font-size: 14px; }
-.lista-chica li { padding: 4px 0; border-top: 1px solid var(--linea); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.lista-chica label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
-.procesando { width: min(520px, 100%); }
-.procesando p { margin: 4px 0 8px; font-size: 14px; }
-.contenido.uno { display: grid; gap: 12px; justify-items: center; }
-.tarjeta-uno { position: relative; width: min(520px, 100%); border-radius: 14px; overflow: hidden; background: var(--panel-2); touch-action: pan-y; user-select: none; }
-.tarjeta-uno img { display: block; width: 100%; max-height: 62vh; object-fit: contain; background: #000; pointer-events: none; }
-.tarjeta-uno.marcada { outline: 3px solid var(--rojo); }
-.tarjeta-uno .estado { position: absolute; left: 10px; bottom: 10px; padding: 3px 10px; border-radius: 8px; background: rgba(0,0,0,.65); color: #fff; font-size: 14px; }
-.tarjeta-uno .etiqueta.queda { position: absolute; left: 10px; top: 10px; padding: 3px 10px; border-radius: 8px; background: var(--acento); color: var(--sobre-acento, #fff); font-size: 13px; }
-.botones-uno { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: min(520px, 100%); }
-.tarjeta-uno .play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 72px; height: 72px; border: 0; border-radius: 50%;
-  background: rgba(0,0,0,.6); color: #fff; font-size: 28px; padding-left: 6px; cursor: pointer; }
-.tarjeta-uno .play:focus-visible { outline: 3px solid #fff; }
+/* Primer uso: el idioma, solo */
+.pantalla-idioma { min-height: 100vh; display: grid; place-items: center; padding: calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); }
+.pantalla-idioma > .pieza-bv { width: min(460px, 100%); padding: 24px; border: 1px solid var(--linea); border-radius: 16px; background: var(--panel); }
+@media (prefers-reduced-motion: reduce) { .espacio > span { transition: none; } }

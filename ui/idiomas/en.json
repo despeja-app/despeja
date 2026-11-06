@@ -372,6 +372,13 @@
   "Ver el video": "Play the video",
   "Abriendo el video…": "Opening the video…",
   "Los videos se ven en el iPhone.": "Videos play on the iPhone.",
-  "No pude abrir ese video.": "I couldn't open that video."
+  "No pude abrir ese video.": "I couldn't open that video.",
+  "Secciones": "Sections",
+  "Limpiar": "Clean up",
+  "Respaldo": "Backup",
+  "Orden": "Tidy",
+  "puedes liberar con lo que está marcado": "you can free up with what's selected",
+  "libres de {t} GB": "free of {t} GB",
+  "Análisis del {f}": "Analyzed on {f}"
  }
 }

@@ -23,9 +23,11 @@
     sugeridas: null, sugiriendo: false, elegidas: new Set(), desinstalando: [],
     analizando: false, analisisAvance: null, grupos: null, grupo: null, items: [], totalGrupo: 0, cargando: false,
     grande: null, borrandoGrupo: false, procesando: null, uno: null,
+    tab: "limpiar",   // iPhone: limpiar | respaldo | orden
     contactos: null, revisandoContactos: false, incompletosElegidos: new Set(), calendario: null, revisandoCalendario: false };
   // ?iphone en la vista previa muestra la pantalla del iPhone.
   const enIphone = host.plataforma === "movil" || (host.plataforma === "web" && new URLSearchParams(location.search).has("iphone"));
+  if (enIphone) document.documentElement.classList.add("iphone");
   const raiz = document.getElementById("app");
   const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => "&#" + c.charCodeAt(0) + ";");
 
@@ -73,8 +75,12 @@
   const gb = (b) => new Intl.NumberFormat(i18n.idioma, { maximumFractionDigits: (b || 0) >= 1e10 ? 0 : 1 }).format((b || 0) / 1e9);
   const tamano = (b) => (b || 0) >= 1e9 ? Tp("{n} GB", { n: gb(b) }) : Tp("{n} MB", { n: new Intl.NumberFormat(i18n.idioma, { maximumFractionDigits: 0 }).format((b || 0) / 1e6) });
   const entero = (n) => new Intl.NumberFormat(i18n.idioma).format(n || 0);
-  const barra = (titulo) => `<header class="barra"><h1 data-sin-traducir>${esc(NOMBRE)}</h1>${titulo || ""}
-      <button type="button" class="pz-boton" id="abrir-ajustes">Ajustes</button></header>`;
+  const barra = (titulo) => `<header class="barra"><h1 data-sin-traducir>${esc(titulo || NOMBRE)}</h1>
+      <button type="button" class="pz-boton pz-chico boton-ajustes" id="abrir-ajustes">Ajustes</button></header>`;
+  // iPhone: tres pestañas abajo, al alcance del pulgar
+  const TABS = [["limpiar", "Limpiar"], ["respaldo", "Respaldo"], ["orden", "Orden"]];
+  const tabbar = () => `<nav class="tabbar" aria-label="${esc(Tp("Secciones"))}" data-sin-traducir>${TABS.map(([k, t]) =>
+    `<button type="button" data-tab="${k}" aria-current="${E.tab === k ? "page" : "false"}"><span class="tab-icono tab-${k}" aria-hidden="true"></span>${esc(Tp(t))}</button>`).join("")}</nav>`;
 
   function tarjetaIphone() {
     const p = E.iphone;
@@ -91,9 +97,11 @@
     return `<section class="tarjeta" id="iphone">
       <div class="fila-titulo"><h2 data-sin-traducir>${esc(p.nombre)}</h2>
         <span class="chip" data-sin-traducir>${esc(Tp(p.conexion === "usb" ? "iOS {v} · por cable" : "iOS {v} · por Wi-Fi", { v: p.ios }))}</span></div>
+      <p class="cifras" data-sin-traducir><span class="cifra-grande${poco ? " poca" : ""}">${esc(Tp("{n} GB", { n: gb(p.libre) }))}</span>
+        <span>${esc(Tp("libres de {t} GB", { t: gb(p.capacidad) }))}</span></p>
       <div class="espacio${poco ? " poco" : ""}" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"
         aria-label="${esc(Tp("Espacio usado"))}" data-sin-traducir><span data-medida="${pct}"></span></div>
-      <p class="cifras" data-sin-traducir><b>${esc(Tp("{n} GB libres", { n: gb(p.libre) }))}</b> · ${esc(Tp("{u} GB usados de {t} GB", { u: gb(usado), t: gb(p.capacidad) }))}</p>
+
       ${poco ? `<p class="aviso">Te queda poco espacio: iOS necesita espacio libre para actualizarse y funcionar bien.</p>` : ""}
       ${E.ios && E.ios.hay ? `<p class="aviso" id="ios-nuevo" data-sin-traducir>${esc(Tp(p.libre < 6e9
         ? "Hay una versión nueva: iOS {v}. Para instalarla conviene tener unos 6 GB libres; tu plan te dice de dónde sacarlos."
@@ -144,24 +152,7 @@
       <p class="nota">iOS no le dice a nadie cuánto usas cada app: esto es una sugerencia de tu IA según el tipo de app. Para que iOS quite solo las que de verdad no usas (y guarde sus datos): Ajustes → App Store → Descargar apps sin usar.</p></div>`;
   }
 
-  function tarjetaFotos() {
-    const f = E.fotos;
-    let cuerpo;
-    if (E.revisandoFotos) cuerpo = `<p class="suave" aria-busy="true">Contando tus fotos y videos…</p>`;
-    else if (f && !f.ok) cuerpo = `<p data-sin-traducir>${esc(Tp(f.error || "No pude revisar tus fotos."))}</p>
-      ${f.codigo === "sin_permiso" ? `<p class="suave">Ábrelo en Ajustes del iPhone → Despeja → Fotos → «Acceso completo».</p>` : ""}
-      <div class="pz-pie"><button type="button" class="pz-boton pz-principal" id="revisar-fotos">Intentar de nuevo</button></div>`;
-    else if (!f) cuerpo = `<p class="suave">Mira cuántas fotos, videos y capturas tienes y cuánto ocupan. Te pediremos permiso para ver tus fotos; este resumen no sale del iPhone.</p>
-      <div class="pz-pie"><button type="button" class="pz-boton pz-principal" id="revisar-fotos">Revisar mis fotos</button></div>`;
-    else cuerpo = `<dl class="resumen-fotos" data-sin-traducir>
-        <div><dt>${esc(Tp("Fotos"))}</dt><dd>${esc(entero(f.fotos))}</dd></div>
-        <div><dt>${esc(Tp("Videos"))}</dt><dd>${esc(entero(f.videos))}</dd></div>
-        <div><dt>${esc(Tp("Capturas de pantalla"))}</dt><dd>${esc(entero(f.capturas))}</dd></div>
-        <div><dt>${esc(Tp("Ocupan"))}</dt><dd>${esc(tamano(f.tamano))}</dd></div></dl>
-      ${f.soloEnIcloud ? `<p class="nota" data-sin-traducir>${esc(Tp("{n} están solo en iCloud (en el iPhone queda una versión liviana).", { n: entero(f.soloEnIcloud) }))}</p>` : ""}
-      <div class="pz-pie"><button type="button" class="pz-boton" id="revisar-fotos">Revisar de nuevo</button></div>`;
-    return `<section class="tarjeta" id="fotos"><h2>Fotos y videos</h2>${cuerpo}</section>`;
-  }
+
 
   // Lo que hace cada paso del plan cuando no lo puede hacer la app sola: dónde está, en palabras de la persona.
   const GUIAS = {
@@ -296,6 +287,7 @@
         return `<li><button type="button" class="fila-grupo" data-grupo="${k}">
           <span class="g-titulo">${esc(titulo)}</span>
           <span class="g-cifras" data-sin-traducir>${esc(ahorro ? entero(g.n) : Tp("{n} · {b}", { n: entero(g.n), b: tamano(g.bytes) }))}</span>
+          <span class="g-flecha" aria-hidden="true"></span>
           <span class="g-propuesta" data-sin-traducir>${g.marcadas ? esc(Tp(ahorro ? "Ahorra ~{b} con {m}" : "Borrar {m} libera {b}", { m: entero(g.marcadas), b: tamano(g.bytesMarcadas) })) : esc(Tp("Revisar"))}</span>
         </button></li>`;
       };
@@ -304,14 +296,16 @@
       const filasAhorro = AHORRO.filter(hay).map(fila).join("");
       const libera = Object.values(E.grupos).reduce((t, g) => t + (g.bytesMarcadas || 0), 0);
       cuerpo = filas || filasAhorro
-        ? `<p data-sin-traducir><b>${esc(Tp("Puedes liberar {b}", { b: tamano(libera) }))}</b> ${esc(Tp("con lo que está marcado."))}</p>
-           ${filas ? `<h3 class="sub">Para borrar</h3><ul class="grupos">${filas}</ul>` : ""}
-           ${filasAhorro ? `<h3 class="sub">Ahorrar sin borrar</h3><ul class="grupos">${filasAhorro}</ul>` : ""}
+        ? `<div class="heroe" data-sin-traducir><span class="heroe-cifra">${esc(tamano(libera))}</span>
+             <span class="heroe-texto">${esc(Tp("puedes liberar con lo que está marcado"))}</span>
+             ${E.fechaAnalisis ? `<span class="nota">${esc(Tp("Análisis del {f}", { f: new Date(E.fechaAnalisis).toLocaleDateString(i18n.idioma, { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }) }))}</span>` : ""}</div>
+           ${filas ? `<h2 class="sub">Para borrar</h2><ul class="grupos">${filas}</ul>` : ""}
+           ${filasAhorro ? `<h2 class="sub">Ahorrar sin borrar</h2><ul class="grupos">${filasAhorro}</ul>` : ""}
            <div class="pz-pie"><button type="button" class="pz-boton" id="analizar">Analizar de nuevo</button></div>`
         : `<p class="hecho">No encontré nada que sobre. Tu biblioteca está ordenada.</p>
            <div class="pz-pie"><button type="button" class="pz-boton" id="analizar">Analizar de nuevo</button></div>`;
     }
-    return `<section class="tarjeta" id="limpiar"><h2>Limpiar fotos y videos</h2>${cuerpo}</section>`;
+    return `<section class="tarjeta sin-marco" id="limpiar">${cuerpo}</section>`;
   }
 
   function vistaGrupo() {
@@ -328,7 +322,7 @@
           <span class="check" aria-hidden="true"></span></button>
         ${x.video ? `<button type="button" class="cuadro-ver" data-video="${esc(x.id)}" aria-label="${esc(Tp("Ver el video"))}" data-sin-traducir>▶</button>`
           : `<button type="button" class="cuadro-ver" data-ver="${esc(x.id)}" aria-label="${esc(Tp("Ver en grande"))}" data-sin-traducir>⤢</button>`}</li>`).join("");
-    return `<header class="barra"><button type="button" class="pz-boton" id="volver" data-sin-traducir>‹ ${esc(Tp("Volver"))}</button>
+    return `<header class="barra chica"><button type="button" class="pz-boton pz-chico" id="volver" data-sin-traducir>‹ ${esc(Tp("Volver"))}</button>
         <h1 data-sin-traducir>${esc(Tp(def[1]))}</h1><span></span></header>
       <main class="contenido grupo">
         <p class="suave">${esc(def[2])}</p>
@@ -357,7 +351,7 @@
     const x = E.items[E.uno];
     const img = E.grande && E.grande.id === x.id && E.grande.img ? E.grande.img : x.img;
     const ahorro = esAhorro(E.grupo);
-    return `<header class="barra"><button type="button" class="pz-boton" id="uno-salir" data-sin-traducir>‹ ${esc(Tp("Cuadrícula"))}</button>
+    return `<header class="barra chica"><button type="button" class="pz-boton pz-chico" id="uno-salir" data-sin-traducir>‹ ${esc(Tp("Cuadrícula"))}</button>
         <h1 data-sin-traducir>${esc(Tp("{i} de {t}", { i: entero(E.uno + 1), t: entero(E.totalGrupo) }))}</h1><span></span></header>
       <main class="contenido uno">
         <div class="tarjeta-uno${x.marcada ? " marcada" : ""}" id="tarjeta-uno" data-sin-traducir>
@@ -430,15 +424,20 @@
          <div class="pz-pie izquierda"><button type="button" class="pz-boton pz-peligro" id="borrar-calendario">Borrar eventos viejos</button></div>
          <p class="nota">Ordena tu calendario; casi no libera espacio. Nunca toca calendarios suscritos ni cumpleaños.</p>`
       : `<p class="suave">No hay eventos viejos para borrar.</p>`;
-    return `<section class="tarjeta" id="orden"><h2>Contactos y calendario</h2><h3 class="sub">Contactos</h3>${contactos}<h3 class="sub">Calendario</h3>${calendario}</section>`;
+    return `<section class="tarjeta" id="orden"><h2>Contactos</h2>${contactos}</section><section class="tarjeta" id="calendario"><h2>Calendario</h2>${calendario}</section>`;
   }
 
   const duracion = (s) => `${Math.floor((s || 0) / 60)}:${String((s || 0) % 60).padStart(2, "0")}`;
 
   function principal() {
     if (enIphone && E.grupo) return vistaGrupo();
-    if (enIphone) return barra() + `<main class="contenido">${tarjetaLimpiar()}${tarjetaEnviar()}${tarjetaLiberar()}${tarjetaOrden()}${tarjetaFotos()}</main>`;
-    return barra() + `<main class="contenido">${tarjetaIphone()}${tarjetaPlan()}${tarjetaRecibir()}${tarjetaApps()}</main>`;
+    if (enIphone) {
+      const titulo = Tp((TABS.find(([k]) => k === E.tab) || TABS[0])[1]);
+      const cuerpo = E.tab === "respaldo" ? tarjetaEnviar() + tarjetaLiberar() : E.tab === "orden" ? tarjetaOrden() : tarjetaLimpiar();
+      return barra(titulo) + `<main class="contenido con-tabs">${cuerpo}</main>` + tabbar();
+    }
+    return barra() + `<main class="contenido mac"><div class="columna">${tarjetaIphone()}${tarjetaPlan()}</div>
+      <div class="columna">${tarjetaRecibir()}${tarjetaApps()}</div></main>`;
   }
   function ajustes() {
     const idiomas = [["es", "Español"], ["en", "English"]].map(([c, n]) =>
@@ -473,6 +472,7 @@
     const b = ev.target.closest("button");
     if (!b) return;
     if (b.id === "abrir-ajustes") { E.ajustes = true; pintar(); }
+    else if (b.dataset.tab) { E.tab = b.dataset.tab; pintar(); window.scrollTo(0, 0); }
     else if (b.dataset.idioma) {
       E.config.idioma_ui = b.dataset.idioma;
       host.enviar("config", { idioma_ui: b.dataset.idioma });
@@ -481,7 +481,6 @@
     } else if (b.id === "buscar") buscarIphone();
     else if (b.id === "revisar-apps") { E.revisandoApps = true; pintar(); host.enviar("iphoneApps"); }
     else if (b.id === "todas-apps") { E.todasLasApps = !E.todasLasApps; pintar(); }
-    else if (b.id === "revisar-fotos") { E.revisandoFotos = true; pintar(); host.enviar("fotosResumen"); }
     // Mac: plan, desinstalar, respaldo
     else if (b.id === "armar-plan") { E.armando = true; E.planError = null; pintar(); host.enviar("planArmar"); }
     else if (b.dataset.desinstalar) desinstalar(b.dataset.desinstalar);
@@ -645,7 +644,7 @@
       if (!E.iniciada) {
         E.iniciada = true;
         bv.abrir({ config: E.config, forzar: new URLSearchParams(location.search).has("bienvenida") });
-        if (!enIphone) { host.enviar("listaIA"); buscarIphone(); } else host.enviar("respaldoEstado");
+        if (!enIphone) { host.enviar("listaIA"); buscarIphone(); } else { host.enviar("respaldoEstado"); host.enviar("limpiezaEstado"); }
       }
       pintar();
     },
@@ -675,7 +674,6 @@
       else toast((r && r.error) || "No pude revisar las apps.", { error: true });
       pintar();
     },
-    fotosResumen(r) { E.revisandoFotos = false; E.fotos = r || { ok: false }; pintar(); },
     // Mac
     iosRevisado(r) { if (r && r.ok) { E.ios = r; pintar(); } },
     planListo(r) {
@@ -726,7 +724,7 @@
     analisisAvance(a) { E.analisisAvance = a; pintar(); },
     analisisListo(r) {
       E.analizando = false;
-      if (r && r.ok) E.grupos = r.grupos || {};
+      if (r && r.ok) { E.grupos = r.grupos || {}; E.fechaAnalisis = r.fecha || ""; }
       else toast((r && r.error) || "No se pudo.", { error: true });
       pintar();
     },
@@ -849,7 +847,6 @@
         : { ok: false, codigo: "sin_iphone", error: "No veo ningún iPhone. Conéctalo por cable o ponlo en la misma red Wi-Fi." }));
       case "iphoneApps": return c.luego(600, () => c.responder("iphoneApps", { ok: true, apps: DEMO.apps,
         total: DEMO.apps.reduce((t, a) => t + a.tamano, 0) }));
-      case "fotosResumen": return c.luego(400, () => c.responder("fotosResumen", DEMO.fotos));
       case "appsSugerir": return c.luego(500, () => c.responder("appsSugeridas", { ok: true, apps: DEMO.sugeridas }));
       case "iosRevisar": return c.luego(200, () => c.responder("iosRevisado", DEMO.ios));
       case "planArmar": return c.luego(700, () => c.responder("planListo", { ok: true, plan: DEMO.plan }));
@@ -868,6 +865,7 @@
         c.luego(300, () => c.responder("respaldoAvance", { hechos: 4200, total: 9025, bytes: 14.1e9, fallas: 0 }));
         return c.luego(900, () => { DEMO.resumen = { respaldadas: 9025, enElIphone: 9025, bytes: 31.4e9 }; c.responder("respaldoListo", { ok: true, hechos: 9025, total: 9025, nuevos: 9025, fallas: 0, detenido: false, resumen: DEMO.resumen }); });
       case "respaldoParar": return;
+      case "limpiezaEstado": return;
       case "analizar":
         c.luego(200, () => c.responder("analisisAvance", { hechos: 4100, total: 9025 }));
         return c.luego(700, () => c.responder("analisisListo", { ok: true, grupos: DEMO.grupos }));

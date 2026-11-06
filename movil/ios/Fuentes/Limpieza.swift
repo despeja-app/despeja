@@ -20,8 +20,42 @@ import Vision
 final class Limpieza {
     static let shared = Limpieza()
 
-    struct Item { let id: String; let bytes: Int64; var marcada: Bool; let guardar: Bool }
-    private(set) var grupos: [String: [Item]] = [:]
+    struct Item: Codable { let id: String; let bytes: Int64; var marcada: Bool; let guardar: Bool }
+    private(set) var grupos: [String: [Item]] = [:] { didSet { guardarPronto() } }
+    private(set) var fecha: Date?
+
+    // El análisis se recuerda (Application Support/Despeja/analisis.json): al volver a abrir la app no hay que analizar de nuevo.
+    // Lo que ya no está en la biblioteca (borrado desde Fotos) se descarta al cargar.
+    private var archivo: URL { Host.datos.appendingPathComponent("analisis.json") }
+    private var guardando = false
+    private func guardarPronto() {
+        guard !guardando else { return }
+        guardando = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                self.guardando = false
+                struct Guardado: Codable { let fecha: Date; let grupos: [String: [Item]] }
+                if let d = try? JSONEncoder().encode(Guardado(fecha: self.fecha ?? Date(), grupos: self.grupos)) {
+                    try? d.write(to: self.archivo, options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication])
+                }
+            }
+        }
+    }
+
+    /// Lo último que se analizó (sin lo que ya no existe), o nil si nunca se analizó.
+    func cargar() -> [String: Any]? {
+        struct Guardado: Codable { let fecha: Date; let grupos: [String: [Item]] }
+        guard grupos.isEmpty, let d = try? Data(contentsOf: archivo), let g = try? JSONDecoder().decode(Guardado.self, from: d) else {
+            return grupos.isEmpty ? nil : ["ok": true, "grupos": resumen(), "fecha": fecha.map { ISO8601DateFormatter().string(from: $0) } ?? ""]
+        }
+        let ids = Array(Set(g.grupos.values.joined().map(\.id)))
+        var existen = Set<String>()
+        PHAsset.fetchAssets(withLocalIdentifiers: ids, options: nil).enumerateObjects { a, _, _ in existen.insert(a.localIdentifier) }
+        fecha = g.fecha
+        grupos = g.grupos.mapValues { $0.filter { existen.contains($0.id) } }
+        return ["ok": true, "grupos": resumen(), "fecha": ISO8601DateFormatter().string(from: g.fecha)]
+    }
     private var analizando = false
 
     // MARK: Analizar
@@ -36,8 +70,9 @@ final class Limpieza {
         let r = await Task.detached(priority: .userInitiated) { Limpieza.calcular { hechos, total in
             Task { @MainActor in avance(["hechos": hechos, "total": total]) }
         } }.value
+        fecha = Date()
         grupos = r
-        return ["ok": true, "grupos": resumen()]
+        return ["ok": true, "grupos": resumen(), "fecha": ISO8601DateFormatter().string(from: fecha!)]
     }
 
     /// {id: {n, bytes, marcadas, bytesMarcadas}} por grupo.
