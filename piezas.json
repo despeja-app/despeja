@@ -204,7 +204,7 @@
    }
   },
   "host-ios": {
-   "version": "0.1.0",
+   "version": "0.1.1",
    "archivos": {
     "movil/ios/Fuentes/PiezaHost/Host.swift": "3ffa71646a37c8c447a1c94a9e322a8b091f2a1c4ae16bb85a610cd090efe756",
     "movil/ios/Fuentes/PiezaHost/Puente.swift": "8407d468851fecf7bf18313e72518e1c7c3714e4a3b3f83aed1e77b3b7cd26b8"
@@ -218,7 +218,7 @@
     "red": []
    },
    "generados": {
-    "movil/ios/App.xcodeproj/project.pbxproj": "e6d8ec410e504ca65ebc76b8b081d0d621a1160e5f5f028964f48da09ee2bff4",
+    "movil/ios/App.xcodeproj/project.pbxproj": "e21470b0996e28ea8b0558b8f9b5023cc144b20393043c3380556a61105432c2",
     "movil/ios/Info.plist": "002db404e6deacac64094efb8a79a61d960918b2fabc78088399011688344221",
     "movil/ios/recursos.sh": "2fb9f2c5a883f608b2a1f21e3abbd7f674519c5864e0a0387318f38f00dcaf9c"
    },
@@ -257,7 +257,7 @@
    }
   },
   "pagina": {
-   "version": "0.1.0",
+   "version": "0.1.1",
    "archivos": {
     "docs/pagina.js": "c9e58a2e25475ad54735db260f4399809f8f20751abe6c2a6eff44466de68a43",
     "docs/pagina.css": "61bfe8b32e7d864f37540c48e38be7f25035390a0f54ba7a7773d2b640f8ee6c",
@@ -265,7 +265,7 @@
     "docs/sello.svg": "570728f16d129abfbc097419174d53491d7a5e58507dc3e679a592e23464dcf9",
     "docs/sello-en.svg": "5fb96b00af24dd3782c6a316d31be7c1c8b0cc5feafc1308464a31c9ad3c4822",
     "docs/pagina-comunes.json": "6289f38a82450911f213a3455e862baac5b1b59c70de4e62206fdf4641a5159b",
-    "herramientas/pagina_capturas.mjs": "8acd3f4c65b6327f4005b354ff9e07cbba3f345ab9d8938179e35378a2a8a893"
+    "herramientas/pagina_capturas.mjs": "722d477d56dcab5859a646e716779acbf5f6426f5fa387222b045f8d6d80f5a4"
    },
    "ficha": {
     "requiere": [],
@@ -275,7 +275,7 @@
    "generados": {
     ".github/workflows/pagina.yml": "e4278ce966e6b89fa55f4809b8f2dda0159b5a4b702404a5ee6c7c7e49f8ab70",
     "docs/colores.css": "ee9f523cc402aca0986951b45f566f6412af9325f163453e15030b72fdd20d3b",
-    "docs/index.html": "079815508ba0d14d3d3c7f24cb575c3a25908219db25f099d2e3b5b412e7b0fd",
+    "docs/index.html": "f06eafafd7c234e225550900dd7446c9027f962c4743a283e0d345bd82883ef3",
     "docs/sitemap.xml": "bd82e6ee0f3c435f478aa8e11e8671610a4cc2a9e5b6d7663fb24abe2cacbc99",
     "herramientas/org.github.io/index.html": "0eb4cb2c5b061fdf912b1ce879cd5d3ff02eaa8f2b0acdac3658ea5f4a25c5ac",
     "herramientas/org.github.io/robots.txt": "c05f61f58d258c98ac2856c00c6bf805120b870fd0b9751747371f59b8b057ab"

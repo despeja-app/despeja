@@ -16,6 +16,15 @@
 //    "demo": "?idioma=en#algo", "tema": "claro|oscuro", "tocar": ["#boton", "[data-vista=x]"], "hora": "2026-10-20T10:48:00-03:00"}
 // Necesita Playwright (PLAYWRIGHT=/ruta/a/playwright si no está en node_modules).
 import http from "node:http";
+
+/** La intro en la imagen para compartir: hasta ~160 caracteres, cortada al final de una frase (o de una palabra, con «…»). */
+function resumenCorto(t) {
+  const s = String(t || "");
+  if (s.length <= 160) return s;
+  const corte = s.slice(0, 160);
+  const fin = corte.lastIndexOf(". ");
+  return fin > 60 ? corte.slice(0, fin + 1) : corte.replace(/\s+\S*$/, "") + "…";
+}
 import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
@@ -136,7 +145,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
         .v{position:absolute;left:590px;top:64px;width:860px;border-radius:14px;overflow:hidden;box-shadow:0 22px 60px rgba(20,30,50,.22);border:1px solid #dde2ea}
         .v img{display:block;width:860px}
       </style></head><body><div class="t"><div class="m"><img src="${logo}" alt="">${esc(app.nombre)}</div>
-        <h1>${esc((d.compartir?.frase || d.frase).es)}</h1><p>${esc(d.intro.es).slice(0, 160)}</p></div>
+        <h1>${esc((d.compartir?.frase || d.frase).es)}</h1><p>${esc(resumenCorto(d.intro.es))}</p></div>
         <div class="s">Gratis · Código abierto</div>${img ? `<div class="v"><img src="${img}" alt=""></div>` : ""}</body></html>`);
       await c.waitForTimeout(200);
       fs.mkdirSync(path.join(RAIZ, "docs", "img"), { recursive: true });

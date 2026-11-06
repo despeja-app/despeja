@@ -28,7 +28,10 @@ aporta hace algo mejor de lo que hacíamos, anótalo como aprendizaje para quien
 
 **Idiomas (`ui/idiomas/<código>.json`)**
 - Mismas claves y marcadores que `en.json`. Si no hablas el idioma, pide revisión de una persona nativa antes de juntarlo.
-<!-- La app: suma la lista de lo propio (su formato, su catálogo, su motor…), con el comando que lo valida. -->
+- **El respaldo** (`bin/respaldo.py` ↔ `movil/ios/Fuentes/Respaldo.swift`): el mismo protocolo en los dos lados, nada marcado
+  como respaldado sin SHA-256 confirmado, nada borrado fuera de `respaldados.json`. Prueba: `python3 -m unittest pruebas.test_app`.
+- **Lo que ve la IA** (`catastro()` y `validar()` en `bin/plan.py`): solo el resumen, y la respuesta validada.
+- **La app de iPhone:** `bash herramientas/compilar_iphone.sh` en un Mac.
 
 ## Veredicto
 Escribe para quien mantiene, en pocas líneas: qué cambia, si es seguro, qué pasó en las pruebas y tu recomendación

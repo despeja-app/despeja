@@ -1,6 +1,6 @@
 # Código de conducta
 
-<!-- La app: una frase con para qué existe Despeja («Despeja existe para que…»). Empecemos por casa. -->
+Despeja existe para que cualquier persona pueda ordenar su iPhone sin miedo a perder lo que le importa. Empecemos por casa.
 
 - **Trato amable y respetuoso**, con todas las personas, sin importar experiencia, origen, idioma, género, edad o forma de pensar.
 - **Crítica a las ideas, nunca a las personas.** Explica el porqué y propone algo mejor.

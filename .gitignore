@@ -25,7 +25,7 @@
 !/app.json
 !/piezas.json
 !/acciones.json
-# La app: suma aquí sus carpetas propias de la raíz (!/plantillas/, !/ejemplos/…).
+# Despeja no tiene más carpetas propias en la raíz (poc/ es local: la prueba de concepto no se sube).
 app/.build/
 escritorio/node_modules/
 escritorio/dist/

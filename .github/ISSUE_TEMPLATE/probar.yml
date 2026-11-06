@@ -26,7 +26,11 @@ body:
       options:
         - label: Se instaló y abrió (y el aviso de app sin firmar fue claro) / It installed and opened (and the unsigned-app warning was clear)
         - label: Lo primero fue elegir el idioma / The first thing was choosing the language
-        # La app: suma aquí 3 a 5 cosas que se prueban en esta app (lo principal que hace), una por línea, en los dos idiomas.
+        - label: El Mac vio el iPhone (por cable y por Wi-Fi) / The Mac saw the iPhone (via cable and Wi-Fi)
+        - label: Las apps aparecieron con su tamaño / The apps showed up with their size
+        - label: El respaldo terminó y las fotos quedaron en la carpeta / The backup finished and the photos were in the folder
+        - label: «Borrar del iPhone» borró solo lo respaldado / “Delete from iPhone” deleted only what was backed up
+        - label: Tu IA armó un plan con sentido / Your AI made a sensible plan
   - type: textarea
     id: problemas
     attributes:

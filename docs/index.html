@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="es" data-titulo-es="Despeja — La app: lo que es, en una línea (título para buscadores)" data-titulo-en="Despeja — The app: what it is, in one line (title for search engines)" data-id="despeja">
+<html lang="es" data-titulo-es="Despeja — Respalda y libera espacio en tu iPhone desde tu Mac, con tu IA" data-titulo-en="Despeja — Back up and free up space on your iPhone from your Mac, with your AI" data-id="despeja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; media-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; upgrade-insecure-requests">
-<title>Despeja — La app: lo que es, en una línea (título para buscadores)</title>
-<meta name="description" content="La app: dos frases para buscadores (unos 155 caracteres).">
+<title>Despeja — Respalda y libera espacio en tu iPhone desde tu Mac, con tu IA</title>
+<meta name="description" content="App gratis y abierta para Mac y iPhone: ve qué ocupa espacio, respalda fotos y videos verificados en tu Mac y borra solo lo que ya está a salvo.">
 <link rel="canonical" href="https://despeja-app.github.io/despeja/">
 <link rel="alternate" hreflang="es" href="https://despeja-app.github.io/despeja/">
 <link rel="alternate" hreflang="en" href="https://despeja-app.github.io/despeja/?lang=en">
@@ -16,14 +16,14 @@
 <meta property="og:site_name" content="Despeja">
 <meta property="og:url" content="https://despeja-app.github.io/despeja/">
 <meta property="og:locale" content="es_CL"><meta property="og:locale:alternate" content="en_US">
-<meta property="og:title" content="Despeja — La app: lo que es, en una línea (título para buscadores)">
-<meta property="og:description" content="La app: dos frases para buscadores (unos 155 caracteres).">
+<meta property="og:title" content="Despeja — Respalda y libera espacio en tu iPhone desde tu Mac, con tu IA">
+<meta property="og:description" content="App gratis y abierta para Mac y iPhone: ve qué ocupa espacio, respalda fotos y videos verificados en tu Mac y borra solo lo que ya está a salvo.">
 <meta property="og:image" content="https://despeja-app.github.io/despeja/img/compartir.png">
 <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Despeja: La app: la frase grande de la portada.">
+<meta property="og:image:alt" content="Despeja: Deja tu iPhone solo con lo necesario.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Despeja — La app: lo que es, en una línea (título para buscadores)">
-<meta name="twitter:description" content="La app: dos frases para buscadores (unos 155 caracteres).">
+<meta name="twitter:title" content="Despeja — Respalda y libera espacio en tu iPhone desde tu Mac, con tu IA">
+<meta name="twitter:description" content="App gratis y abierta para Mac y iPhone: ve qué ocupa espacio, respalda fotos y videos verificados en tu Mac y borra solo lo que ya está a salvo.">
 <meta name="twitter:image" content="https://despeja-app.github.io/despeja/img/compartir.png">
 <script type="application/ld+json">
 {
@@ -34,7 +34,8 @@
    "name": "Despeja",
    "url": "https://despeja-app.github.io/despeja/",
    "image": "https://despeja-app.github.io/despeja/img/compartir.png",
-   "description": "La app: dos frases para buscadores (unos 155 caracteres).",
+   "screenshot": "https://despeja-app.github.io/despeja/img/mac.png",
+   "description": "App gratis y abierta para Mac y iPhone: ve qué ocupa espacio, respalda fotos y videos verificados en tu Mac y borra solo lo que ya está a salvo.",
    "applicationCategory": "UtilitiesApplication",
    "operatingSystem": "macOS 15, iOS",
    "license": "https://www.gnu.org/licenses/agpl-3.0.html",
@@ -47,9 +48,14 @@
   {
    "@type": "FAQPage",
    "mainEntity": [
+    { "@type": "Question", "name": "¿Qué pasa si se corta el Wi-Fi a mitad del respaldo?", "acceptedAnswer": { "@type": "Answer", "text": "Nada se pierde: solo queda marcado como respaldado lo que tu Mac ya verificó. Vuelve a tocar «Respaldar» y sigue donde quedó." } },
+    { "@type": "Question", "name": "¿Despeja borra la caché de otras apps o mis chats de WhatsApp?", "acceptedAnswer": { "@type": "Answer", "text": "No: iOS no deja que ninguna app toque lo de otra. Despeja te dice cuáles pesan más y exactamente dónde limpiarlas en tu iPhone." } },
+    { "@type": "Question", "name": "¿Qué ve mi IA?", "acceptedAnswer": { "@type": "Answer", "text": "Solo un resumen: espacio, tamaños y nombres de apps, versión de iOS y cuánto hay respaldado. Nunca tus fotos, nombres de archivos ni contenido." } },
+    { "@type": "Question", "name": "¿Necesito el cable siempre?", "acceptedAnswer": { "@type": "Answer", "text": "Solo la primera vez, para que el iPhone confíe en tu Mac. Después funciona por Wi-Fi; para respaldos muy grandes el cable es más rápido." } },
+    { "@type": "Question", "name": "¿Por qué la app de iPhone se instala con Xcode?", "acceptedAnswer": { "@type": "Answer", "text": "Todavía no está en la App Store. Con Xcode y tu Apple ID la instalas gratis; con una cuenta gratuita dura 7 días y se reinstala igual." } },
     { "@type": "Question", "name": "¿Cómo se actualiza? ¿Pierdo algo?", "acceptedAnswer": { "@type": "Answer", "text": "Al abrir y cada 6 horas, la app revisa si hay una versión nueva en sus Releases de GitHub y te avisa dentro de la app, en Ajustes. Si la instalas, la baja, comprueba su huella SHA-256, reemplaza la app y vuelve a abrirla. Nunca en medio de algo que esté haciendo. Tus datos viven fuera de la app: actualizar no los toca." } },
     { "@type": "Question", "name": "¿Por qué mi computador dice que no puede verificar la app?", "acceptedAnswer": { "@type": "Answer", "text": "Porque es un proyecto gratis que no paga los certificados de Apple ni de Microsoft. En macOS 15: abre la app una vez, ve a Ajustes del Sistema → Privacidad y seguridad y, abajo, toca «Abrir igualmente». Cada descarga tiene su huella SHA-256 en el Release y el código de cada versión está en GitHub." } },
-    { "@type": "Question", "name": "¿Dónde están mis datos?", "acceptedAnswer": { "@type": "Answer", "text": "En tu computador (en Mac, en ~/Library/Application Support/Despeja). Son archivos en formato abierto. No hay servidores ni cuentas: nada sale de ahí sin que lo pidas." } },
+    { "@type": "Question", "name": "¿Dónde están mis datos?", "acceptedAnswer": { "@type": "Answer", "text": "En tu Mac (~/Library/Application Support/Despeja) y en la app del iPhone, en archivos de formato abierto. Tus fotos quedan en la carpeta que elijas. No hay servidores ni cuentas: nada sale de tus equipos sin que lo pidas." } },
     { "@type": "Question", "name": "¿Qué IA uso? ¿Tengo que pagar otra?", "acceptedAnswer": { "@type": "Answer", "text": "La tuya: Claude Code, Codex o Gemini, con tu propia cuenta. La app no tiene una IA propia ni te cobra por usarla: corre la que ya tienes, sin herramientas y sin tu memoria personal, y solo le pasa lo que hace falta." } },
     { "@type": "Question", "name": "¿Qué permisos pide y a qué se conecta?", "acceptedAnswer": { "@type": "Answer", "text": "Lo justo, y todo está en «Permisos e internet»: sale de las piezas que usa la app, así nunca dice de más ni de menos. Nunca manda nada tuyo a un servidor nuestro: no tenemos." } },
     { "@type": "Question", "name": "¿Cuánto cuesta?", "acceptedAnswer": { "@type": "Answer", "text": "Nada. Es gratis y de código abierto, sin cuentas ni publicidad." } }
@@ -69,6 +75,8 @@
   <a class="marca" href="./"><img src="favicon.svg" alt="" width="28" height="28"><span data-sin-traducir>Despeja</span></a>
   <nav aria-label="Secciones">
     <a href="#funciones"><span data-es>Funciones</span><span data-en>Features</span></a>
+    <a href="#como-funciona"><span data-es>Cómo funciona</span><span data-en>How it works</span></a>
+    <a href="#comparar"><span data-es>Comparación</span><span data-en>Comparison</span></a>
     <a href="#preguntas"><span data-es>Preguntas</span><span data-en>FAQ</span></a>
     <a href="#descargar"><span data-es>Descargar</span><span data-en>Download</span></a>
   </nav>
@@ -79,22 +87,53 @@
 <section class="portada"><div class="ancho">
   <div>
     <p class="etiqueta"><span data-es>Gratis · Código abierto · En tu computador</span><span data-en>Free · Open source · On your computer</span></p>
-    <h1><span data-es>La app: la frase grande de la portada.</span><span data-en>The app: the big headline.</span></h1>
-    <p class="intro"><span data-es>La app: un párrafo corto con lo que hace y para quién.</span><span data-en>The app: a short paragraph with what it does and for whom.</span></p>
+    <h1><span data-es>Deja tu iPhone solo con lo necesario.</span><span data-en>Keep only what you need on your iPhone.</span></h1>
+    <p class="intro"><span data-es>Despeja ve qué ocupa espacio en tu iPhone, respalda tus fotos y videos en tu Mac verificándolos uno por uno y borra del iPhone solo lo que ya está a salvo. Tu propia IA revisa el resumen y te propone un plan. Todo queda entre tu Mac y tu iPhone.</span><span data-en>Despeja shows what takes up space on your iPhone, backs up your photos and videos to your Mac verifying each one, and deletes from the iPhone only what&apos;s already safe. Your own AI reviews the summary and suggests a plan. Everything stays between your Mac and your iPhone.</span></p>
     <div class="acciones">
       <a class="boton principal" id="descarga-principal" href="#descargar"><span data-es>Descargar</span><span data-en>Download</span></a>
       <a class="boton" href="demo/"><span data-es>Probar la vista previa</span><span data-en>Try the live preview</span></a>
       <a class="boton" href="https://github.com/despeja-app/despeja"><span data-es>Ver el código</span><span data-en>See the code</span></a>
     </div>
+    <p class="aviso"><span data-es>Primera versión: la app de iPhone se instala desde tu Mac con Xcode (aún no está en la App Store).</span><span data-en>First version: the iPhone app is installed from your Mac with Xcode (it&apos;s not on the App Store yet).</span></p>
     <p class="nota" id="descarga-nota"><span data-es>Gratis, sin cuenta y sin publicidad.</span><span data-en>Free, no account, no ads.</span></p>
   </div>
+  <figure class="captura"><img src="img/mac.png" alt="Despeja en el Mac: el iPhone con poco espacio, el plan de la IA y el respaldo" data-alt-es="Despeja en el Mac: el iPhone con poco espacio, el plan de la IA y el respaldo" data-alt-en="Despeja on the Mac: the iPhone low on space, the AI plan and the backup" width="1280" height="800"></figure>
 </div></section>
 
 <section id="funciones"><div class="ancho">
   <h2><span data-es>Lo que hace</span><span data-en>What it does</span></h2>
   <div class="rejilla">
-    <div class="tarjeta"><h3><span data-es>La app: una función</span><span data-en>The app: a feature</span></h3><p><span data-es>Qué resuelve, en una o dos frases.</span><span data-en>What it solves, in one or two sentences.</span></p></div>
+    <div class="tarjeta"><h3><span data-es>Ve lo que ocupa espacio</span><span data-en>See what takes up space</span></h3><p><span data-es>Tu Mac ve el iPhone por cable o Wi-Fi: espacio libre, apps de la más pesada a la más liviana y si hay un iOS más nuevo.</span><span data-en>Your Mac sees the iPhone via cable or Wi-Fi: free space, apps from heaviest to lightest and whether a newer iOS is out.</span></p></div>
+    <div class="tarjeta"><h3><span data-es>Respaldo verificado</span><span data-en>Verified backup</span></h3><p><span data-es>Cada foto y video viaja cifrado por tu Wi-Fi, con su Live Photo y sus ediciones, y se comprueba archivo por archivo en la carpeta que elijas.</span><span data-en>Every photo and video travels encrypted over your Wi-Fi, with its Live Photo and edits, and is checked file by file in the folder you choose.</span></p></div>
+    <div class="tarjeta"><h3><span data-es>Borra sin miedo</span><span data-en>Delete without fear</span></h3><p><span data-es>El iPhone borra solo lo que tu Mac ya verificó. Si algo falló, no se toca.</span><span data-en>The iPhone deletes only what your Mac has verified. If anything failed, it isn&apos;t touched.</span></p></div>
+    <div class="tarjeta"><h3><span data-es>Un plan con tu IA</span><span data-en>A plan with your AI</span></h3><p><span data-es>Claude, ChatGPT o Gemini, con tu cuenta, revisa el resumen (nunca tus fotos) y te dice qué hacer primero. Tú decides cada paso.</span><span data-en>Claude, ChatGPT or Gemini, with your account, reviews the summary (never your photos) and tells you what to do first. You decide every step.</span></p></div>
+    <div class="tarjeta"><h3><span data-es>Honesta con lo que iOS no deja</span><span data-en>Honest about what iOS doesn&apos;t allow</span></h3><p><span data-es>La caché de otras apps o los chats de WhatsApp no se pueden borrar desde afuera: Despeja te dice exactamente dónde hacerlo.</span><span data-en>Other apps&apos; caches or WhatsApp chats can&apos;t be deleted from outside: Despeja tells you exactly where to do it.</span></p></div>
   </div>
+  <figure class="captura-extra"><img src="img/mac-en.png" alt="Despeja en el Mac, en inglés" data-alt-es="Despeja en el Mac, en inglés" data-alt-en="Despeja on the Mac, in English" width="1280" height="800" loading="lazy"><figcaption><span data-es>Despeja en el Mac, en inglés</span><span data-en>Despeja on the Mac, in English</span></figcaption></figure>
+  <figure class="captura-extra"><img src="img/iphone.png" alt="Despeja en el iPhone: respaldar en el Mac y el resumen de fotos" data-alt-es="Despeja en el iPhone: respaldar en el Mac y el resumen de fotos" data-alt-en="Despeja on the iPhone: back up to the Mac and the photo summary" width="390" height="844" loading="lazy"><figcaption><span data-es>Despeja en el iPhone: respaldar en el Mac y el resumen de fotos</span><span data-en>Despeja on the iPhone: back up to the Mac and the photo summary</span></figcaption></figure>
+</div></section>
+
+<section id="como-funciona"><div class="ancho">
+  <h2><span data-es>Cómo funciona</span><span data-en>How it works</span></h2>
+  <ol class="pasos">
+    <li><h3><span data-es>Conecta tu iPhone</span><span data-en>Connect your iPhone</span></h3><p><span data-es>Por cable la primera vez y toca «Confiar». Después también por Wi-Fi.</span><span data-en>Via cable the first time and tap “Trust”. After that, over Wi-Fi too.</span></p></li>
+    <li><h3><span data-es>Arma tu plan</span><span data-en>Make your plan</span></h3><p><span data-es>Tu IA mira el espacio, las apps y la versión de iOS, y propone qué hacer primero.</span><span data-en>Your AI looks at the space, the apps and the iOS version, and suggests what to do first.</span></p></li>
+    <li><h3><span data-es>Respalda en tu Mac</span><span data-en>Back up to your Mac</span></h3><p><span data-es>El Mac muestra un código, lo escribes en el iPhone y se mandan tus fotos y videos, verificados.</span><span data-en>The Mac shows a code, you type it on the iPhone and your photos and videos are sent, verified.</span></p></li>
+    <li><h3><span data-es>Libera espacio</span><span data-en>Free up space</span></h3><p><span data-es>Borra del iPhone lo que ya está a salvo y vacía «Eliminados recientemente».</span><span data-en>Delete from the iPhone what&apos;s already safe and empty “Recently Deleted”.</span></p></li>
+  </ol>
+</div></section>
+
+<section id="comparar"><div class="ancho">
+  <h2><span data-es>Lo que gana y lo que no</span><span data-en>Where it wins and where it doesn’t</span></h2>
+  <div class="tabla-caja" tabindex="0" role="region" aria-label="Comparación · Comparison"><table class="comparar">
+    <thead><tr><th scope="col"><span class="oculto"><span data-es>Qué</span><span data-en>What</span></span></th><th scope="col" data-sin-traducir>Despeja</th><th scope="col" data-sin-traducir>Fotos de iCloud</th><th scope="col" data-sin-traducir>Captura de Imagen</th></tr></thead>
+    <tbody>
+      <tr><th scope="row"><span data-es>Dónde quedan tus fotos</span><span data-en>Where your photos end up</span></th><td><span data-es>En tu Mac, en la carpeta que elijas</span><span data-en>On your Mac, in the folder you choose</span></td><td><span data-es>En iCloud</span><span data-en>In iCloud</span></td><td><span data-es>En tu Mac</span><span data-en>On your Mac</span></td></tr>
+      <tr><th scope="row"><span data-es>Borrar del iPhone</span><span data-en>Deleting from the iPhone</span></th><td><span data-es>Solo lo verificado, archivo por archivo</span><span data-en>Only what&apos;s verified, file by file</span></td><td><span data-es>Deja versiones livianas en el iPhone</span><span data-en>Keeps lightweight versions on the iPhone</span></td><td><span data-es>Puedes borrar al importar</span><span data-en>You can delete on import</span></td></tr>
+      <tr><th scope="row"><span data-es>Qué más ocupa espacio</span><span data-en>What else takes up space</span></th><td><span data-es>Apps, versión de iOS y un plan con tu IA</span><span data-en>Apps, iOS version and a plan with your AI</span></td><td><span data-es>No</span><span data-en>No</span></td><td><span data-es>No</span><span data-en>No</span></td></tr>
+      <tr><th scope="row"><span data-es>Costo</span><span data-en>Cost</span></th><td><span data-es>Gratis y abierto</span><span data-en>Free and open source</span></td><td><span data-es>5 GB gratis; después, pago mensual</span><span data-en>5 GB free; then a monthly fee</span></td><td><span data-es>Gratis, viene con macOS</span><span data-en>Free, comes with macOS</span></td></tr>
+    </tbody>
+  </table></div>
 </div></section>
 
 <section id="permisos"><div class="ancho">
@@ -103,12 +142,15 @@
   <div class="rejilla dos">
     <div class="tarjeta"><h3><span data-es>Permisos</span><span data-en>Permissions</span></h3>
       <ul>
+        <li><b><span data-es>Fotos</span><span data-en>Photos</span></b> <span data-sin-traducir>(iPhone)</span>: <span data-es>Para contar, respaldar y, si lo pides, borrar tus fotos y videos. Se pide recién cuando tocas «Revisar mis fotos» o «Respaldar».</span><span data-en>To count, back up and, if you ask, delete your photos and videos. It&apos;s asked only when you tap “Check my photos” or “Back up”.</span></li>
+        <li><b><span data-es>Red local</span><span data-en>Local network</span></b> <span data-sin-traducir>(iPhone)</span>: <span data-es>Para encontrar tu Mac en tu Wi-Fi y mandarle los respaldos, sin pasar por internet.</span><span data-en>To find your Mac on your Wi-Fi and send it the backups, without going through the internet.</span></li>
       </ul>
       <p class="si-vacio"><span data-es>Ninguno especial del sistema: ni cámara, ni micrófono, ni avisos. Solo abre lo que tú eliges.</span><span data-en>No special system permissions: no camera, microphone or notifications. It only opens what you pick.</span></p>
     </div>
     <div class="tarjeta"><h3><span data-es>A qué se conecta</span><span data-en>What it connects to</span></h3>
       <ul>
         <li><b data-sin-traducir>api.github.com · github.com · objects.githubusercontent.com · release-assets.githubusercontent.com</b>: <span data-es>Para saber si hay una versión nueva (al abrir y cada 6 horas) y bajarla de los Releases del repositorio de la app cuando tú lo pides. Antes de instalarla se comprueba su huella SHA-256.</span><span data-en>To check for a new version (on launch and every 6 hours) and download it from the app&apos;s repository Releases when you ask. Its SHA-256 fingerprint is checked before installing.</span></li>
+        <li><b data-sin-traducir>api.ipsw.me</b>: <span data-es>Saber si hay una versión de iOS más nueva para tu modelo de iPhone (no se manda nada tuyo).</span><span data-en>To know if there&apos;s a newer iOS for your iPhone model (nothing of yours is sent).</span></li>
         <li><b><span data-es>Tu IA</span><span data-en>Your AI</span></b>: <span data-es>Si la usas, Claude Code, Codex o Gemini se conectan a su proveedor con tu cuenta y reciben solo lo que la app les pasa para esa tarea. Corren sin herramientas y sin tu memoria personal.</span><span data-en>If you use it, Claude Code, Codex or Gemini connect to their provider with your account and receive only what the app gives them for that task. They run without tools and without your personal memory.</span></li>
       </ul>
       <p class="si-vacio"><span data-es>A nada: la app no sale a internet por su cuenta.</span><span data-en>Nothing: the app doesn&apos;t go online on its own.</span></p>
@@ -119,9 +161,14 @@
 <section id="preguntas"><div class="ancho">
   <h2><span data-es>Lo que la gente pregunta</span><span data-en>What people ask</span></h2>
   <div class="faq">
+    <details class="p"><summary><span data-es>¿Qué pasa si se corta el Wi-Fi a mitad del respaldo?</span><span data-en>What if the Wi-Fi drops halfway through the backup?</span></summary><p><span data-es>Nada se pierde: solo queda marcado como respaldado lo que tu Mac ya verificó. Vuelve a tocar «Respaldar» y sigue donde quedó.</span><span data-en>Nothing is lost: only what your Mac already verified is marked as backed up. Tap “Back up” again and it continues where it left off.</span></p></details>
+    <details class="p"><summary><span data-es>¿Despeja borra la caché de otras apps o mis chats de WhatsApp?</span><span data-en>Does Despeja clear other apps&apos; caches or my WhatsApp chats?</span></summary><p><span data-es>No: iOS no deja que ninguna app toque lo de otra. Despeja te dice cuáles pesan más y exactamente dónde limpiarlas en tu iPhone.</span><span data-en>No: iOS doesn&apos;t let any app touch another&apos;s data. Despeja shows which ones weigh the most and exactly where to clean them on your iPhone.</span></p></details>
+    <details class="p"><summary><span data-es>¿Qué ve mi IA?</span><span data-en>What does my AI see?</span></summary><p><span data-es>Solo un resumen: espacio, tamaños y nombres de apps, versión de iOS y cuánto hay respaldado. Nunca tus fotos, nombres de archivos ni contenido.</span><span data-en>Only a summary: space, app sizes and names, iOS version and how much is backed up. Never your photos, file names or content.</span></p></details>
+    <details class="p"><summary><span data-es>¿Necesito el cable siempre?</span><span data-en>Do I always need the cable?</span></summary><p><span data-es>Solo la primera vez, para que el iPhone confíe en tu Mac. Después funciona por Wi-Fi; para respaldos muy grandes el cable es más rápido.</span><span data-en>Only the first time, so the iPhone trusts your Mac. After that it works over Wi-Fi; for very large backups the cable is faster.</span></p></details>
+    <details class="p"><summary><span data-es>¿Por qué la app de iPhone se instala con Xcode?</span><span data-en>Why is the iPhone app installed with Xcode?</span></summary><p><span data-es>Todavía no está en la App Store. Con Xcode y tu Apple ID la instalas gratis; con una cuenta gratuita dura 7 días y se reinstala igual.</span><span data-en>It isn&apos;t on the App Store yet. With Xcode and your Apple ID you install it for free; with a free account it lasts 7 days and you reinstall it the same way.</span></p></details>
     <details class="p"><summary><span data-es>¿Cómo se actualiza? ¿Pierdo algo?</span><span data-en>How does it update? Do I lose anything?</span></summary><p><span data-es>Al abrir y cada 6 horas, la app revisa si hay una versión nueva en sus Releases de GitHub y te avisa dentro de la app, en Ajustes. Si la instalas, la baja, comprueba su huella SHA-256, reemplaza la app y vuelve a abrirla. Nunca en medio de algo que esté haciendo. Tus datos viven fuera de la app: actualizar no los toca.</span><span data-en>On launch and every 6 hours, the app checks its GitHub Releases for a new version and tells you inside the app, in Settings. If you install it, it downloads it, checks its SHA-256 fingerprint, replaces the app and reopens it. Never in the middle of something it&apos;s doing. Your data lives outside the app: updating doesn&apos;t touch it.</span></p></details>
     <details class="p"><summary><span data-es>¿Por qué mi computador dice que no puede verificar la app?</span><span data-en>Why does my computer say it can&apos;t verify the app?</span></summary><p><span data-es>Porque es un proyecto gratis que no paga los certificados de Apple ni de Microsoft. En macOS 15: abre la app una vez, ve a Ajustes del Sistema → Privacidad y seguridad y, abajo, toca «Abrir igualmente». Cada descarga tiene su huella SHA-256 en el Release y el código de cada versión está en GitHub.</span><span data-en>Because it&apos;s a free project that doesn&apos;t pay for Apple or Microsoft certificates. On macOS 15: open the app once, go to System Settings → Privacy &amp; Security and, at the bottom, click “Open Anyway”. Every download has its SHA-256 fingerprint in the Release, and each version&apos;s code is on GitHub.</span></p></details>
-    <details class="p"><summary><span data-es>¿Dónde están mis datos?</span><span data-en>Where is my data?</span></summary><p><span data-es>En tu computador (en Mac, en ~/Library/Application Support/Despeja). Son archivos en formato abierto. No hay servidores ni cuentas: nada sale de ahí sin que lo pidas.</span><span data-en>On your computer (on Mac, in ~/Library/Application Support/Despeja). They&apos;re open-format files. There are no servers or accounts: nothing leaves it unless you ask.</span></p></details>
+    <details class="p"><summary><span data-es>¿Dónde están mis datos?</span><span data-en>Where is my data?</span></summary><p><span data-es>En tu Mac (~/Library/Application Support/Despeja) y en la app del iPhone, en archivos de formato abierto. Tus fotos quedan en la carpeta que elijas. No hay servidores ni cuentas: nada sale de tus equipos sin que lo pidas.</span><span data-en>On your Mac (~/Library/Application Support/Despeja) and in the iPhone app, in open-format files. Your photos stay in the folder you choose. There are no servers or accounts: nothing leaves your devices unless you ask.</span></p></details>
     <details class="p"><summary><span data-es>¿Qué IA uso? ¿Tengo que pagar otra?</span><span data-en>Which AI do I use? Do I have to pay for another one?</span></summary><p><span data-es>La tuya: Claude Code, Codex o Gemini, con tu propia cuenta. La app no tiene una IA propia ni te cobra por usarla: corre la que ya tienes, sin herramientas y sin tu memoria personal, y solo le pasa lo que hace falta.</span><span data-en>Yours: Claude Code, Codex or Gemini, with your own account. The app has no AI of its own and doesn&apos;t charge you for one: it runs the one you already have, without tools or your personal memory, and only gives it what&apos;s needed.</span></p></details>
     <details class="p"><summary><span data-es>¿Qué permisos pide y a qué se conecta?</span><span data-en>What permissions does it ask for and what does it connect to?</span></summary><p><span data-es>Lo justo, y todo está en «Permisos e internet»: sale de las piezas que usa la app, así nunca dice de más ni de menos. Nunca manda nada tuyo a un servidor nuestro: no tenemos.</span><span data-en>Only what&apos;s needed, and it&apos;s all in “Permissions and internet”: it comes from the building blocks the app uses, so it never says more or less than the truth. It never sends anything of yours to a server of ours: we don&apos;t have one.</span></p></details>
     <details class="p"><summary><span data-es>¿Cuánto cuesta?</span><span data-en>How much does it cost?</span></summary><p><span data-es>Nada. Es gratis y de código abierto, sin cuentas ni publicidad.</span><span data-en>Nothing. It&apos;s free and open source, with no accounts or ads.</span></p></details>

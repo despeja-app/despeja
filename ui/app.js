@@ -18,7 +18,10 @@
     recibiendo: false, codigo: "", recibidos: 0, bytesRecibidos: 0, finRespaldo: null, conectado: false,
     // iPhone: respaldar en el Mac y borrar lo verificado
     macs: null, buscandoMac: false, mac: "", codigoEscrito: "", conectando: false, macConectado: "", errorMac: "",
-    respaldando: false, avance: null, finEnvio: null, resumen: null, borrando: false, finBorrado: null };
+    respaldando: false, avance: null, finEnvio: null, resumen: null, borrando: false, finBorrado: null,
+    // iPhone: analizar y limpiar por grupos
+    analizando: false, analisisAvance: null, grupos: null, grupo: null, items: [], totalGrupo: 0, cargando: false,
+    grande: null, borrandoGrupo: false };
   // ?iphone en la vista previa muestra la pantalla del iPhone.
   const enIphone = host.plataforma === "movil" || (host.plataforma === "web" && new URLSearchParams(location.search).has("iphone"));
   const raiz = document.getElementById("app");
@@ -40,7 +43,7 @@
   const tema = PiezaTema.crear({ guardar: (v) => { E.config.tema = v; host.enviar("config", { tema: v }); } });
   const ui = PiezaComponentes.crear({
     i18n, host, app: NOMBRE, repo: REPO, version: () => E.version, pintar, mantenerCampos: true,
-    cerrar: () => { E.ajustes = false; pintar(); },   // Esc, el velo o ✕ sobre un diálogo de la app
+    cerrar: () => { E.ajustes = false; E.grande = null; pintar(); },   // Esc, el velo o ✕ sobre un diálogo de la app
     retener: (...a) => bv.retener(...a),               // mientras se elige el idioma, los avisos esperan
     elegirIA: (id) => { E.config.ia = id; host.enviar("config", { ia: id }); },
   });
@@ -233,8 +236,77 @@
     </section>`;
   }
 
+  // Los grupos que arma el análisis del iPhone (Limpieza.swift), en el orden en que conviene revisarlos.
+  const GRUPOS = [
+    ["repetidas", "Fotos repetidas", "La misma imagen guardada más de una vez. Se queda una; las demás están marcadas."],
+    ["parecidas", "Fotos parecidas", "Varias tomas seguidas de lo mismo. Se queda la mejor; las demás están marcadas."],
+    ["capturas", "Capturas de pantalla", "Todas están marcadas: desmarca las que quieras conservar."],
+    ["rafagas", "Ráfagas", "Las fotos de cada ráfaga que no son la elegida."],
+    ["utiles", "Memes, documentos y recibos", "Imágenes que no parecen fotos tuyas. Ninguna está marcada: elige las que sobran."],
+    ["videos", "Videos grandes", "Los de más de 100 MB, del más pesado al más liviano. Ninguno está marcado."],
+  ];
+
+  function tarjetaLimpiar() {
+    let cuerpo;
+    if (E.analizando) {
+      const a = E.analisisAvance || { hechos: 0, total: 0 };
+      const pct = a.total ? Math.round((a.hechos / a.total) * 100) : 0;
+      cuerpo = `<div class="espacio" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="${esc(Tp("Avance"))}" data-sin-traducir><span data-medida="${pct}"></span></div>
+        <p aria-live="polite" data-sin-traducir>${esc(a.total ? Tp("Revisando {h} de {t} fotos…", { h: entero(a.hechos), t: entero(a.total) }) : Tp("Preparando el análisis…"))}</p>
+        <p class="suave">Todo se analiza en tu iPhone. Nada sale de aquí.</p>`;
+    } else if (!E.grupos) {
+      cuerpo = `<p class="suave">Despeja busca fotos repetidas y parecidas, capturas, ráfagas, memes y videos grandes, y te propone qué borrar. Tú decides; nada sale del iPhone.</p>
+        <div class="pz-pie"><button type="button" class="pz-boton pz-principal" id="analizar">Analizar mi iPhone</button></div>`;
+    } else {
+      const filas = GRUPOS.filter(([k]) => E.grupos[k] && E.grupos[k].n).map(([k, titulo]) => {
+        const g = E.grupos[k];
+        return `<li><button type="button" class="fila-grupo" data-grupo="${k}">
+          <span class="g-titulo">${esc(titulo)}</span>
+          <span class="g-cifras" data-sin-traducir>${esc(Tp("{n} · {b}", { n: entero(g.n), b: tamano(g.bytes) }))}</span>
+          <span class="g-propuesta" data-sin-traducir>${g.marcadas ? esc(Tp("Borrar {m} libera {b}", { m: entero(g.marcadas), b: tamano(g.bytesMarcadas) })) : esc(Tp("Revisar"))}</span>
+        </button></li>`;
+      }).join("");
+      const libera = Object.values(E.grupos).reduce((t, g) => t + (g.bytesMarcadas || 0), 0);
+      cuerpo = filas
+        ? `<p data-sin-traducir><b>${esc(Tp("Puedes liberar {b}", { b: tamano(libera) }))}</b> ${esc(Tp("con lo que está marcado."))}</p><ul class="grupos">${filas}</ul>
+           <div class="pz-pie"><button type="button" class="pz-boton" id="analizar">Analizar de nuevo</button></div>`
+        : `<p class="hecho">No encontré nada que sobre. Tu biblioteca está ordenada.</p>
+           <div class="pz-pie"><button type="button" class="pz-boton" id="analizar">Analizar de nuevo</button></div>`;
+    }
+    return `<section class="tarjeta" id="limpiar"><h2>Limpiar fotos y videos</h2>${cuerpo}</section>`;
+  }
+
+  function vistaGrupo() {
+    const def = GRUPOS.find(([k]) => k === E.grupo) || [E.grupo, E.grupo, ""];
+    const g = (E.grupos || {})[E.grupo] || { n: 0, marcadas: 0, bytesMarcadas: 0 };
+    const cuadros = E.items.map((x) => `<li class="cuadro${x.marcada ? " marcada" : ""}${x.guardar ? " guardar" : ""}">
+        <button type="button" class="cuadro-elegir" data-marcar="${esc(x.id)}" aria-pressed="${x.marcada}"
+          aria-label="${esc(Tp(x.marcada ? "Desmarcar ({b})" : "Marcar para borrar ({b})", { b: tamano(x.bytes) }))}" data-sin-traducir>
+          ${x.img ? `<img src="${esc(x.img)}" alt="" loading="lazy">` : `<span class="sin-img"></span>`}
+          ${x.video ? `<span class="etiqueta" data-sin-traducir>${esc(duracion(x.duracion))}</span>` : ""}
+          ${x.guardar ? `<span class="etiqueta queda" data-sin-traducir>${esc(Tp("Se queda"))}</span>` : ""}
+          <span class="check" aria-hidden="true"></span></button>
+        <button type="button" class="cuadro-ver" data-ver="${esc(x.id)}" aria-label="${esc(Tp("Ver en grande"))}" data-sin-traducir>⤢</button></li>`).join("");
+    return `<header class="barra"><button type="button" class="pz-boton" id="volver" data-sin-traducir>‹ ${esc(Tp("Volver"))}</button>
+        <h1 data-sin-traducir>${esc(Tp(def[1]))}</h1><span></span></header>
+      <main class="contenido grupo">
+        <p class="suave">${esc(def[2])}</p>
+        <div class="pz-pie izquierda"><button type="button" class="pz-boton pz-chico" id="marcar-todas">Marcar todas</button>
+          <button type="button" class="pz-boton pz-chico" id="marcar-ninguna">Ninguna</button></div>
+        <ul class="cuadros">${cuadros}</ul>
+        ${E.items.length < E.totalGrupo ? `<div class="pz-pie"><button type="button" class="pz-boton" id="cargar-mas"${E.cargando ? " disabled" : ""}>${E.cargando ? "Cargando…" : "Ver más"}</button></div>`
+          : E.cargando ? `<p class="suave" aria-busy="true">Cargando…</p>` : ""}
+      </main>
+      <div class="barra-borrar"><button type="button" class="pz-boton pz-principal pz-peligro" id="borrar-grupo"${g.marcadas && !E.borrandoGrupo ? "" : " disabled"} data-sin-traducir>${esc(E.borrandoGrupo ? Tp("Borrando…")
+        : g.marcadas ? Tp("Borrar {m} ({b})", { m: entero(g.marcadas), b: tamano(g.bytesMarcadas) }) : Tp("Marca lo que quieras borrar"))}</button></div>
+      ${E.grande ? ui.dialogo({ id: "t-grande", titulo: "Vista", cuerpo: E.grande.img ? `<img class="grande" src="${esc(E.grande.img)}" alt="">` : `<p class="suave" aria-busy="true">Cargando…</p>`,
+        pie: '<button type="button" class="pz-boton pz-principal" data-pz-cerrar>Listo</button>' }) : ""}`;
+  }
+  const duracion = (s) => `${Math.floor((s || 0) / 60)}:${String((s || 0) % 60).padStart(2, "0")}`;
+
   function principal() {
-    if (enIphone) return barra() + `<main class="contenido">${tarjetaEnviar()}${tarjetaLiberar()}${tarjetaFotos()}</main>`;
+    if (enIphone && E.grupo) return vistaGrupo();
+    if (enIphone) return barra() + `<main class="contenido">${tarjetaLimpiar()}${tarjetaEnviar()}${tarjetaLiberar()}${tarjetaFotos()}</main>`;
     return barra() + `<main class="contenido">${tarjetaIphone()}${tarjetaPlan()}${tarjetaRecibir()}${tarjetaApps()}</main>`;
   }
   function ajustes() {
@@ -296,6 +368,24 @@
     else if (b.id === "respaldar") { Object.assign(E, { respaldando: true, avance: null, finEnvio: null }); pintar(); host.enviar("respaldar"); }
     else if (b.id === "parar-envio") host.enviar("respaldoParar");
     else if (b.id === "borrar-respaldadas") borrarRespaldadas();
+    // iPhone: analizar y limpiar por grupos
+    else if (b.id === "analizar") { Object.assign(E, { analizando: true, analisisAvance: null }); pintar(); host.enviar("analizar"); }
+    else if (b.dataset.grupo) abrirGrupo(b.dataset.grupo);
+    else if (b.id === "volver") { E.grupo = null; E.items = []; pintar(); }
+    else if (b.id === "cargar-mas") { E.cargando = true; pintar(); host.enviar("grupoVer", { grupo: E.grupo, desde: E.items.length }); }
+    else if (b.dataset.marcar) {
+      const x = E.items.find((i) => i.id === b.dataset.marcar);
+      if (!x) return;
+      x.marcada = !x.marcada;
+      pintar();
+      host.enviar("grupoMarcar", { grupo: E.grupo, id: x.id, marcada: x.marcada });
+    } else if (b.dataset.ver) { E.grande = { id: b.dataset.ver, img: "" }; pintar(); host.enviar("fotoGrande", { id: b.dataset.ver }); }
+    else if (b.id === "marcar-todas" || b.id === "marcar-ninguna") {
+      const todas = b.id === "marcar-todas";
+      for (const x of E.items) x.marcada = todas && !x.guardar;
+      pintar();
+      host.enviar("grupoMarcar", { grupo: E.grupo, todas });
+    } else if (b.id === "borrar-grupo") borrarGrupo();
   });
   document.addEventListener("input", (ev) => {
     if (ev.target.id !== "codigo") return;
@@ -317,6 +407,21 @@
     const si = await ui.confirmar({ titulo: "¿Desinstalar {app}?", valores: { app: nombre }, peligro: true, si: "Desinstalar",
       texto: "Se borra del iPhone junto con lo que guarda adentro. Si tiene datos que no están en la nube, se pierden. La puedes volver a bajar de la App Store." });
     if (si) { toast("Desinstalando {app}…", { valores: { app: nombre } }); host.enviar("iphoneDesinstalar", { id }); }
+  }
+  function abrirGrupo(k) {
+    Object.assign(E, { grupo: k, items: [], totalGrupo: (E.grupos[k] || {}).n || 0, cargando: true });
+    pintar();
+    window.scrollTo(0, 0);
+    host.enviar("grupoVer", { grupo: k, desde: 0 });
+  }
+  async function borrarGrupo() {
+    const g = (E.grupos || {})[E.grupo] || {};
+    const si = await ui.confirmar({ titulo: "¿Borrar {m} del iPhone?", valores: { m: entero(g.marcadas) }, peligro: true, si: "Borrar",
+      texto: "Van a «Eliminados recientemente» por 30 días: ahí todavía las puedes recuperar. iOS te va a preguntar una vez más." });
+    if (!si) return;
+    E.borrandoGrupo = true;
+    pintar();
+    host.enviar("grupoBorrar", { grupo: E.grupo });
   }
   async function borrarRespaldadas() {
     const r = E.resumen || {};
@@ -402,6 +507,39 @@
       pintar();
     },
     respaldoDetenido() {},
+    // iPhone: análisis y limpieza
+    analisisAvance(a) { E.analisisAvance = a; pintar(); },
+    analisisListo(r) {
+      E.analizando = false;
+      if (r && r.ok) E.grupos = r.grupos || {};
+      else toast((r && r.error) || "No se pudo.", { error: true });
+      pintar();
+    },
+    grupoPagina(r) {
+      E.cargando = false;
+      if (!r || !r.ok || r.grupo !== E.grupo) return pintar();
+      const ya = new Set(E.items.map((x) => x.id));
+      E.items = E.items.concat((r.items || []).filter((x) => !ya.has(x.id) && (!x.img || /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(x.img))));
+      E.totalGrupo = r.total || 0;
+      pintar();
+    },
+    fotoGrande(r) {
+      if (!E.grande || !r || r.id !== E.grande.id) return;
+      E.grande.img = r.ok && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(r.img || "") ? r.img : "";
+      if (!E.grande.img) E.grande = null;
+      pintar();
+    },
+    grupos(r) { if (r && r.ok) { E.grupos = r.grupos || {}; pintar(); } },
+    grupoBorrado(r) {
+      E.borrandoGrupo = false;
+      if (r && r.ok) {
+        E.grupos = r.grupos || {};
+        if (r.borradas) toast("Se borraron {n} ({b}). Están en «Eliminados recientemente».", { valores: { n: entero(r.borradas), b: tamano(r.bytes) } });
+        E.grupo = null;
+        E.items = [];
+      } else if (r && r.codigo !== "cancelado") toast((r && r.error) || "No se pudo.", { error: true });
+      pintar();
+    },
     // iPhone
     respaldoEstado(r) { E.resumen = r || null; pintar(); },
     macsEncontrados(r) {
@@ -480,6 +618,27 @@
         c.luego(300, () => c.responder("respaldoAvance", { hechos: 4200, total: 9025, bytes: 14.1e9, fallas: 0 }));
         return c.luego(900, () => { DEMO.resumen = { respaldadas: 9025, enElIphone: 9025, bytes: 31.4e9 }; c.responder("respaldoListo", { ok: true, hechos: 9025, total: 9025, nuevos: 9025, fallas: 0, detenido: false, resumen: DEMO.resumen }); });
       case "respaldoParar": return;
+      case "analizar":
+        c.luego(200, () => c.responder("analisisAvance", { hechos: 4100, total: 9025 }));
+        return c.luego(700, () => c.responder("analisisListo", { ok: true, grupos: DEMO.grupos }));
+      case "grupoVer": {
+        const todos = (DEMO.items[d.grupo] || []);
+        return c.luego(250, () => c.responder("grupoPagina", { ok: true, grupo: d.grupo, desde: d.desde, total: todos.length, items: todos.slice(d.desde, d.desde + 60) }));
+      }
+      case "grupoMarcar": {
+        const g = DEMO.grupos[d.grupo], todos = DEMO.items[d.grupo] || [];
+        for (const x of todos) if (d.todas !== undefined) x.marcada = d.todas && !x.guardar; else if (x.id === d.id) x.marcada = d.marcada;
+        const m = todos.filter((x) => x.marcada);
+        Object.assign(g, { marcadas: m.length, bytesMarcadas: m.reduce((t, x) => t + x.bytes, 0) });
+        return c.responder("grupos", { ok: true, grupos: DEMO.grupos });
+      }
+      case "fotoGrande": return c.luego(200, () => c.responder("fotoGrande", { ok: true, id: d.id, img: DEMO.foto }));
+      case "grupoBorrar": {
+        const g = DEMO.grupos[d.grupo], n = g.marcadas, b = g.bytesMarcadas;
+        DEMO.items[d.grupo] = (DEMO.items[d.grupo] || []).filter((x) => !x.marcada);
+        Object.assign(g, { n: g.n - n, bytes: g.bytes - b, marcadas: 0, bytesMarcadas: 0 });
+        return c.luego(400, () => c.responder("grupoBorrado", { ok: true, grupo: d.grupo, borradas: n, bytes: b, grupos: DEMO.grupos }));
+      }
       case "borrarRespaldadas": return c.luego(500, () => c.responder("borradas", { ok: true, borradas: 9025, bytes: 31.4e9, resumen: { respaldadas: 9025, enElIphone: 0, bytes: 31.4e9 } }));
       case "listaIA": return c.responder("iaLista", { ias: DEMO.ias, elegida: DEMO.config.ia });
       default: return COMUNES[accion] ? COMUNES[accion](d, c) : undefined;
@@ -493,6 +652,12 @@
       const q = new URLSearchParams(location.search);
       if (q.has("bienvenida")) DEMO.config.idioma_ui = "";
       if (q.has("sin-iphone")) DEMO.iphone = null;
+      // ?completo (capturas de la página): con las apps, el plan y la carpeta ya listos.
+      if (q.has("completo")) {
+        E.apps = { apps: DEMO.apps, total: DEMO.apps.reduce((t, a) => t + a.tamano, 0) };
+        E.plan = DEMO.plan;
+        DEMO.destino = { nombre: "Respaldos iPhone", ruta: "~/Respaldos iPhone" };
+      }
     }
     host.enviar("listo");
   }

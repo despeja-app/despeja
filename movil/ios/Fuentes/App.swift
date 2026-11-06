@@ -28,6 +28,39 @@ struct DespejaApp: App {
                 }
             }
             p.registrar("respaldoParar") { _ in r.pararRespaldo() }
+            // Analizar y limpiar (Limpieza.swift): grupos con lo que se propone borrar, ver, marcar y borrar.
+            let l = Limpieza.shared
+            p.registrar("analizar") { _ in
+                p.ocupar()
+                Task {
+                    let r = await l.analizar { p.llamar("analisisAvance", $0) }
+                    p.soltar()
+                    p.llamar("analisisListo", r)
+                }
+            }
+            p.registrar("grupoVer") { d in
+                guard let g = d["grupo"] as? String, g.count <= 20 else { return }
+                let desde = (d["desde"] as? NSNumber)?.intValue ?? 0
+                Task { p.llamar("grupoPagina", await l.pagina(g, desde: desde)) }
+            }
+            p.registrar("fotoGrande") { d in
+                guard let id = d["id"] as? String, id.count <= 300 else { return }
+                Task { p.llamar("fotoGrande", await l.grande(id)) }
+            }
+            p.registrar("grupoMarcar") { d in
+                guard let g = d["grupo"] as? String, g.count <= 20 else { return }
+                let id = (d["id"] as? String).flatMap { $0.count <= 300 ? $0 : nil }
+                l.marcar(g, id: id, marcada: d["marcada"] as? Bool, todas: d["todas"] as? Bool)
+                p.llamar("grupos", ["ok": true, "grupos": l.resumen()])
+            }
+            p.registrar("grupoBorrar") { d in
+                guard let g = d["grupo"] as? String, g.count <= 20 else { return }
+                Task {
+                    let r = await l.borrar(g)
+                    p.llamar("grupoBorrado", r)
+                    p.llamar("respaldoEstado", Respaldo.shared.resumen())
+                }
+            }
             p.registrar("borrarRespaldadas") { _ in
                 Task { p.llamar("borradas", await r.borrar()) }
             }

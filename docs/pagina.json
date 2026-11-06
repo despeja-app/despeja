@@ -1,29 +1,369 @@
 {
  "_la_app": "Lo propio de la página de Despeja: completa cada texto en español e inglés y corre python3 <pieza>/herramientas/pieza.py generar . pagina. Todo es texto plano (se escapa). Lo que ya sabe Pieza (permisos, a qué se conecta, preguntas comunes) no va aquí: sale de docs/pagina-comunes.json y de las piezas de la app.",
  "formato": 1,
- "titulo": {"es": "Despeja — La app: lo que es, en una línea (título para buscadores)", "en": "Despeja — The app: what it is, in one line (title for search engines)"},
- "descripcion": {"es": "La app: dos frases para buscadores (unos 155 caracteres).", "en": "The app: two sentences for search engines (about 155 characters)."},
- "frase": {"es": "La app: la frase grande de la portada.", "en": "The app: the big headline."},
- "intro": {"es": "La app: un párrafo corto con lo que hace y para quién.", "en": "The app: a short paragraph with what it does and for whom."},
+ "titulo": {
+  "es": "Despeja — Respalda y libera espacio en tu iPhone desde tu Mac, con tu IA",
+  "en": "Despeja — Back up and free up space on your iPhone from your Mac, with your AI"
+ },
+ "descripcion": {
+  "es": "App gratis y abierta para Mac y iPhone: ve qué ocupa espacio, respalda fotos y videos verificados en tu Mac y borra solo lo que ya está a salvo.",
+  "en": "Free, open-source app for Mac and iPhone: see what takes up space, back up verified photos and videos to your Mac and delete only what's safe."
+ },
+ "frase": {
+  "es": "Deja tu iPhone solo con lo necesario.",
+  "en": "Keep only what you need on your iPhone."
+ },
+ "intro": {
+  "es": "Despeja ve qué ocupa espacio en tu iPhone, respalda tus fotos y videos en tu Mac verificándolos uno por uno y borra del iPhone solo lo que ya está a salvo. Tu propia IA revisa el resumen y te propone un plan. Todo queda entre tu Mac y tu iPhone.",
+  "en": "Despeja shows what takes up space on your iPhone, backs up your photos and videos to your Mac verifying each one, and deletes from the iPhone only what's already safe. Your own AI reviews the summary and suggests a plan. Everything stays between your Mac and your iPhone."
+ },
  "categoria": "UtilitiesApplication",
  "licencia": "AGPL-3.0",
  "licencia_url": "https://www.gnu.org/licenses/agpl-3.0.html",
- "acento": {"claro": "#2f5fd0", "oscuro": "#7fa2ff"},
+ "acento": {
+  "claro": "#2f5fd0",
+  "oscuro": "#7fa2ff"
+ },
  "descargas": true,
  "demo": true,
- "datos": {"es": "En tu computador (en Mac, en ~/Library/Application Support/Despeja). Son archivos en formato abierto. No hay servidores ni cuentas: nada sale de ahí sin que lo pidas.", "en": "On your computer (on Mac, in ~/Library/Application Support/Despeja). They're open-format files. There are no servers or accounts: nothing leaves it unless you ask."},
- "usa": {"notificaciones": false, "llavero": false, "microfono": false},
+ "datos": {
+  "es": "En tu Mac (~/Library/Application Support/Despeja) y en la app del iPhone, en archivos de formato abierto. Tus fotos quedan en la carpeta que elijas. No hay servidores ni cuentas: nada sale de tus equipos sin que lo pidas.",
+  "en": "On your Mac (~/Library/Application Support/Despeja) and in the iPhone app, in open-format files. Your photos stay in the folder you choose. There are no servers or accounts: nothing leaves your devices unless you ask."
+ },
+ "usa": {
+  "notificaciones": false,
+  "llavero": false,
+  "microfono": false
+ },
  "funciones": [
-  {"titulo": {"es": "La app: una función", "en": "The app: a feature"}, "texto": {"es": "Qué resuelve, en una o dos frases.", "en": "What it solves, in one or two sentences."}}
+  {
+   "titulo": {
+    "es": "Ve lo que ocupa espacio",
+    "en": "See what takes up space"
+   },
+   "texto": {
+    "es": "Tu Mac ve el iPhone por cable o Wi-Fi: espacio libre, apps de la más pesada a la más liviana y si hay un iOS más nuevo.",
+    "en": "Your Mac sees the iPhone via cable or Wi-Fi: free space, apps from heaviest to lightest and whether a newer iOS is out."
+   }
+  },
+  {
+   "titulo": {
+    "es": "Respaldo verificado",
+    "en": "Verified backup"
+   },
+   "texto": {
+    "es": "Cada foto y video viaja cifrado por tu Wi-Fi, con su Live Photo y sus ediciones, y se comprueba archivo por archivo en la carpeta que elijas.",
+    "en": "Every photo and video travels encrypted over your Wi-Fi, with its Live Photo and edits, and is checked file by file in the folder you choose."
+   }
+  },
+  {
+   "titulo": {
+    "es": "Borra sin miedo",
+    "en": "Delete without fear"
+   },
+   "texto": {
+    "es": "El iPhone borra solo lo que tu Mac ya verificó. Si algo falló, no se toca.",
+    "en": "The iPhone deletes only what your Mac has verified. If anything failed, it isn't touched."
+   }
+  },
+  {
+   "titulo": {
+    "es": "Un plan con tu IA",
+    "en": "A plan with your AI"
+   },
+   "texto": {
+    "es": "Claude, ChatGPT o Gemini, con tu cuenta, revisa el resumen (nunca tus fotos) y te dice qué hacer primero. Tú decides cada paso.",
+    "en": "Claude, ChatGPT or Gemini, with your account, reviews the summary (never your photos) and tells you what to do first. You decide every step."
+   }
+  },
+  {
+   "titulo": {
+    "es": "Honesta con lo que iOS no deja",
+    "en": "Honest about what iOS doesn't allow"
+   },
+   "texto": {
+    "es": "La caché de otras apps o los chats de WhatsApp no se pueden borrar desde afuera: Despeja te dice exactamente dónde hacerlo.",
+    "en": "Other apps' caches or WhatsApp chats can't be deleted from outside: Despeja tells you exactly where to do it."
+   }
+  }
  ],
- "pasos": [],
- "comparacion": null,
- "capturas": [],
- "preguntas": [],
- "permisos": [],
- "red": [],
+ "pasos": [
+  {
+   "titulo": {
+    "es": "Conecta tu iPhone",
+    "en": "Connect your iPhone"
+   },
+   "texto": {
+    "es": "Por cable la primera vez y toca «Confiar». Después también por Wi-Fi.",
+    "en": "Via cable the first time and tap “Trust”. After that, over Wi-Fi too."
+   }
+  },
+  {
+   "titulo": {
+    "es": "Arma tu plan",
+    "en": "Make your plan"
+   },
+   "texto": {
+    "es": "Tu IA mira el espacio, las apps y la versión de iOS, y propone qué hacer primero.",
+    "en": "Your AI looks at the space, the apps and the iOS version, and suggests what to do first."
+   }
+  },
+  {
+   "titulo": {
+    "es": "Respalda en tu Mac",
+    "en": "Back up to your Mac"
+   },
+   "texto": {
+    "es": "El Mac muestra un código, lo escribes en el iPhone y se mandan tus fotos y videos, verificados.",
+    "en": "The Mac shows a code, you type it on the iPhone and your photos and videos are sent, verified."
+   }
+  },
+  {
+   "titulo": {
+    "es": "Libera espacio",
+    "en": "Free up space"
+   },
+   "texto": {
+    "es": "Borra del iPhone lo que ya está a salvo y vacía «Eliminados recientemente».",
+    "en": "Delete from the iPhone what's already safe and empty “Recently Deleted”."
+   }
+  }
+ ],
+ "comparacion": {
+  "con": [
+   "Fotos de iCloud",
+   "Captura de Imagen"
+  ],
+  "filas": [
+   {
+    "que": {
+     "es": "Dónde quedan tus fotos",
+     "en": "Where your photos end up"
+    },
+    "valores": [
+     {
+      "es": "En tu Mac, en la carpeta que elijas",
+      "en": "On your Mac, in the folder you choose"
+     },
+     {
+      "es": "En iCloud",
+      "en": "In iCloud"
+     },
+     {
+      "es": "En tu Mac",
+      "en": "On your Mac"
+     }
+    ]
+   },
+   {
+    "que": {
+     "es": "Borrar del iPhone",
+     "en": "Deleting from the iPhone"
+    },
+    "valores": [
+     {
+      "es": "Solo lo verificado, archivo por archivo",
+      "en": "Only what's verified, file by file"
+     },
+     {
+      "es": "Deja versiones livianas en el iPhone",
+      "en": "Keeps lightweight versions on the iPhone"
+     },
+     {
+      "es": "Puedes borrar al importar",
+      "en": "You can delete on import"
+     }
+    ]
+   },
+   {
+    "que": {
+     "es": "Qué más ocupa espacio",
+     "en": "What else takes up space"
+    },
+    "valores": [
+     {
+      "es": "Apps, versión de iOS y un plan con tu IA",
+      "en": "Apps, iOS version and a plan with your AI"
+     },
+     {
+      "es": "No",
+      "en": "No"
+     },
+     {
+      "es": "No",
+      "en": "No"
+     }
+    ]
+   },
+   {
+    "que": {
+     "es": "Costo",
+     "en": "Cost"
+    },
+    "valores": [
+     {
+      "es": "Gratis y abierto",
+      "en": "Free and open source"
+     },
+     {
+      "es": "5 GB gratis; después, pago mensual",
+      "en": "5 GB free; then a monthly fee"
+     },
+     {
+      "es": "Gratis, viene con macOS",
+      "en": "Free, comes with macOS"
+     }
+    ]
+   }
+  ]
+ },
+ "capturas": [
+  {
+   "archivo": "img/mac.png",
+   "alt": {
+    "es": "Despeja en el Mac: el iPhone con poco espacio, el plan de la IA y el respaldo",
+    "en": "Despeja on the Mac: the iPhone low on space, the AI plan and the backup"
+   },
+   "ancho": 1280,
+   "alto": 800,
+   "demo": "?idioma=es&completo"
+  },
+  {
+   "archivo": "img/mac-en.png",
+   "alt": {
+    "es": "Despeja en el Mac, en inglés",
+    "en": "Despeja on the Mac, in English"
+   },
+   "ancho": 1280,
+   "alto": 800,
+   "demo": "?idioma=en&completo&tema=oscuro",
+   "tema": "oscuro"
+  },
+  {
+   "archivo": "img/iphone.png",
+   "alt": {
+    "es": "Despeja en el iPhone: respaldar en el Mac y el resumen de fotos",
+    "en": "Despeja on the iPhone: back up to the Mac and the photo summary"
+   },
+   "ancho": 390,
+   "alto": 844,
+   "demo": "?idioma=es&iphone",
+   "tocar": [
+    "#revisar-fotos"
+   ]
+  }
+ ],
+ "preguntas": [
+  {
+   "pregunta": {
+    "es": "¿Qué pasa si se corta el Wi-Fi a mitad del respaldo?",
+    "en": "What if the Wi-Fi drops halfway through the backup?"
+   },
+   "respuesta": {
+    "es": "Nada se pierde: solo queda marcado como respaldado lo que tu Mac ya verificó. Vuelve a tocar «Respaldar» y sigue donde quedó.",
+    "en": "Nothing is lost: only what your Mac already verified is marked as backed up. Tap “Back up” again and it continues where it left off."
+   }
+  },
+  {
+   "pregunta": {
+    "es": "¿Despeja borra la caché de otras apps o mis chats de WhatsApp?",
+    "en": "Does Despeja clear other apps' caches or my WhatsApp chats?"
+   },
+   "respuesta": {
+    "es": "No: iOS no deja que ninguna app toque lo de otra. Despeja te dice cuáles pesan más y exactamente dónde limpiarlas en tu iPhone.",
+    "en": "No: iOS doesn't let any app touch another's data. Despeja shows which ones weigh the most and exactly where to clean them on your iPhone."
+   }
+  },
+  {
+   "pregunta": {
+    "es": "¿Qué ve mi IA?",
+    "en": "What does my AI see?"
+   },
+   "respuesta": {
+    "es": "Solo un resumen: espacio, tamaños y nombres de apps, versión de iOS y cuánto hay respaldado. Nunca tus fotos, nombres de archivos ni contenido.",
+    "en": "Only a summary: space, app sizes and names, iOS version and how much is backed up. Never your photos, file names or content."
+   }
+  },
+  {
+   "pregunta": {
+    "es": "¿Necesito el cable siempre?",
+    "en": "Do I always need the cable?"
+   },
+   "respuesta": {
+    "es": "Solo la primera vez, para que el iPhone confíe en tu Mac. Después funciona por Wi-Fi; para respaldos muy grandes el cable es más rápido.",
+    "en": "Only the first time, so the iPhone trusts your Mac. After that it works over Wi-Fi; for very large backups the cable is faster."
+   }
+  },
+  {
+   "pregunta": {
+    "es": "¿Por qué la app de iPhone se instala con Xcode?",
+    "en": "Why is the iPhone app installed with Xcode?"
+   },
+   "respuesta": {
+    "es": "Todavía no está en la App Store. Con Xcode y tu Apple ID la instalas gratis; con una cuenta gratuita dura 7 días y se reinstala igual.",
+    "en": "It isn't on the App Store yet. With Xcode and your Apple ID you install it for free; with a free account it lasts 7 days and you reinstall it the same way."
+   }
+  }
+ ],
+ "permisos": [
+  {
+   "sistema": "iPhone",
+   "nombre": {
+    "es": "Fotos",
+    "en": "Photos"
+   },
+   "por": {
+    "es": "Para contar, respaldar y, si lo pides, borrar tus fotos y videos. Se pide recién cuando tocas «Revisar mis fotos» o «Respaldar».",
+    "en": "To count, back up and, if you ask, delete your photos and videos. It's asked only when you tap “Check my photos” or “Back up”."
+   }
+  },
+  {
+   "sistema": "iPhone",
+   "nombre": {
+    "es": "Red local",
+    "en": "Local network"
+   },
+   "por": {
+    "es": "Para encontrar tu Mac en tu Wi-Fi y mandarle los respaldos, sin pasar por internet.",
+    "en": "To find your Mac on your Wi-Fi and send it the backups, without going through the internet."
+   }
+  }
+ ],
+ "red": [
+  {
+   "dominio": "api.ipsw.me",
+   "por": {
+    "es": "Saber si hay una versión de iOS más nueva para tu modelo de iPhone (no se manda nada tuyo).",
+    "en": "To know if there's a newer iOS for your iPhone model (nothing of yours is sent)."
+   }
+  }
+ ],
  "comunidad": [
-  {"titulo": {"es": "Aporta", "en": "Contribute"}, "texto": {"es": "Con o sin programar, con o sin IA.", "en": "With or without code, with or without AI."}, "url": "https://github.com/despeja-app/despeja/blob/main/CONTRIBUTING.md"},
-  {"titulo": {"es": "Cuéntanos", "en": "Tell us"}, "texto": {"es": "Ideas, dudas y errores.", "en": "Ideas, questions and bugs."}, "url": "https://github.com/despeja-app/despeja/issues/new/choose"}
- ]
+  {
+   "titulo": {
+    "es": "Aporta",
+    "en": "Contribute"
+   },
+   "texto": {
+    "es": "Con o sin programar, con o sin IA.",
+    "en": "With or without code, with or without AI."
+   },
+   "url": "https://github.com/despeja-app/despeja/blob/main/CONTRIBUTING.md"
+  },
+  {
+   "titulo": {
+    "es": "Cuéntanos",
+    "en": "Tell us"
+   },
+   "texto": {
+    "es": "Ideas, dudas y errores.",
+    "en": "Ideas, questions and bugs."
+   },
+   "url": "https://github.com/despeja-app/despeja/issues/new/choose"
+  }
+ ],
+ "estado": {
+  "es": "Primera versión: la app de iPhone se instala desde tu Mac con Xcode (aún no está en la App Store).",
+  "en": "First version: the iPhone app is installed from your Mac with Xcode (it's not on the App Store yet)."
+ }
 }

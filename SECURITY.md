@@ -23,7 +23,9 @@ Qué puedes esperar:
 - Que la IA reciba más de lo que se le pide o pueda usar herramientas.
 - Cualquier cosa que saque datos del computador sin que la persona lo pida.
 - Problemas en los workflows de GitHub, en cómo se arma la app o en sus actualizaciones que permitan colar código.
-<!-- La app: suma lo propio (p. ej. «que un diagrama…», «que una cartola…»), una viñeta por cosa. -->
+- Que alguien en la misma red Wi-Fi pueda ver, cambiar o dejar archivos en el respaldo sin el código, o hacerse pasar por el Mac.
+- Que una foto se borre del iPhone sin estar verificada en el Mac, o que se escriba fuera de la carpeta elegida.
+- Que la IA reciba fotos, nombres de archivos o algo más que el resumen, o que su respuesta logre hacer algo sin el sí de la persona.
 
 No cuentan: fallas de tu IA (Claude Code, Codex, Gemini; repórtalas a ellos, salvo que Despeja las exponga de más); ataques que
 ya necesitan control total del computador; o encabezados que GitHub Pages no deja configurar en la página pública.
@@ -41,7 +43,15 @@ ya necesitan control total del computador; o encabezados que GitHub Pages no dej
 - La IA es la de la persona, corre en una carpeta temporal vacía, sin herramientas ni MCP y sin las variables de la app.
 - Las actualizaciones se bajan solo de los Releases de `despeja-app/despeja` y se instalan si su SHA-256 coincide; todo lo que se descarga al
   armar la app tiene su huella fija.
-<!-- La app: suma cómo se protege lo propio (qué lee y escribe, qué ve la IA, qué sale a internet y por qué), una viñeta por cosa. -->
+- **El iPhone:** el Mac habla con él por el mismo canal que el Finder (usbmuxd y lockdownd con el registro de emparejamiento que el
+  iPhone aceptó con «Confiar»). La llave del emparejamiento existe solo un momento en un archivo 0600 dentro de una carpeta temporal propia.
+- **El respaldo por Wi-Fi:** TLS con un certificado nuevo en cada sesión (borrado al terminar); un código de 8 letras que nunca
+  viaja y del que sale la llave (PBKDF2-SHA256, 200.000 vueltas) con la que el Mac firma la huella de su certificado y el iPhone
+  firma cada archivo; cada archivo con su SHA-256, vuelto a leer del disco; nombres limpiados y nada fuera de la carpeta elegida.
+  El Mac deja de escuchar al terminar, si la persona lo detiene o tras 15 minutos sin actividad.
+- **Borrar:** solo lo anotado en `respaldados.json` del iPhone (lo que el Mac confirmó), y iOS pregunta antes.
+- **La IA** ve espacio, tamaños y nombres de apps, versión de iOS y cuánto hay respaldado. Su respuesta se valida y no ejecuta nada.
+- **Internet:** solo `api.ipsw.me` (la versión de iOS disponible para el modelo, sin datos de la persona) y GitHub para las actualizaciones.
 
 ---
 

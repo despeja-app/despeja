@@ -12,5 +12,10 @@ EXCEPCIONES = {
     "mac:respaldar": _IPHONE,
     "mac:respaldoParar": _IPHONE,
     "mac:borrarRespaldadas": _IPHONE,
+    "mac:analizar": _IPHONE,
+    "mac:grupoVer": _IPHONE,
+    "mac:grupoMarcar": _IPHONE,
+    "mac:grupoBorrar": _IPHONE,
+    "mac:fotoGrande": _IPHONE,
     "ios:elegirDestino": "solo en el Mac: la carpeta donde quedan los respaldos (en el iPhone la interfaz no la pide)",
 }

@@ -3,8 +3,10 @@
 Despeja es gratis y abierto, y lo hacemos entre todos. Hay lugar para cualquiera, programes o no. *(English below.)*
 
 ## Sin programar
-<!-- La app: lo que se puede aportar sin programar que es propio de esta app (un contenido para su catálogo, probarla con algo
-de la persona —siempre con datos ficticios—…). Una viñeta por cosa, con su enlace. -->
+- **Pruébala con otro iPhone u otra versión de iOS** y cuéntanos qué vio Despeja (espacio, apps) y si el respaldo terminó, con la
+  plantilla [`probar`](https://github.com/despeja-app/despeja/issues/new?template=probar.yml). Nunca subas fotos ni nombres reales.
+- **Mejora las guías** de lo que iOS no deja hacer desde afuera (WhatsApp, «Eliminados recientemente», actualizar iOS): si en tu
+  versión de iOS los menús se llaman distinto, avísanos.
 - **Pruébalo y cuéntanos qué falla:** los issues con la etiqueta [`probar`](https://github.com/despeja-app/despeja/labels/probar) piden justo
   eso (siempre con datos ficticios).
 - **Conversa:** dudas, ideas o lo que hiciste con Despeja → [Discussions](https://github.com/despeja-app/despeja/discussions).
@@ -38,7 +40,10 @@ Todo entra por pull request y lo junta alguien que mantiene el proyecto: nadie p
   página, las guías y el `CHANGELOG.md` cuenten la app como queda. Lo que falte lo completamos antes de juntar.
 - **Interfaz:** que funcione con teclado, a 390 px y en claro y oscuro, y que los textos tengan traducción.
 - **Traducciones:** que una persona que hable el idioma revise el texto.
-<!-- La app: lo que se revisa en lo propio de esta app (su formato, su catálogo, su motor…), una viñeta por cosa. -->
+- **El respaldo:** que nada se marque como respaldado sin el SHA-256 confirmado por el Mac, que el protocolo siga igual en
+  `bin/respaldo.py` y `movil/ios/Fuentes/Respaldo.swift` (y en su prueba), y que nada se borre del iPhone fuera de `respaldados.json`.
+- **Lo que ve la IA:** que `catastro()` no sume fotos, nombres de archivos ni contenido, y que su respuesta se valide antes de mostrarse.
+- **La app de iPhone:** que compile (`bash herramientas/compilar_iphone.sh` en un Mac) y que los permisos pedidos tengan su porqué en `app.json → ios`.
 
 Si algo falta te lo pedimos con un comentario; casi nunca cerramos un aporte sin conversar.
 

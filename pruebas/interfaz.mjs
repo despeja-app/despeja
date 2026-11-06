@@ -3,7 +3,7 @@
 // solo en la pantalla; después, todo traducido al inglés (ningún texto sin traducir); el ejemplo de punta a punta; Ajustes; y
 // nada se sale a 390 px. Con CAPTURAS=<carpeta> guarda capturas para mirarlas a ojo (en GitHub quedan como artefacto).
 //   PLAYWRIGHT=/ruta/a/node_modules/playwright node pruebas/interfaz.mjs
-// La app: suma aquí lo propio (cada pantalla nueva, en español y en inglés).
+// Lo propio de Despeja: el iPhone en el Mac, el plan, recibir el respaldo, y en el iPhone (?iphone) mandar y borrar.
 import { createRequire } from "node:module";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -105,6 +105,30 @@ await capturar(page, "6-sin-iphone");
 
 // 5. La pantalla del iPhone (?iphone): buscar el Mac, código (uno malo y el bueno), respaldar, borrar; y fotos y videos.
 page = await abrir("?idioma=en&iphone", 390);
+// Analizar: grupos con lo propuesto, abrir uno, desmarcar, ver en grande y borrar lo marcado.
+await page.click("#analizar");
+await page.waitForSelector("#limpiar .grupos li");
+await capturar(page, "6a-iphone-grupos-en");
+await page.click('[data-grupo="capturas"]');
+await page.waitForSelector(".cuadros li");
+assert.equal(await page.locator(".cuadros li.marcada").count(), 14);
+await page.click('[data-marcar="c0"]');
+assert.equal(await page.locator(".cuadros li.marcada").count(), 13);
+await page.waitForSelector("#borrar-grupo:has-text('Delete 13')");
+await page.click('[data-ver="c1"]');
+await page.waitForSelector("img.grande");
+await capturar(page, "6b-iphone-grande-en");
+await page.click("[data-pz-cerrar]");
+await sinDesborde(page, "grupo a 390 px");
+await capturar(page, "6c-iphone-grupo-en");
+await page.click("#borrar-grupo");
+await page.click('[data-pz-confirmar="si"]');
+await page.waitForSelector("#limpiar .grupos");
+assert.equal(await page.locator('[data-grupo="capturas"]').count(), 1);   // queda la que se desmarcó
+await page.click('[data-grupo="repetidas"]');
+await page.waitForSelector(".cuadros li.guardar");
+assert.equal(await page.locator(".cuadros li.guardar.marcada").count(), 0, "lo que se queda nunca va marcado");
+await page.click("#volver");
 await page.click("#buscar-mac");
 await page.click("[data-mac]");
 await page.fill("#codigo", "aaaa1111");

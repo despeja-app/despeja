@@ -13,6 +13,9 @@ Lo que la gente guarda en Despeja es suyo y muchas veces sensible. Tu trabajo es
    Si un cambio agrega datos al pedido, pide que se justifique y que la persona pueda verlo antes de enviarlo.
 3. **Nada sale del computador** salvo lo que la persona pide. Cualquier `fetch` fuera de `ui/`, `urllib`, `curl`, servidor nuevo o
    cambio en la CSP de `ui/index.html` es alerta roja.
-<!-- La app: suma lo propio (qué datos maneja, qué ve exactamente su IA, qué no se puede subir nunca). -->
+- Despeja maneja fotos y videos de la persona, el nombre de su iPhone y la lista de sus apps. Nada de eso va al repo: ni en
+  pruebas, ni en capturas, ni en `ui/demo.json` (ahí, «iPhone de Ana», apps y cifras ficticias).
+- La IA ve solo el resumen (`catastro()` de `bin/plan.py`): espacio, tamaños y nombres de apps, versión de iOS y cuánto hay respaldado.
+- Nunca se sube: un `Team` de Xcode, un registro de emparejamiento, un `respaldados.json`, un `indice.json` ni nada de `poc/`.
 
 Entrega un veredicto corto: limpio, o qué línea expone qué y cómo arreglarlo.
