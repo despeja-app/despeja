@@ -326,7 +326,8 @@
           ${x.video ? `<span class="etiqueta" data-sin-traducir>${esc(duracion(x.duracion))}</span>` : ""}
           ${x.guardar ? `<span class="etiqueta queda" data-sin-traducir>${esc(Tp("Se queda"))}</span>` : ""}
           <span class="check" aria-hidden="true"></span></button>
-        <button type="button" class="cuadro-ver" data-ver="${esc(x.id)}" aria-label="${esc(Tp("Ver en grande"))}" data-sin-traducir>⤢</button></li>`).join("");
+        ${x.video ? `<button type="button" class="cuadro-ver" data-video="${esc(x.id)}" aria-label="${esc(Tp("Ver el video"))}" data-sin-traducir>▶</button>`
+          : `<button type="button" class="cuadro-ver" data-ver="${esc(x.id)}" aria-label="${esc(Tp("Ver en grande"))}" data-sin-traducir>⤢</button>`}</li>`).join("");
     return `<header class="barra"><button type="button" class="pz-boton" id="volver" data-sin-traducir>‹ ${esc(Tp("Volver"))}</button>
         <h1 data-sin-traducir>${esc(Tp(def[1]))}</h1><span></span></header>
       <main class="contenido grupo">
@@ -362,7 +363,8 @@
         <div class="tarjeta-uno${x.marcada ? " marcada" : ""}" id="tarjeta-uno" data-sin-traducir>
           <img src="${esc(img)}" alt="">
           ${x.guardar ? `<span class="etiqueta queda">${esc(Tp("La mejor del grupo"))}</span>` : ""}
-          <span class="estado">${esc(Tp(x.marcada ? (ahorro ? "Se aligera" : "Se borra") : "Se queda"))} · ${esc(tamano(x.bytes))}</span>
+          ${x.video ? `<button type="button" class="play" data-video="${esc(x.id)}" aria-label="${esc(Tp("Ver el video"))}">▶</button>` : ""}
+          <span class="estado">${esc(Tp(x.marcada ? (ahorro ? "Se aligera" : "Se borra") : "Se queda"))} · ${esc(tamano(x.bytes))}${x.video ? " · " + esc(duracion(x.duracion)) : ""}</span>
         </div>
         <div class="botones-uno"><button type="button" class="pz-boton pz-peligro" id="uno-borrar" data-sin-traducir>← ${esc(Tp(ahorro ? "Aligerar" : "Borrar"))}</button>
           <button type="button" class="pz-boton" id="uno-quedar" data-sin-traducir>${esc(Tp("Se queda"))} →</button></div>
@@ -510,6 +512,9 @@
       x.marcada = !x.marcada;
       pintar();
       host.enviar("grupoMarcar", { grupo: E.grupo, id: x.id, marcada: x.marcada });
+    } else if (b.dataset.video) {
+      if (enIphone) { toast("Abriendo el video…"); host.enviar("verVideo", { id: b.dataset.video }); }
+      else toast("Los videos se ven en el iPhone.");
     } else if (b.dataset.ver) { E.grande = { id: b.dataset.ver, img: "" }; pintar(); host.enviar("fotoGrande", { id: b.dataset.ver }); }
     else if (b.id === "marcar-todas" || b.id === "marcar-ninguna") {
       const todas = b.id === "marcar-todas";
@@ -742,6 +747,7 @@
       pintar();
     },
     grupos(r) { if (r && r.ok) { E.grupos = r.grupos || {}; pintar(); } },
+    videoVisto(r) { if (!r || !r.ok) toast("No pude abrir ese video.", { error: true }); },
     procesoAvance(a) { if (E.procesando) { E.procesando = a; pintar(); } },
     procesoListo(r) {
       E.procesando = null;
@@ -876,6 +882,7 @@
         Object.assign(g, { marcadas: m.length, bytesMarcadas: m.reduce((t, x) => t + x.bytes, 0) });
         return c.responder("grupos", { ok: true, grupos: DEMO.grupos });
       }
+      case "verVideo": return c.luego(200, () => c.responder("videoVisto", { ok: true, id: d.id }));
       case "fotoGrande": return c.luego(200, () => c.responder("fotoGrande", { ok: true, id: d.id, img: DEMO.foto }));
       case "grupoProcesar": {
         const g = DEMO.grupos[d.grupo], n = g.marcadas, b = g.bytesMarcadas;

@@ -17,6 +17,7 @@ EXCEPCIONES = {
     "mac:grupoMarcar": _IPHONE,
     "mac:grupoBorrar": _IPHONE,
     "mac:fotoGrande": _IPHONE,
+    "mac:verVideo": _IPHONE,
     "mac:grupoProcesar": _IPHONE,
     "mac:procesoParar": _IPHONE,
     "mac:contactosAnalizar": _IPHONE,

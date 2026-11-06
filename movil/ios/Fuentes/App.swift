@@ -47,6 +47,10 @@ struct DespejaApp: App {
                 guard let id = d["id"] as? String, id.count <= 300 else { return }
                 Task { p.llamar("fotoGrande", await l.grande(id)) }
             }
+            p.registrar("verVideo") { d in
+                guard let id = d["id"] as? String, id.count <= 300 else { return }
+                Reproductor.ver(id) { p.llamar("videoVisto", $0) }
+            }
             p.registrar("grupoMarcar") { d in
                 guard let g = d["grupo"] as? String, g.count <= 20 else { return }
                 let id = (d["id"] as? String).flatMap { $0.count <= 300 ? $0 : nil }

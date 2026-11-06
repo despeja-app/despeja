@@ -151,6 +151,9 @@ await page.click("#volver");
 // Ahorrar sin borrar: comprimir videos.
 await page.click('[data-grupo="comprimir"]');
 await page.waitForSelector("#procesar-grupo:not([disabled])");
+await page.waitForSelector(".cuadros li");
+assert.equal(await page.locator(".cuadros [data-video]").count(), 3, "cada video se puede ver");
+await page.click('.cuadros [data-video="k1"]');
 await page.click("#procesar-grupo");
 await page.click('[data-pz-confirmar="si"]');
 await page.waitForSelector("#limpiar .grupos");

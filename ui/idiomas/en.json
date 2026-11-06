@@ -368,6 +368,10 @@
   "Para revisar tu calendario necesito permiso.": "I need permission to check your calendar.",
   "No pude borrar los eventos.": "I couldn't delete the events.",
   "Desliza a la izquierda para aligerar y a la derecha para conservar.": "Swipe left to slim down and right to keep.",
-  "Desliza a la izquierda para borrar y a la derecha para conservar.": "Swipe left to delete and right to keep."
+  "Desliza a la izquierda para borrar y a la derecha para conservar.": "Swipe left to delete and right to keep.",
+  "Ver el video": "Play the video",
+  "Abriendo el video…": "Opening the video…",
+  "Los videos se ven en el iPhone.": "Videos play on the iPhone.",
+  "No pude abrir ese video.": "I couldn't open that video."
  }
 }
