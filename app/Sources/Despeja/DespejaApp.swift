@@ -25,6 +25,10 @@ enum DespejaApp {
             p.registrar("elegirDestino") { _ in
                 destino.elegir(mensaje: Idioma.t("Elige dónde guardar las fotos y videos del iPhone"), boton: Idioma.t("Guardar aquí")) { _ in p.enviarEstado() }
             }
+            // WhatsApp lee el respaldo local del Finder: macOS pide «Acceso total al disco». Se abre justo ese ajuste.
+            p.registrar("abrirAccesoDisco") { _ in
+                if let u = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles") { NSWorkspace.shared.open(u) }
+            }
             p.estado = { base, listo in
                 var e = base
                 if let u = destino.actual() { e["destino"] = ["nombre": u.lastPathComponent, "ruta": u.path] }

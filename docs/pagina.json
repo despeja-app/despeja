@@ -78,6 +78,16 @@
   },
   {
    "titulo": {
+    "es": "WhatsApp sin miedo",
+    "en": "WhatsApp without fear"
+   },
+   "texto": {
+    "es": "Desde el respaldo de tu iPhone en el Mac, te dice qué chats ocupan más y guarda sus fotos y videos antes de que los borres en WhatsApp.",
+    "en": "From your iPhone's backup on the Mac, it shows which chats take the most and saves their photos and videos before you delete them in WhatsApp."
+   }
+  },
+  {
+   "titulo": {
     "es": "Borra sin miedo",
     "en": "Delete without fear"
    },
@@ -265,12 +275,9 @@
     "es": "Despeja en el iPhone: lo que puedes liberar, agrupado",
     "en": "Despeja on the iPhone: what you can free up, grouped"
    },
-   "ancho": 390,
-   "alto": 844,
-   "demo": "?idioma=es&iphone",
-   "tocar": [
-    "#analizar"
-   ]
+   "ancho": 375,
+   "alto": 812,
+   "demo": "?idioma=es&iphone&analizado"
   }
  ],
  "preguntas": [
@@ -357,6 +364,17 @@
    "por": {
     "es": "Solo si tocas «Revisar contactos» o «Revisar calendario», para encontrar repetidos y eventos viejos.",
     "en": "Only if you tap “Check contacts” or “Check calendar”, to find duplicates and old events."
+   }
+  },
+  {
+   "sistema": "Mac",
+   "nombre": {
+    "es": "Acceso total al disco (opcional)",
+    "en": "Full Disk Access (optional)"
+   },
+   "por": {
+    "es": "Solo para leer WhatsApp en el respaldo de tu iPhone que guarda el Finder. Sin él, todo lo demás funciona igual.",
+    "en": "Only to read WhatsApp from your iPhone backup saved by the Finder. Without it, everything else works the same."
    }
   }
  ],

@@ -51,6 +51,8 @@ ya necesitan control total del computador; o encabezados que GitHub Pages no dej
   El Mac deja de escuchar al terminar, si la persona lo detiene o tras 15 minutos sin actividad.
 - **Borrar:** solo lo anotado en `respaldados.json` del iPhone (lo que el Mac confirmó), y iOS pregunta antes.
 - **La IA** ve espacio, tamaños y nombres de apps, versión de iOS y cuánto hay respaldado. Su respuesta se valida y no ejecuta nada.
+- **WhatsApp:** se lee el respaldo local del Finder sin cambiarlo (SQLite en solo lectura, sobre una copia temporal) y solo con el
+  «Acceso total al disco» que la persona le da a Despeja. Los nombres de los chats se muestran en el Mac y nunca van a la IA.
 - **Internet:** solo `api.ipsw.me` (la versión de iOS disponible para el modelo, sin datos de la persona) y GitHub para las actualizaciones.
 
 ---

@@ -25,5 +25,6 @@ EXCEPCIONES = {
     "mac:contactosBorrar": _IPHONE,
     "mac:calendarioAnalizar": _IPHONE,
     "mac:calendarioBorrar": _IPHONE,
+    "ios:abrirAccesoDisco": "solo en el Mac: el ajuste de Acceso total al disco para leer el respaldo de WhatsApp",
     "ios:elegirDestino": "solo en el Mac: la carpeta donde quedan los respaldos (en el iPhone la interfaz no la pide)",
 }

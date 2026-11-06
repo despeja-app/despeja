@@ -93,6 +93,12 @@ await page.waitForSelector("text=128 files received and verified");
 await page.click("#detener-recibir");
 await page.waitForSelector("#recibir-tarjeta .hecho");
 await capturar(page, "3c-plan-respaldo-en");
+// WhatsApp desde el respaldo del Finder: buscar, leer (un solo respaldo: sola) y guardar un chat.
+await page.click("#wa-buscar");
+await page.waitForSelector("#whatsapp [data-wa-guardar]");
+await page.click('#whatsapp [data-wa-guardar="12"]');
+await page.waitForSelector('#whatsapp [data-wa-guardar="12"]:not([disabled])');
+await capturar(page, "3d-whatsapp-en");
 await page.click("#abrir-ajustes");
 await page.waitForSelector("[role=dialog]");
 await capturar(page, "4-ajustes-en");

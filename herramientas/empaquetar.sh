@@ -11,7 +11,7 @@ RAIZ="$(cd "$(dirname "$0")/.." && pwd)"
 [ "$(uname -s)" = Darwin ] || { echo "✗ La app de Mac se arma en un Mac." >&2; exit 1; }
 [ "$(uname -m)" = arm64 ] || { echo "✗ Por ahora Despeja para Mac es solo para Apple Silicon (arm64)." >&2; exit 1; }
 # La versión sale de app.json (la única que se sube para publicar).
-VERSION=$(plutil -extract version raw -o - "$RAIZ/app.json" 2>/dev/null || echo 0.2.0)
+VERSION=$(plutil -extract version raw -o - "$RAIZ/app.json" 2>/dev/null || echo 0.3.0)
 cd "$RAIZ/app"
 PROGRESO=DESPEJA_PROGRESO   # la pieza «actualizaciones» muestra el avance de la compilación
 swift build -c release 2>&1 | tee "${!PROGRESO:-/dev/null}" | tail -20

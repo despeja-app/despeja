@@ -196,10 +196,10 @@
    },
    "generados": {
     ".github/workflows/publicar.yml": "42e96f465997c3458c8292d8416f02e1813827669814625306697c3f309e8c2c",
-    "app/Info.plist": "7fdc795f51b050eb76602ebb7635d80d6ead2d48836895a6f3a2737e3e82dc0b",
+    "app/Info.plist": "5a04ba4b91dd0214cd8f0a92ffe5674c41d26bb87b5c8a3c03239c741225de6f",
     "app/Package.swift": "2d04c3f6eeabfed4f949f83937615357900a5f7c94d4e9717540f4b5d1744b44",
     "build.sh": "1dd347c343903442a6c1336e2dc11455be131819b381036c037d554a175df830",
-    "herramientas/empaquetar.sh": "ff98f4ba12d138ece4f51324374b0635362d23cbf3ffb8bd0a2e1f9549a3c8f8",
+    "herramientas/empaquetar.sh": "6f4284939485a3e8807974e2ca75ba5eabe1b0a28d24220820a46d9f0acbb49c",
     "instalar.sh": "d7ce2eb79e6b17f6434eee1bbb11b3cad2be5a37bbccaf57cdcaf3ba712d8813"
    }
   },
@@ -218,7 +218,7 @@
     "red": []
    },
    "generados": {
-    "movil/ios/App.xcodeproj/project.pbxproj": "c223a5fb136695e0596cf7dba3734cb35e12e0ca3abf976da87a7a41488c4035",
+    "movil/ios/App.xcodeproj/project.pbxproj": "810290f7588aaea64be39dfc34755ead089258a1249f05962180c58a309ac6f9",
     "movil/ios/Info.plist": "6c6192f6bd1bc39213b75a1d975303924d8c126769656d70858f24cc83fa172c",
     "movil/ios/recursos.sh": "2fb9f2c5a883f608b2a1f21e3abbd7f674519c5864e0a0387318f38f00dcaf9c"
    },
@@ -275,7 +275,7 @@
    "generados": {
     ".github/workflows/pagina.yml": "e4278ce966e6b89fa55f4809b8f2dda0159b5a4b702404a5ee6c7c7e49f8ab70",
     "docs/colores.css": "ee9f523cc402aca0986951b45f566f6412af9325f163453e15030b72fdd20d3b",
-    "docs/index.html": "74504dc4d43d032255027eb9b77cb8e7cbbafe8ee48a2c6210c7164ae24c65ae",
+    "docs/index.html": "1604ae5d30bda056d2b94e5d4d9e13802e7b55f052338c3b023abd3225fbf3e3",
     "docs/sitemap.xml": "bd82e6ee0f3c435f478aa8e11e8671610a4cc2a9e5b6d7663fb24abe2cacbc99",
     "herramientas/org.github.io/index.html": "0eb4cb2c5b061fdf912b1ce879cd5d3ff02eaa8f2b0acdac3658ea5f4a25c5ac",
     "herramientas/org.github.io/robots.txt": "c05f61f58d258c98ac2856c00c6bf805120b870fd0b9751747371f59b8b057ab"

@@ -179,5 +179,71 @@ class Respaldo(unittest.TestCase):
                     proc.kill()
 
 
+class WhatsApp(unittest.TestCase):
+    """Un respaldo local de mentira (como el del Finder) con WhatsApp: dos chats, fotos y un video."""
+
+    def armar(self, tmp, cifrado=False):
+        import hashlib, plistlib, sqlite3
+        base = os.path.join(tmp, "Backup")
+        ruta = os.path.join(base, "00008101-000A1B2C3D4E5F60")
+        os.makedirs(ruta)
+        with open(os.path.join(ruta, "Info.plist"), "wb") as f:
+            import datetime
+            plistlib.dump({"Device Name": "iPhone de Ana", "Last Backup Date": datetime.datetime(2026, 11, 5, 22, 10)}, f)
+        with open(os.path.join(ruta, "Manifest.plist"), "wb") as f:
+            plistlib.dump({"IsEncrypted": cifrado}, f)
+        man = sqlite3.connect(os.path.join(ruta, "Manifest.db"))
+        man.execute("CREATE TABLE Files (fileID TEXT, domain TEXT, relativePath TEXT, flags INTEGER, file BLOB)")
+        dom = "AppDomainGroup-group.net.whatsapp.WhatsApp.shared"
+
+        def poner(rel, datos):
+            fid = hashlib.sha1(f"{dom}-{rel}".encode()).hexdigest()
+            os.makedirs(os.path.join(ruta, fid[:2]), exist_ok=True)
+            with open(os.path.join(ruta, fid[:2], fid), "wb") as f:
+                f.write(datos)
+            man.execute("INSERT INTO Files VALUES (?, ?, ?, 1, NULL)", (fid, dom, rel))
+        chat = os.path.join(tmp, "chat.sqlite")
+        db = sqlite3.connect(chat)
+        db.executescript("""CREATE TABLE ZWACHATSESSION (Z_PK INTEGER, ZPARTNERNAME TEXT, ZCONTACTJID TEXT);
+            CREATE TABLE ZWAMESSAGE (Z_PK INTEGER, ZCHATSESSION INTEGER, ZMESSAGETYPE INTEGER, ZMESSAGEDATE REAL);
+            CREATE TABLE ZWAMEDIAITEM (Z_PK INTEGER, ZMESSAGE INTEGER, ZMEDIALOCALPATH TEXT, ZFILESIZE INTEGER);
+            INSERT INTO ZWACHATSESSION VALUES (1, 'Familia Pérez', '1@g.us'), (2, 'Matías Soto', '2@s.whatsapp.net');
+            INSERT INTO ZWAMESSAGE VALUES (10, 1, 1, 700000000), (11, 1, 2, 700000100), (12, 2, 1, 760000000);
+            INSERT INTO ZWAMEDIAITEM VALUES (100, 10, 'Media/1@g.us/a/foto1.jpg', 0), (101, 11, 'Media/1@g.us/b/video1.mp4', 0),
+                                            (102, 12, 'Media/2@s.whatsapp.net/c/foto2.jpg', 0);""")
+        db.commit(); db.close()
+        poner("ChatStorage.sqlite", open(chat, "rb").read())
+        poner("Message/Media/1@g.us/a/foto1.jpg", b"f" * 1000)
+        poner("Message/Media/1@g.us/b/video1.mp4", b"v" * 5000)
+        poner("Message/Media/2@s.whatsapp.net/c/foto2.jpg", b"g" * 300)
+        man.commit(); man.close()
+        return base
+
+    def test_ordena_los_chats_y_guarda_uno(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            base = self.armar(tmp)
+            env = {"DESPEJA_RESPALDOS_IPHONE": base}
+            r = correr("whatsapp.py", "respaldos", entorno_extra=env)
+            self.assertEqual([x["nombre"] for x in r["respaldos"]], ["iPhone de Ana"])
+            r = correr("whatsapp.py", "analizar", entrada={"respaldo": "00008101-000A1B2C3D4E5F60"}, entorno_extra=env)
+            self.assertTrue(r["ok"], r)
+            self.assertEqual([(c["nombre"], c["bytes"], c["fotos"], c["videos"]) for c in r["chats"]],
+                             [("Familia Pérez", 6000, 1, 1), ("Matías Soto", 300, 1, 0)])
+            destino = os.path.join(tmp, "Respaldos")
+            os.makedirs(destino)
+            g = correr("whatsapp.py", "guardar", entrada={"respaldo": "00008101-000A1B2C3D4E5F60", "chat": 1, "destino": destino}, entorno_extra=env)
+            self.assertEqual((g["ok"], g["copiados"], g["bytes"]), (True, 2, 6000))
+            self.assertTrue(os.path.isfile(os.path.join(destino, "WhatsApp", "Familia Pérez", "2023-03", "foto1.jpg")))
+            # Otra vez: no copia lo que ya estaba
+            g = correr("whatsapp.py", "guardar", entrada={"respaldo": "00008101-000A1B2C3D4E5F60", "chat": 1, "destino": destino}, entorno_extra=env)
+            self.assertEqual(g["copiados"], 0)
+
+    def test_respaldo_cifrado_se_dice(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            base = self.armar(tmp, cifrado=True)
+            r = correr("whatsapp.py", "analizar", entrada={"respaldo": "00008101-000A1B2C3D4E5F60"}, entorno_extra={"DESPEJA_RESPALDOS_IPHONE": base})
+            self.assertEqual((r["ok"], r["codigo"]), (False, "cifrado"))
+
+
 if __name__ == "__main__":
     unittest.main()

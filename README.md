@@ -9,6 +9,7 @@ Gratis y abierto (AGPL-3.0). Todo queda entre tu Mac y tu iPhone: sin cuentas ni
 |---|---|
 | Ve tu iPhone por cable o Wi-Fi: espacio, apps de la más pesada a la más liviana y si hay un iOS más nuevo | Cuenta tus fotos, videos y capturas y cuánto ocupan |
 | Recibe los respaldos en la carpeta que elijas, ordenados por año y mes, y verifica cada archivo | Manda cada foto y video al Mac, con su Live Photo y sus ediciones, cifrado por tu Wi-Fi |
+| WhatsApp: qué chats ocupan más (desde el respaldo del Finder) y guarda sus fotos y videos antes de que los borres | |
 | Tu IA (Claude, ChatGPT o Gemini, con tu cuenta) arma un plan y marca las apps que podrían sobrar; las desinstalas con casillas | Borra solo lo que tu Mac verificó |
 | | Analiza solo: fotos repetidas y parecidas, capturas, ráfagas, videos repetidos, borrosas, memes y videos grandes; las revisas en cuadrícula o una por una deslizando |
 | | Ahorra sin borrar: comprime videos y convierte Live Photos en fotos; junta contactos repetidos y borra eventos viejos |

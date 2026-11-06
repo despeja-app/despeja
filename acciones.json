@@ -133,6 +133,58 @@
    "progreso": "respaldoProgreso",
    "responde": "respaldoTerminado",
    "pieza": "app"
+  },
+  "whatsappAnalizar": {
+   "script": "whatsapp.py",
+   "args": [
+    "analizar"
+   ],
+   "entrada": "archivo",
+   "datos": {
+    "respaldo": {
+     "tipo": "texto",
+     "max": 40
+    }
+   },
+   "responde": "whatsappAnalizado",
+   "limite": 300,
+   "pieza": "app"
+  },
+  "whatsappGuardar": {
+   "script": "whatsapp.py",
+   "args": [
+    "guardar"
+   ],
+   "entrada": "archivo",
+   "datos": {
+    "respaldo": {
+     "tipo": "texto",
+     "max": 40
+    },
+    "chat": {
+     "tipo": "entero",
+     "max": 100000000
+    }
+   },
+   "eco": [
+    "chat"
+   ],
+   "inyectar": {
+    "destino": "carpetaActual"
+   },
+   "responde": "whatsappGuardado",
+   "limite": 1800,
+   "pieza": "app"
+  },
+  "whatsappRespaldos": {
+   "script": "whatsapp.py",
+   "args": [
+    "respaldos"
+   ],
+   "datos": {},
+   "responde": "whatsappRespaldos",
+   "limite": 30,
+   "pieza": "app"
   }
  }
 }

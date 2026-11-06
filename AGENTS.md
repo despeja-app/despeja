@@ -41,6 +41,7 @@ PhotoKit, manda cada foto y video al Mac y borra del iPhone **solo lo que el Mac
 | `CHANGELOG.md` | Lo que cambia para quien usa la app, en palabras simples (ver «Lo que rodea a un cambio»). |
 | `bin/iphone.py` | El Mac habla con el iPhone (usbmuxd → lockdownd con TLS y el registro de emparejamiento): `estado` (modelo, iOS, capacidad, libre), `apps` (con su tamaño; queda en `catastro.json`) y `desinstalar` (solo una app de la última lista revisada). |
 | `bin/respaldo.py` | El Mac recibe: servidor HTTPS en la red local anunciado por Bonjour (`_despeja._tcp`), código de 8 letras, verificación SHA-256 y `respaldo/indice.json`. |
+| `bin/whatsapp.py` | WhatsApp desde el respaldo local del Finder: qué chats ocupan más y copiar sus archivos a la carpeta elegida (`WhatsApp/<chat>/AAAA-MM`). Solo lee el respaldo. |
 | `bin/plan.py` | El catastro y el plan con la IA de la persona (`armar`) y la versión de iOS más nueva para el modelo (`ios`, api.ipsw.me). |
 | `movil/ios/Fuentes/` | La app de iPhone: `App.swift` (lo que atiende), `Fotos.swift` (resumen), `Respaldo.swift` (buscar el Mac, conectar, mandar, borrar), `Limpieza.swift` (analizar y agrupar), `Compresion.swift` (comprimir videos, Live Photos a fotos), `Contactos.swift`, `Calendario.swift`. El proyecto de Xcode y su `Info.plist` los genera «host-ios». |
 | `herramientas/compilar_iphone.sh`, `instalar_iphone.sh` | Compilar la app de iPhone para el simulador; instalarla con `devicectl` (si Xcode no tiene la sesión, se instala con ▶︎ desde Xcode). |
@@ -54,6 +55,7 @@ PhotoKit, manda cada foto y video al Mac y borra del iPhone **solo lo que el Mac
 | Mac | ¿Hay iOS más nuevo? | `iosRevisar` → `bin/plan.py ios` (una vez por conexión) |
 | Mac | Plan con la IA | `planArmar` → `bin/plan.py armar` (idioma inyectado; la respuesta se valida) |
 | Mac | Desinstalar una app | `iphoneDesinstalar` → `bin/iphone.py desinstalar` (con confirmación en la interfaz) |
+| Mac | WhatsApp | `whatsappRespaldos`, `whatsappAnalizar {respaldo}`, `whatsappGuardar {respaldo, chat}` → `bin/whatsapp.py` (lee el respaldo local del Finder, sin cifrar; necesita «Acceso total al disco»: `abrirAccesoDisco`, nativo). Los nombres de los chats nunca van a la IA |
 | Mac | Recibir un respaldo | `elegirDestino` (nativo, `CarpetaElegida`) y `respaldoRecibir` → `bin/respaldo.py recibir` (trabajo que late; avisa `esperando`/`conectado`/`archivo`/`fin` por `respaldoProgreso`); `respaldoDetener` |
 | iPhone | Resumen de fotos | `fotosResumen` (PhotoKit; el permiso se pide recién al tocar) |
 | iPhone | Mandar al Mac | `macBuscar` → `macConectar {mac, codigo}` → `respaldar` (avisa `respaldoAvance`) → `respaldoListo`; `respaldoParar` |

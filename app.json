@@ -1,7 +1,7 @@
 {
  "nombre": "Despeja",
  "id": "despeja",
- "version": "0.2.0",
+ "version": "0.3.0",
  "repo": "despeja-app/despeja",
  "datos": "sistema",
  "icono": "docs/favicon.svg",
@@ -133,6 +133,55 @@
    },
    "responde": "appsSugeridas",
    "limite": 300
+  },
+  "whatsappRespaldos": {
+   "script": "whatsapp.py",
+   "args": [
+    "respaldos"
+   ],
+   "datos": {},
+   "responde": "whatsappRespaldos",
+   "limite": 30
+  },
+  "whatsappAnalizar": {
+   "script": "whatsapp.py",
+   "args": [
+    "analizar"
+   ],
+   "entrada": "archivo",
+   "datos": {
+    "respaldo": {
+     "tipo": "texto",
+     "max": 40
+    }
+   },
+   "responde": "whatsappAnalizado",
+   "limite": 300
+  },
+  "whatsappGuardar": {
+   "script": "whatsapp.py",
+   "args": [
+    "guardar"
+   ],
+   "entrada": "archivo",
+   "datos": {
+    "respaldo": {
+     "tipo": "texto",
+     "max": 40
+    },
+    "chat": {
+     "tipo": "entero",
+     "max": 100000000
+    }
+   },
+   "eco": [
+    "chat"
+   ],
+   "inyectar": {
+    "destino": "carpetaActual"
+   },
+   "responde": "whatsappGuardado",
+   "limite": 1800
   }
  },
  "ios": {

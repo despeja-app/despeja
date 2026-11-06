@@ -23,7 +23,8 @@
     sugeridas: null, sugiriendo: false, elegidas: new Set(), desinstalando: [],
     analizando: false, analisisAvance: null, grupos: null, grupo: null, items: [], totalGrupo: 0, cargando: false,
     grande: null, borrandoGrupo: false, procesando: null, uno: null,
-    tab: "limpiar",   // iPhone: limpiar | respaldo | orden
+    tab: "limpiar",
+    wa: null, waBuscando: false, waRespaldo: "", waAnalizando: false, waChats: null, waGuardando: null,   // iPhone: limpiar | respaldo | orden
     contactos: null, revisandoContactos: false, incompletosElegidos: new Set(), calendario: null, revisandoCalendario: false };
   // ?iphone en la vista previa muestra la pantalla del iPhone.
   const enIphone = host.plataforma === "movil" || (host.plataforma === "web" && new URLSearchParams(location.search).has("iphone"));
@@ -129,6 +130,38 @@
         <p class="nota">Es lo que ocupa cada app. Lo que guarda adentro (chats, caché) iOS no lo informa: lo veremos aparte.</p>`;
     }
     return `<section class="tarjeta" id="apps"><h2>Apps</h2>${cuerpo}</section>`;
+  }
+
+  /** WhatsApp desde el respaldo local del Finder: qué chats pesan más y guardar sus fotos y videos antes de borrarlos. */
+  function tarjetaWhatsapp() {
+    if (!E.iphone) return "";
+    const w = E.wa;
+    let cuerpo;
+    if (E.waAnalizando) cuerpo = `<p class="suave" aria-busy="true">Leyendo WhatsApp en el respaldo…</p>`;
+    else if (E.waChats) {
+      const max = (E.waChats.chats[0] || {}).bytes || 1;
+      cuerpo = `<p class="cifras" data-sin-traducir><span class="cifra-grande">${esc(tamano(E.waChats.total))}</span><span>${esc(Tp("en fotos, videos y archivos de {n} chats", { n: entero(E.waChats.n_chats) }))}</span></p>
+        <ul class="apps wa">${E.waChats.chats.slice(0, 12).map((c) => `<li><span class="nombre" data-sin-traducir>${esc(c.nombre || Tp("(sin nombre)"))}<br>
+          <span class="suave" data-sin-traducir>${esc(Tp("{f} fotos, {v} videos, {a} audios", { f: entero(c.fotos), v: entero(c.videos), a: entero(c.audios) }))}</span></span>
+          <span class="medida" data-medida="${Math.max(2, Math.round((c.bytes / max) * 100))}" aria-hidden="true"></span>
+          <span class="tam" data-sin-traducir>${esc(tamano(c.bytes))}</span>
+          <button type="button" class="pz-boton pz-chico" data-wa-guardar="${c.id}"${E.destino && E.waGuardando === null ? "" : " disabled"} data-sin-traducir>${esc(E.waGuardando === c.id ? Tp("Guardando…") : Tp("Guardar"))}</button></li>`).join("")}</ul>
+        <p class="guia">${esc("Guarda un chat en tu Mac y después bórralo en WhatsApp: Ajustes → Almacenamiento y datos → Administrar almacenamiento → el chat → Seleccionar → Eliminar.")}</p>
+        ${E.destino ? "" : `<p class="nota">Elige una carpeta en «Respaldo en tu Mac» para poder guardar.</p>`}`;
+    } else if (w && w.ok && w.respaldos.length) {
+      cuerpo = `<p>Elige el respaldo de tu iPhone:</p><div class="lista-macs">${w.respaldos.map((r) => `<button type="button" class="pz-boton" data-wa-respaldo="${esc(r.id)}"${r.cifrado ? " disabled" : ""} data-sin-traducir>
+          ${esc(r.nombre)} · ${esc(r.fecha ? new Date(r.fecha).toLocaleDateString(i18n.idioma, { day: "numeric", month: "short", year: "numeric" }) : "")}${r.cifrado ? " · " + esc(Tp("cifrado")) : ""}</button>`).join("")}</div>
+        ${w.respaldos.some((r) => r.cifrado) ? `<p class="nota">Un respaldo cifrado no se puede leer sin su contraseña. En el Finder, desmarca «Cifrar respaldo local» y respalda de nuevo.</p>` : ""}`;
+    } else {
+      const sinAcceso = w && w.codigo === "sin_acceso";
+      cuerpo = `<p class="suave">WhatsApp suele ser lo que más pesa y iOS no deja que otra app lo lea. Despeja lo lee del respaldo de tu iPhone en este Mac: te dice qué chats ocupan más y guarda sus fotos y videos antes de que los borres.</p>
+        <ol class="pasos"><li>En el Finder, elige tu iPhone y toca «Respaldar ahora» (respaldo en este Mac, sin cifrar).</li>
+          <li>Dale a Despeja «Acceso total al disco» para leer ese respaldo.</li></ol>
+        ${sinAcceso ? `<p class="error">Falta el acceso total al disco.</p>` : w && w.ok ? `<p class="nota">No encontré respaldos en este Mac todavía.</p>` : ""}
+        <div class="pz-pie izquierda"><button type="button" class="pz-boton" id="wa-acceso">Abrir Acceso total al disco</button>
+          <button type="button" class="pz-boton pz-principal" id="wa-buscar"${E.waBuscando ? " disabled" : ""}>${E.waBuscando ? "Buscando…" : "Buscar respaldo"}</button></div>`;
+    }
+    return `<section class="tarjeta" id="whatsapp"><h2>WhatsApp</h2>${cuerpo}</section>`;
   }
 
   /** Lo que tu IA cree que podría sobrar, para elegir y desinstalar de una vez. */
@@ -437,7 +470,7 @@
       return barra(titulo) + `<main class="contenido con-tabs">${cuerpo}</main>` + tabbar();
     }
     return barra() + `<main class="contenido mac"><div class="columna">${tarjetaIphone()}${tarjetaPlan()}</div>
-      <div class="columna">${tarjetaRecibir()}${tarjetaApps()}</div></main>`;
+      <div class="columna">${tarjetaRecibir()}${tarjetaWhatsapp()}${tarjetaApps()}</div></main>`;
   }
   function ajustes() {
     const idiomas = [["es", "Español"], ["en", "English"]].map(([c, n]) =>
@@ -485,6 +518,10 @@
     else if (b.id === "armar-plan") { E.armando = true; E.planError = null; pintar(); host.enviar("planArmar"); }
     else if (b.dataset.desinstalar) desinstalar(b.dataset.desinstalar);
     else if (b.id === "sugerir") sugerir();
+    else if (b.id === "wa-acceso") host.enviar("abrirAccesoDisco");
+    else if (b.id === "wa-buscar") { E.waBuscando = true; pintar(); host.enviar("whatsappRespaldos"); }
+    else if (b.dataset.waRespaldo) { Object.assign(E, { waRespaldo: b.dataset.waRespaldo, waAnalizando: true }); pintar(); host.enviar("whatsappAnalizar", { respaldo: b.dataset.waRespaldo }); }
+    else if (b.dataset.waGuardar) { E.waGuardando = Number(b.dataset.waGuardar); pintar(); host.enviar("whatsappGuardar", { respaldo: E.waRespaldo, chat: E.waGuardando }); }
     else if (b.id === "desinstalar-elegidas") desinstalarElegidas();
     else if (b.id === "elegir-destino") host.enviar("elegirDestino");
     else if (b.id === "recibir") {
@@ -660,6 +697,26 @@
         E.sinIphone = false;
       }
       else { E.iphone = null; E.apps = null; E.sinIphone = r || {}; }
+      pintar();
+    },
+    whatsappRespaldos(r) {
+      E.waBuscando = false;
+      E.wa = r || { ok: false };
+      // Un solo respaldo sin cifrar: se lee de una
+      const usables = r && r.ok ? r.respaldos.filter((x) => !x.cifrado) : [];
+      if (usables.length === 1 && r.respaldos.length === 1) { Object.assign(E, { waRespaldo: usables[0].id, waAnalizando: true }); host.enviar("whatsappAnalizar", { respaldo: usables[0].id }); }
+      pintar();
+    },
+    whatsappAnalizado(r) {
+      E.waAnalizando = false;
+      if (r && r.ok) E.waChats = r;
+      else { toast((r && r.error) || "No se pudo.", { error: true }); if (r && r.codigo === "sin_acceso") E.wa = r; }
+      pintar();
+    },
+    whatsappGuardado(r) {
+      E.waGuardando = null;
+      if (r && r.ok) toast("Listo: {n} archivos guardados ({b}). Ya puedes borrarlos en WhatsApp.", { valores: { n: entero(r.copiados), b: tamano(r.bytes) } });
+      else toast((r && r.error) || "No se pudo.", { error: true });
       pintar();
     },
     appsSugeridas(r) {
@@ -847,6 +904,10 @@
         : { ok: false, codigo: "sin_iphone", error: "No veo ningún iPhone. Conéctalo por cable o ponlo en la misma red Wi-Fi." }));
       case "iphoneApps": return c.luego(600, () => c.responder("iphoneApps", { ok: true, apps: DEMO.apps,
         total: DEMO.apps.reduce((t, a) => t + a.tamano, 0) }));
+      case "whatsappRespaldos": return c.luego(300, () => c.responder("whatsappRespaldos", { ok: true, respaldos: [{ id: "00008101-000A1B2C3D4E5F60", nombre: "iPhone de Ana", fecha: "2026-11-05T22:10:00Z", cifrado: false }] }));
+      case "whatsappAnalizar": return c.luego(500, () => c.responder("whatsappAnalizado", DEMO.whatsapp));
+      case "whatsappGuardar": return c.luego(600, () => c.responder("whatsappGuardado", { ok: true, chat: d.chat, copiados: 412, bytes: 1.3e9 }));
+      case "abrirAccesoDisco": return;
       case "appsSugerir": return c.luego(500, () => c.responder("appsSugeridas", { ok: true, apps: DEMO.sugeridas }));
       case "iosRevisar": return c.luego(200, () => c.responder("iosRevisado", DEMO.ios));
       case "planArmar": return c.luego(700, () => c.responder("planListo", { ok: true, plan: DEMO.plan }));
@@ -865,7 +926,8 @@
         c.luego(300, () => c.responder("respaldoAvance", { hechos: 4200, total: 9025, bytes: 14.1e9, fallas: 0 }));
         return c.luego(900, () => { DEMO.resumen = { respaldadas: 9025, enElIphone: 9025, bytes: 31.4e9 }; c.responder("respaldoListo", { ok: true, hechos: 9025, total: 9025, nuevos: 9025, fallas: 0, detenido: false, resumen: DEMO.resumen }); });
       case "respaldoParar": return;
-      case "limpiezaEstado": return;
+      // ?analizado: como el iPhone, que recuerda el último análisis.
+      case "limpiezaEstado": return new URLSearchParams(location.search).has("analizado") ? c.luego(100, () => c.responder("analisisListo", { ok: true, grupos: DEMO.grupos })) : undefined;
       case "analizar":
         c.luego(200, () => c.responder("analisisAvance", { hechos: 4100, total: 9025 }));
         return c.luego(700, () => c.responder("analisisListo", { ok: true, grupos: DEMO.grupos }));
