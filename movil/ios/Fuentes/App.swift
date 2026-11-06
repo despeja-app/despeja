@@ -89,6 +89,11 @@ struct DespejaApp: App {
             }
             p.registrar("calendarioAnalizar") { _ in Task { p.llamar("calendarioAnalizado", await cal.analizar()) } }
             p.registrar("calendarioBorrar") { _ in Task { p.llamar("calendarioBorrado", await cal.borrarViejos()) } }
+            // Siempre al día (Vigia.swift): si cambia la biblioteca o vuelves a la app, se actualiza lo que se ve.
+            Vigia.shared.empezar {
+                if l.actualizar() { p.llamar("grupos", ["ok": true, "grupos": l.resumen()]) }
+                p.llamar("respaldoEstado", r.resumen())
+            }
             p.registrar("borrarRespaldadas") { _ in
                 Task { p.llamar("borradas", await r.borrar()) }
             }

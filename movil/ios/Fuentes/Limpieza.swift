@@ -10,6 +10,7 @@
 // - utiles: memes, documentos, recibos (iOS 18: Vision dice «isUtility»), solo entre imágenes sin ubicación (las del cámara
 //   suelen tenerla). Sin marcar: es una sugerencia.
 // - videos: de más de 100 MB, de mayor a menor. Sin marcar.
+// - comprimidos: originales que ya tienen su versión liviana hecha por Despeja (si al comprimir iOS no pudo borrarlos). Marcados.
 // Una foto favorita nunca se marca sola.
 import Foundation
 import Photos
@@ -54,7 +55,80 @@ final class Limpieza {
         PHAsset.fetchAssets(withLocalIdentifiers: ids, options: nil).enumerateObjects { a, _, _ in existen.insert(a.localIdentifier) }
         fecha = g.fecha
         grupos = g.grupos.mapValues { $0.filter { existen.contains($0.id) } }
+        quitarComprimidos(Limpieza.comprimidos())
         return ["ok": true, "grupos": resumen(), "fecha": ISO8601DateFormatter().string(from: g.fecha)]
+    }
+
+    /// Al día con la biblioteca (se llama cuando cambia o cuando la app vuelve a primer plano): lo que ya no existe sale de los
+    /// grupos y se revisan los originales ya comprimidos. Devuelve true si algo cambió.
+    func actualizar() -> Bool {
+        guard !grupos.isEmpty, !analizando, !procesando else { return false }
+        let antes = resumen() as NSDictionary
+        let ids = Array(Set(grupos.values.joined().map(\.id)))
+        var existen = Set<String>()
+        PHAsset.fetchAssets(withLocalIdentifiers: ids, options: nil).enumerateObjects { a, _, _ in existen.insert(a.localIdentifier) }
+        if existen.count < ids.count {
+            for k in grupos.keys { grupos[k] = grupos[k]?.filter { existen.contains($0.id) } }
+            for k in ["repetidas", "parecidas"] where grupos[k]?.count == 1 { grupos[k] = [] }
+        }
+        quitarComprimidos(Limpieza.comprimidos())
+        return !(resumen() as NSDictionary).isEqual(antes)
+    }
+
+    /// Pone los originales ya comprimidos en su grupo (respetando lo que la persona desmarcó) y los saca de los demás, para que
+    /// no se propongan de nuevo para comprimir.
+    private func quitarComprimidos(_ nuevos: [Item]) {
+        let previos = Dictionary((grupos["comprimidos"] ?? []).map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        let lista = nuevos.map { previos[$0.id] ?? $0 }
+        let ids = Set(lista.map(\.id))
+        if (grupos["comprimidos"] ?? []).map(\.id) != lista.map(\.id) { grupos["comprimidos"] = lista }
+        guard !ids.isEmpty else { return }
+        for k in grupos.keys where k != "comprimidos" {
+            if grupos[k]?.contains(where: { ids.contains($0.id) }) == true { grupos[k] = grupos[k]?.filter { !ids.contains($0.id) } }
+        }
+    }
+
+    /// Las versiones que crea Despeja se guardan con un nombre de archivo propio (un UUID). Su original es el video o la Live
+    /// Photo con la misma fecha (al segundo) que sigue en la biblioteca: se busca solo entre esas fechas, así que es rápido.
+    nonisolated static func comprimidos() -> [Item] {
+        let uuid = try! NSRegularExpression(pattern: "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}\\.[A-Za-z0-9]+$")
+        func esDespeja(_ a: PHAsset) -> Bool {
+            guard let n = PHAssetResource.assetResources(for: a).first?.originalFilename else { return false }
+            return uuid.firstMatch(in: n, range: NSRange(n.startIndex..., in: n)) != nil
+        }
+        func seg(_ a: PHAsset) -> Int? { a.creationDate.map { Int($0.timeIntervalSince1970.rounded()) } }
+        var r: [Item] = []
+        // Videos: misma fecha y misma duración (±1 s); el original es el más pesado.
+        let videos = PHAsset.fetchAssets(with: .video, options: nil)
+        var porFecha: [Int: [PHAsset]] = [:]
+        videos.enumerateObjects { v, _, _ in if let s = seg(v) { porFecha[s, default: []].append(v) } }
+        for (_, g) in porFecha where g.count > 1 {
+            let livianas = g.filter(esDespeja)
+            for o in g where !livianas.contains(o) && !esDespeja(o) {
+                if livianas.contains(where: { abs($0.duration - o.duration) <= 1 }) {
+                    r.append(Item(id: o.localIdentifier, bytes: bytes(o), marcada: true, guardar: false))
+                }
+            }
+        }
+        // Live Photos: la foto sin video que hizo Despeja y la Live Photo original, con la misma fecha.
+        let op = PHFetchOptions()
+        op.predicate = NSPredicate(format: "(mediaSubtypes & %d) != 0", PHAssetMediaSubtype.photoLive.rawValue)
+        var lives: [Int: [PHAsset]] = [:]
+        PHAsset.fetchAssets(with: .image, options: op).enumerateObjects { a, _, _ in if let s = seg(a) { lives[s, default: []].append(a) } }
+        if !lives.isEmpty {
+            let fechas = lives.keys.sorted()
+            let op2 = PHFetchOptions()
+            op2.predicate = NSPredicate(format: "creationDate >= %@ AND creationDate <= %@ AND (mediaSubtypes & %d) == 0",
+                                        Date(timeIntervalSince1970: TimeInterval(fechas.first! - 1)) as NSDate,
+                                        Date(timeIntervalSince1970: TimeInterval(fechas.last! + 1)) as NSDate,
+                                        PHAssetMediaSubtype.photoLive.rawValue)
+            var conPar = Set<Int>()
+            PHAsset.fetchAssets(with: .image, options: op2).enumerateObjects { a, _, _ in
+                if let s = seg(a), lives[s] != nil, esDespeja(a) { conPar.insert(s) }
+            }
+            for s in conPar { for o in lives[s] ?? [] { r.append(Item(id: o.localIdentifier, bytes: bytes(o), marcada: true, guardar: false)) } }
+        }
+        return r.sorted { $0.bytes > $1.bytes }
     }
     private var analizando = false
 
@@ -72,6 +146,7 @@ final class Limpieza {
         } }.value
         fecha = Date()
         grupos = r
+        quitarComprimidos(await Task.detached(priority: .userInitiated) { Limpieza.comprimidos() }.value)
         return ["ok": true, "grupos": resumen(), "fecha": ISO8601DateFormatter().string(from: fecha!)]
     }
 
@@ -354,6 +429,7 @@ final class Limpieza {
     // MARK: Ahorrar sin borrar (comprimir videos, Live Photos a fotos)
 
     private var detener = false
+    private var procesando = false
     func pararProceso() { detener = true }
 
     func procesar(_ grupo: String, avance: @escaping @MainActor ([String: Any]) -> Void) async -> [String: Any] {
@@ -361,11 +437,15 @@ final class Limpieza {
         let ids = lista.filter(\.marcada).map(\.id)
         guard !ids.isEmpty else { return ["ok": true, "hechos": 0, "ahorro": 0, "grupos": resumen()] }
         detener = false
+        procesando = true
+        defer { procesando = false }
         var r = await Compresion.procesar(ids, tipo: grupo, avance: avance, detenido: { [weak self] in self?.detener ?? true })
         let hechos = Set((r["ids"] as? [String]) ?? [])
         grupos[grupo] = lista.filter { !hechos.contains($0.id) }
         // Lo reemplazado ya no está en los demás grupos (era otro archivo)
         for k in grupos.keys where k != grupo { grupos[k] = grupos[k]?.filter { !hechos.contains($0.id) } }
+        // Si iOS no pudo borrar los originales (la persona dijo que no), quedan en «Originales ya comprimidos» para borrarlos después.
+        if r["originalesQuedaron"] as? Bool == true { quitarComprimidos(await Task.detached { Limpieza.comprimidos() }.value) }
         r["grupo"] = grupo
         r["grupos"] = resumen()
         return r

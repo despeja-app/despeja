@@ -114,7 +114,7 @@
     if (!E.iphone) return "";
     const a = E.apps;
     let cuerpo;
-    if (E.revisandoApps) cuerpo = `<p class="suave" aria-busy="true">Revisando tus apps… calcular cuánto ocupa cada una toma unos minutos.</p>`;
+    if (E.revisandoApps && !a) cuerpo = `<p class="suave" aria-busy="true">Revisando tus apps… calcular cuánto ocupa cada una toma unos minutos.</p>`;
     else if (!a) cuerpo = `<p class="suave">Mira cuánto ocupa cada app, de la más pesada a la más liviana.</p>
       <div class="pz-pie"><button type="button" class="pz-boton pz-principal" id="revisar-apps">Revisar apps</button></div>`;
     else {
@@ -285,6 +285,7 @@
 
   // Los grupos que arma el análisis del iPhone (Limpieza.swift), en el orden en que conviene revisarlos.
   const GRUPOS = [
+    ["comprimidos", "Originales ya comprimidos", "Ya tienes la versión liviana de cada uno en tu biblioteca, con la misma fecha y lugar. Todos están marcados: bórralos y te quedas con la liviana."],
     ["repetidas", "Fotos repetidas", "La misma imagen guardada más de una vez. Se queda una; las demás están marcadas."],
     ["parecidas", "Fotos parecidas", "Varias tomas seguidas de lo mismo. Se queda la mejor; las demás están marcadas."],
     ["capturas", "Capturas de pantalla", "Todas están marcadas: desmarca las que quieras conservar."],
@@ -654,6 +655,20 @@
     pintar();
     host.enviar("grupoBorrar", { grupo: E.grupo });
   }
+  // Comprimiste pero iOS no borró los originales (dijiste que no): quedan los dos. Se ofrece borrarlos de una; si no, quedan en
+  // «Originales ya comprimidos» para cuando quieras.
+  async function ofrecerOriginales() {
+    const g = (E.grupos || {}).comprimidos;
+    if (!g || !g.marcadas) return toast("Las versiones livianas quedaron, pero no se borraron los originales: ahora están los dos.", { error: true });
+    const si = await ui.confirmar({ titulo: "Quedaron los originales", si: "Borrar originales", peligro: true,
+      valores: { m: entero(g.marcadas), b: tamano(g.bytesMarcadas) },
+      texto: "Ya tienes las versiones livianas, pero los {m} originales siguen en el iPhone ({b}). ¿Los borro? Si no, quedan en «Originales ya comprimidos»." });
+    if (!si) return;
+    E.grupo = "comprimidos";
+    E.borrandoGrupo = true;
+    pintar();
+    host.enviar("grupoBorrar", { grupo: "comprimidos" });
+  }
   async function borrarRespaldadas() {
     const r = E.resumen || {};
     const si = await ui.confirmar({ titulo: "¿Borrar {n} fotos y videos del iPhone?", valores: { n: entero(r.enElIphone) }, peligro: true, si: "Borrar del iPhone",
@@ -668,7 +683,20 @@
     if (enIphone) return;
     E.buscando = true;
     pintar();
+    E.pidiendoEstado = true;
     host.enviar("iphoneEstado");
+  }
+  // Siempre al día: en el Mac, el estado del iPhone se vuelve a pedir cada 10 s mientras la ventana está a la vista (y al
+  // volver a ella). Si lo conectas, aparece solo; si se libera espacio, la cifra cambia sola. Solo se repinta si algo cambió.
+  function refrescar() {
+    if (enIphone || document.hidden || E.pidiendoEstado || E.buscando || E.desinstalando.length || !E.iniciada) return;
+    E.pidiendoEstado = true;
+    host.enviar("iphoneEstado");
+  }
+  if (!enIphone) {
+    setInterval(refrescar, 10000);
+    document.addEventListener("visibilitychange", refrescar);
+    window.addEventListener("focus", refrescar);
   }
 
   // ── Lo que manda la app ──
@@ -686,18 +714,32 @@
       pintar();
     },
     iphoneEstado(r) {
+      const antes = JSON.stringify([E.iphone, E.sinIphone, E.buscando]);
+      const pedidoPorTi = E.buscando;
       E.buscando = false;
+      E.pidiendoEstado = false;
       if (r && r.ok && r.iphone) {
+        E.fallasEstado = 0;
+        // Otro iPhone: lo de antes (apps, sugerencias, plan) era del anterior.
+        const mismo = E.ultimoIphone && E.ultimoIphone.nombre === r.iphone.nombre && E.ultimoIphone.tipo === r.iphone.tipo;
+        if (!mismo) Object.assign(E, { apps: null, sugeridas: null, plan: null, ios: null });
+        else if (E.ultimoIphone.ios !== r.iphone.ios) { E.ios = null; host.enviar("iosRevisar"); }   // se actualizó
+        // Cambió mucho el espacio (borraste o instalaste algo grande en el iPhone): las apps se vuelven a revisar, sin apuro.
+        else if (E.apps && !E.revisandoApps && Math.abs((r.iphone.libre || 0) - (E.ultimoIphone.libre || 0)) > 1e9) { E.revisandoApps = true; host.enviar("iphoneApps"); }
         if (!E.iphone) {
-          host.enviar("iosRevisar");   // una vez por conexión: ¿hay una versión de iOS más nueva?
+          if (!E.ios) host.enviar("iosRevisar");   // una vez por iPhone: ¿hay una versión de iOS más nueva?
           // Y las apps solas (tarda unos minutos): al terminar, tu IA sugiere cuáles podrían sobrar.
           if (!E.apps && !E.revisandoApps) { E.revisandoApps = true; host.enviar("iphoneApps"); }
         }
         E.iphone = r.iphone;
+        E.ultimoIphone = r.iphone;
         E.sinIphone = false;
+      } else {
+        // Un corte suelto del Wi-Fi no borra la pantalla: se espera a la segunda vez seguida (o a que lo pidas tú).
+        E.fallasEstado = (E.fallasEstado || 0) + 1;
+        if (pedidoPorTi || !E.iphone || E.fallasEstado >= 2) { E.iphone = null; E.sinIphone = r || {}; }
       }
-      else { E.iphone = null; E.apps = null; E.sinIphone = r || {}; }
-      pintar();
+      if (JSON.stringify([E.iphone, E.sinIphone, E.buscando]) !== antes) pintar();
     },
     whatsappRespaldos(r) {
       E.waBuscando = false;
@@ -728,7 +770,7 @@
     iphoneApps(r) {
       E.revisandoApps = false;
       if (r && r.ok) { E.apps = { apps: r.apps || [], total: r.total || 0 }; if (!E.sugeridas) sugerir(); }
-      else toast((r && r.error) || "No pude revisar las apps.", { error: true });
+      else if (!E.apps) toast((r && r.error) || "No pude revisar las apps.", { error: true });   // si ya había lista, era una revisión de fondo
       pintar();
     },
     // Mac
@@ -801,14 +843,25 @@
       if (!E.grande.img && !E.grande.soloUno) E.grande = null;
       pintar();
     },
-    grupos(r) { if (r && r.ok) { E.grupos = r.grupos || {}; pintar(); } },
+    grupos(r) {
+      if (!r || !r.ok) return;
+      const nuevos = r.grupos || {};
+      if (JSON.stringify(nuevos) === JSON.stringify(E.grupos)) return;
+      E.grupos = nuevos;
+      // Si la lista abierta cambió de tamaño (borraste algo en Fotos), se vuelve a pedir; si quedó vacía, se cierra.
+      if (E.grupo && !E.procesando && !E.borrandoGrupo && ((nuevos[E.grupo] || {}).n || 0) !== E.totalGrupo) {
+        if (!(nuevos[E.grupo] || {}).n) { E.grupo = null; E.items = []; E.uno = null; }
+        else { Object.assign(E, { items: [], totalGrupo: nuevos[E.grupo].n, cargando: true, uno: null }); host.enviar("grupoVer", { grupo: E.grupo, desde: 0 }); }
+      }
+      pintar();
+    },
     videoVisto(r) { if (!r || !r.ok) toast("No pude abrir ese video.", { error: true }); },
     procesoAvance(a) { if (E.procesando) { E.procesando = a; pintar(); } },
     procesoListo(r) {
       E.procesando = null;
       if (r && r.ok) {
         E.grupos = r.grupos || E.grupos;
-        if (r.originalesQuedaron) toast("Las versiones livianas quedaron, pero no se borraron los originales: ahora están los dos.", { error: true });
+        if (r.originalesQuedaron) ofrecerOriginales();
         else if (r.hechos) toast("Listo: {n} más livianos, ahorraste {b}. Los originales están en «Eliminados recientemente».", { valores: { n: entero(r.hechos), b: tamano(r.ahorro) } });
         else toast("No se pudo aligerar nada: ya estaban comprimidos o no se pudieron bajar de iCloud.");
         if (r.fallas && r.hechos) toast("{f} no se pudieron (ya estaban livianos o no se bajaron de iCloud).", { valores: { f: entero(r.fallas) } });
@@ -845,7 +898,11 @@
       pintar();
     },
     // iPhone
-    respaldoEstado(r) { E.resumen = r || null; pintar(); },
+    respaldoEstado(r) {
+      if (JSON.stringify(r || null) === JSON.stringify(E.resumen || null)) return;
+      E.resumen = r || null;
+      pintar();
+    },
     macsEncontrados(r) {
       if (r && r.ok) E.macs = r.macs || [];
       else E.errorMac = Tp((r && r.error) || "No pude buscar en tu red Wi-Fi.");
@@ -947,8 +1004,16 @@
       case "grupoProcesar": {
         const g = DEMO.grupos[d.grupo], n = g.marcadas, b = g.bytesMarcadas;
         c.luego(200, () => c.responder("procesoAvance", { hechos: Math.ceil(n / 2), total: n, ahorro: b / 2 }));
+        const hechas = (DEMO.items[d.grupo] || []).filter((x) => x.marcada);
         DEMO.items[d.grupo] = (DEMO.items[d.grupo] || []).filter((x) => !x.marcada);
         Object.assign(g, { n: g.n - n, bytes: g.bytes - b, marcadas: 0, bytesMarcadas: 0 });
+        // ?dice-no: como si en iOS dijeras «No permitir» al borrar los originales (quedan en «Originales ya comprimidos»).
+        if (new URLSearchParams(location.search).has("dice-no")) {
+          DEMO.items.comprimidos = (DEMO.items.comprimidos || []).concat(hechas.map((x) => ({ ...x, id: "q" + x.id, marcada: true })));
+          const m = DEMO.items.comprimidos;
+          DEMO.grupos.comprimidos = { n: m.length, bytes: m.reduce((t, x) => t + x.bytes, 0), marcadas: m.length, bytesMarcadas: m.reduce((t, x) => t + x.bytes, 0), guardadas: 0 };
+          return c.luego(700, () => c.responder("procesoListo", { ok: true, hechos: n, ahorro: 0, fallas: 0, originalesQuedaron: true, grupo: d.grupo, grupos: DEMO.grupos }));
+        }
         return c.luego(700, () => c.responder("procesoListo", { ok: true, hechos: n, ahorro: b, fallas: 0, grupo: d.grupo, grupos: DEMO.grupos }));
       }
       case "procesoParar": return;

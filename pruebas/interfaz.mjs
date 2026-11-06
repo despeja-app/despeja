@@ -124,6 +124,15 @@ page = await abrir("?idioma=en&iphone", 375);
 await page.click("#analizar");
 await page.waitForSelector("#limpiar .grupos li");
 await capturar(page, "6a-iphone-grupos-en");
+// Originales que quedaron después de comprimir: van primero y ya marcados; se borran de una.
+assert.equal(await page.locator(".grupos li").first().locator("[data-grupo]").getAttribute("data-grupo"), "comprimidos");
+await page.waitForSelector("text=Originals already compressed");
+await page.click('[data-grupo="comprimidos"]');
+await page.waitForSelector("#borrar-grupo:has-text('Delete 2')");
+await page.click("#borrar-grupo");
+await page.click('[data-pz-confirmar="si"]');
+await page.waitForSelector("#limpiar .grupos");
+assert.equal(await page.locator('[data-grupo="comprimidos"]').count(), 0);
 await page.click('[data-grupo="capturas"]');
 await page.waitForSelector(".cuadros li");
 assert.equal(await page.locator(".cuadros li.marcada").count(), 14);
@@ -163,6 +172,20 @@ await page.click('.cuadros [data-video="k1"]');
 await page.click("#procesar-grupo");
 await page.click('[data-pz-confirmar="si"]');
 await page.waitForSelector("#limpiar .grupos");
+// Si en iOS dices «No permitir» al comprimir, Despeja ofrece borrar los originales y, si no, quedan en su grupo.
+{
+  const p2 = await abrir("?idioma=en&iphone&analizado&dice-no", 375);
+  await p2.waitForSelector('[data-grupo="comprimir"]');
+  await p2.click('[data-grupo="comprimir"]');
+  await p2.waitForSelector("#procesar-grupo:not([disabled])");
+  await p2.click("#procesar-grupo");
+  await p2.click('[data-pz-confirmar="si"]');
+  await p2.waitForSelector("text=The originals are still there");
+  await capturar(p2, "6f-iphone-originales-en");
+  await p2.click('[data-pz-confirmar="no"]');
+  await p2.waitForSelector('[data-grupo="comprimidos"]:has-text("Deleting 5")');
+  await p2.close();
+}
 // Contactos y calendario (pestaña «Orden»).
 await page.click('[data-tab="orden"]');
 await page.click("#revisar-contactos");

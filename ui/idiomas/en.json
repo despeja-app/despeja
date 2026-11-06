@@ -403,6 +403,11 @@
   "Ese respaldo está cifrado. Haz uno sin cifrar en el Finder (desmarca «Cifrar respaldo local») o elige otro.": "That backup is encrypted. Make an unencrypted one in the Finder (uncheck “Encrypt local backup”) or choose another.",
   "No encontré ese respaldo.": "I couldn't find that backup.",
   "No pude leer WhatsApp en ese respaldo.": "I couldn't read WhatsApp in that backup.",
-  "Ese respaldo no trae WhatsApp.": "That backup doesn't include WhatsApp."
+  "Ese respaldo no trae WhatsApp.": "That backup doesn't include WhatsApp.",
+  "Originales ya comprimidos": "Originals already compressed",
+  "Ya tienes la versión liviana de cada uno en tu biblioteca, con la misma fecha y lugar. Todos están marcados: bórralos y te quedas con la liviana.": "You already have the lighter version of each one in your library, with the same date and place. All are selected: delete them and keep the lighter one.",
+  "Quedaron los originales": "The originals are still there",
+  "Borrar originales": "Delete originals",
+  "Ya tienes las versiones livianas, pero los {m} originales siguen en el iPhone ({b}). ¿Los borro? Si no, quedan en «Originales ya comprimidos».": "You have the lighter versions, but the {m} originals are still on the iPhone ({b}). Delete them? If not, they stay in “Originals already compressed”."
  }
 }

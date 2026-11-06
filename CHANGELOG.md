@@ -8,6 +8,15 @@ Lo que cambia para quien usa Despeja, en palabras simples. Las descargas de cada
 <!-- Una línea por cambio que se nota, en lenguaje de persona («Ahora puedes…»), en español · *e inglés*. Al publicar una
 versión (subir «version» en app.json), estas líneas pasan a «## X.Y.Z». -->
 
+## 0.3.1
+- Si al comprimir videos o Live Photos dices que no a borrar los originales, Despeja te ofrece borrarlos ahí mismo; si no,
+  quedan en «Originales ya comprimidos» (también los que ya tenías así). Y no se te proponen para comprimir otra vez. ·
+  *If you decline deleting the originals after compressing, Despeja offers to delete them right there; otherwise they stay in
+  “Originals already compressed” (including ones from before), and they're no longer offered for compression again.*
+- Lo que ves está siempre al día: en el iPhone, al borrar algo en Fotos o volver a la app; en el Mac, el espacio del iPhone se
+  actualiza solo y aparece en cuanto lo conectas. · *What you see is always current: on the iPhone when you delete in Photos or
+  come back to the app; on the Mac, the iPhone's space updates on its own and shows up as soon as you connect it.*
+
 ## 0.3.0
 - Diseño nuevo: en el iPhone, tres pestañas abajo y todo cabe en pantallas chicas como la del iPhone 12 mini; en el Mac, dos columnas. ·
   *New design: three tabs at the bottom on the iPhone, fitting small screens like the iPhone 12 mini; two columns on the Mac.*

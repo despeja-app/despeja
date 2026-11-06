@@ -196,10 +196,10 @@
    },
    "generados": {
     ".github/workflows/publicar.yml": "42e96f465997c3458c8292d8416f02e1813827669814625306697c3f309e8c2c",
-    "app/Info.plist": "5a04ba4b91dd0214cd8f0a92ffe5674c41d26bb87b5c8a3c03239c741225de6f",
+    "app/Info.plist": "25df0e85e84cfe530c38860806258bc11a0d784f60402f96e7c13221465c071e",
     "app/Package.swift": "2d04c3f6eeabfed4f949f83937615357900a5f7c94d4e9717540f4b5d1744b44",
     "build.sh": "1dd347c343903442a6c1336e2dc11455be131819b381036c037d554a175df830",
-    "herramientas/empaquetar.sh": "6f4284939485a3e8807974e2ca75ba5eabe1b0a28d24220820a46d9f0acbb49c",
+    "herramientas/empaquetar.sh": "5a3d1dc7a62017e5fa6271b8acb3cf5f8be923e8d086af3d83b3b72e408bedb8",
     "instalar.sh": "d7ce2eb79e6b17f6434eee1bbb11b3cad2be5a37bbccaf57cdcaf3ba712d8813"
    }
   },
@@ -218,7 +218,7 @@
     "red": []
    },
    "generados": {
-    "movil/ios/App.xcodeproj/project.pbxproj": "810290f7588aaea64be39dfc34755ead089258a1249f05962180c58a309ac6f9",
+    "movil/ios/App.xcodeproj/project.pbxproj": "e6a61d4c045ea8ce0efd725309cf172598b1d0d260a994658b859bd1af2493ba",
     "movil/ios/Info.plist": "6c6192f6bd1bc39213b75a1d975303924d8c126769656d70858f24cc83fa172c",
     "movil/ios/recursos.sh": "2fb9f2c5a883f608b2a1f21e3abbd7f674519c5864e0a0387318f38f00dcaf9c"
    },
