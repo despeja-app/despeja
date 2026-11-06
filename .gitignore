@@ -37,3 +37,7 @@ __pycache__/
 .terminos-privados
 capturas/
 .DS_Store
+
+# Xcode: lo de cada persona (ventanas, esquemas, el equipo elegido) nunca va al repo.
+movil/ios/App.xcodeproj/xcuserdata/
+movil/ios/App.xcodeproj/project.xcworkspace/

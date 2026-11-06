@@ -6,7 +6,7 @@ set -euo pipefail
 RAIZ="$(cd "$(dirname "$0")/.." && pwd)"
 : "${EQUIPO:?Falta EQUIPO=<tu Team de Xcode>}"
 DD="${TMPDIR:-/tmp}/despeja-iphone-dispositivo"
-ID="$(xcrun devicectl list devices 2>/dev/null | awk '/iPhone/ && /available/ {for (i=1;i<=NF;i++) if ($i ~ /^[0-9A-F-]{36}$/) {print $i; exit}}')"
+ID="$(xcrun devicectl list devices 2>/dev/null | awk '/iPhone/ && (/available/ || / connected /) {for (i=1;i<=NF;i++) if ($i ~ /^[0-9A-F-]{36}$/) {print $i; exit}}')"
 [ -n "$ID" ] || { echo "No veo tu iPhone: conéctalo por cable y desbloquéalo."; exit 1; }
 cd "$RAIZ/movil/ios"
 xcodebuild -project App.xcodeproj -scheme Despeja -configuration Debug -destination "generic/platform=iOS" \
