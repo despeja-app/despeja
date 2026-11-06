@@ -57,7 +57,8 @@ PLATAFORMAS_HOST = {"mac": "app/Sources", "escritorio": "escritorio/src/main.js"
 DEL_HOST = {"listo", "config", "abrirEnlace", "copiar"}
 DEL_HOST_ACTUALIZACIONES = {"buscarActualizacion", "actualizar"}
 #: Respuestas que el host manda solo si la interfaz pidió algo que la app quizás no usa.
-RESPUESTAS_OPCIONALES = {"copiado": "copiar", "archivoCambiado": None}
+RESPUESTAS_OPCIONALES = {"copiado": "copiar", "archivoCambiado": None,
+                         "error": None}   # host-ios: una acción que el iPhone no atiende (la interfaz puede mostrarlo o no)
 #: Señales de que un archivo arma el comando de una IA (eso es de bin/ia.py, pieza «ia»).
 COMANDO_IA = re.compile(r'"--disallowedTools"|"--strict-mcp-config"|"--skip-git-repo-check"|["\'](claude|codex|gemini|agy)["\']\s*,\s*\[')
 
@@ -431,6 +432,10 @@ class Contrato:
         llama |= set(re.findall(rf"window\.{re.escape(self.global_)}\.(\w+)", sin_comentarios(propio)))
         declaradas = set(self.declaradas) if nombre not in ("movil", "ios") else set()
         atiende = registradas | del_host | declaradas
+        if nombre == "ios":
+            # Lo declarado (scripts de Python) y las actualizaciones son del computador: en el iPhone host-ios responde «error»
+            # con código «falta» y la interfaz no queda esperando. Lo que la interfaz pide solo en el iPhone sí tiene que estar.
+            atiende |= set(self.declaradas) | DEL_HOST_ACTUALIZACIONES
         for a in sorted(self.acciones - atiende):
             self.problema(nombre, a, f"{etiqueta} no atiende «{a}» (ni registrada, ni del host, ni declarada)")
         for a in sorted(registradas - self.acciones):

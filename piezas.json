@@ -160,7 +160,7 @@
   "contrato": {
    "version": "0.1.2",
    "archivos": {
-    "pruebas/contrato.py": "948519d5ef6e2bf485d396a04dba8ca4650ed4093537f48a6d1bf7aa9e4b7cc4"
+    "pruebas/contrato.py": "abd93205887f83da286eeb14f84be6892c944bf18f9eed50105dbba551f503de"
    },
    "ficha": {
     "requiere": [],
