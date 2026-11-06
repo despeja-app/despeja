@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Pieza «host-ios» (generado desde app.json → ios): los permisos de la app de iPhone, cada uno con su porqué. Xcode suma
+     lo demás (GENERATE_INFOPLIST_FILE). -->
+<plist version="1.0">
+<dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Para revisar tus fotos y videos y respaldarlos en tu Mac antes de borrar algo.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Para conectarte con Despeja en tu Mac por tu Wi-Fi, sin pasar por internet.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_despeja._tcp</string>
+	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+</dict>
+</plist>

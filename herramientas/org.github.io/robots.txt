@@ -1,0 +1,4 @@
+# Para el repo despeja-app/despeja-app.github.io (la raíz del sitio de la organización): copia este archivo ahí.
+User-agent: *
+Allow: /
+Sitemap: https://despeja-app.github.io/despeja/sitemap.xml

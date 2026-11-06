@@ -1,0 +1,119 @@
+{
+ "_la_app": "Datos ficticios para la vista previa del navegador (cd ui && python3 -m http.server 8765; ?bienvenida, ?idioma=en, ?tema=oscuro). Nunca datos reales: Ana Pérez, Matías Soto.",
+ "version": "0.1.0",
+ "plataforma": "web",
+ "ias": [
+  {
+   "id": "claude",
+   "nombre": "Claude Code",
+   "instalada": true
+  },
+  {
+   "id": "codex",
+   "nombre": "Codex",
+   "instalada": false
+  },
+  {
+   "id": "gemini",
+   "nombre": "Gemini",
+   "instalada": false
+  }
+ ],
+ "config": {
+  "idioma_ui": "es",
+  "bienvenida": true,
+  "tema": "sistema",
+  "ia": "claude"
+ },
+ "iphone": {
+  "nombre": "iPhone de Ana",
+  "tipo": "iPhone13,1",
+  "ios": "26.2",
+  "build": "23C55",
+  "conexion": "usb",
+  "capacidad": 64000000000,
+  "libre": 1900000000
+ },
+ "apps": [
+  {
+   "id": "com.ejemplo.fotos",
+   "nombre": "Galería Ficticia",
+   "version": "3.2",
+   "tamano": 712000000
+  },
+  {
+   "id": "com.ejemplo.mapas",
+   "nombre": "Mapas de Matías",
+   "version": "1.0",
+   "tamano": 655000000
+  },
+  {
+   "id": "com.ejemplo.musica",
+   "nombre": "Música Demo",
+   "version": "8.1",
+   "tamano": 540000000
+  },
+  {
+   "id": "com.ejemplo.idiomas",
+   "nombre": "Idiomas Ya",
+   "version": "6.0",
+   "tamano": 498000000
+  },
+  {
+   "id": "com.ejemplo.correo",
+   "nombre": "Correo Ejemplo",
+   "version": "2.4",
+   "tamano": 431000000
+  },
+  {
+   "id": "com.ejemplo.taxi",
+   "nombre": "Taxi Ficticio",
+   "version": "4.9",
+   "tamano": 402000000
+  },
+  {
+   "id": "com.ejemplo.tienda",
+   "nombre": "Tienda Demo",
+   "version": "10.2",
+   "tamano": 388000000
+  },
+  {
+   "id": "com.ejemplo.chat",
+   "nombre": "Chat Ana",
+   "version": "25.1",
+   "tamano": 366000000
+  },
+  {
+   "id": "com.ejemplo.banco",
+   "nombre": "Banco Ficticio",
+   "version": "7.7",
+   "tamano": 250000000
+  },
+  {
+   "id": "com.ejemplo.notas",
+   "nombre": "Notas Demo",
+   "version": "1.1",
+   "tamano": 120000000
+  },
+  {
+   "id": "com.ejemplo.clima",
+   "nombre": "Clima Demo",
+   "version": "2.0",
+   "tamano": 45000000
+  },
+  {
+   "id": "com.ejemplo.linterna",
+   "nombre": "Linterna",
+   "version": "1.0",
+   "tamano": 8000000
+  }
+ ],
+ "fotos": {
+  "ok": true,
+  "fotos": 8412,
+  "videos": 613,
+  "capturas": 1290,
+  "tamano": 31400000000,
+  "soloEnIcloud": 0
+ }
+}

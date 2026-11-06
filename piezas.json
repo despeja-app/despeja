@@ -1,0 +1,353 @@
+{
+ "formato": 1,
+ "piezas": {
+  "nucleo": {
+   "version": "0.7.1",
+   "archivos": {
+    "bin/nucleo.py": "1a1fd2b119d3f7ac3ade50fbce479b72494bffb406d5ad70136733b354af824f"
+   },
+   "ficha": {
+    "requiere": [],
+    "permisos": {},
+    "red": []
+   }
+  },
+  "ia": {
+   "version": "0.6.3",
+   "archivos": {
+    "bin/ia.py": "36d6df8fb3097e149e15174406e7d8fd82a4a4c9cac4b2ba8b2505ecb4dcdfef"
+   },
+   "ficha": {
+    "requiere": [
+     "nucleo"
+    ],
+    "permisos": {},
+    "red": []
+   },
+   "acciones": {
+    "probarIA": {
+     "script": "ia.py",
+     "args": [
+      "probar"
+     ],
+     "entrada": "archivo",
+     "datos": {
+      "ia": {
+       "tipo": "enum",
+       "valores": [
+        "claude",
+        "codex",
+        "gemini"
+       ]
+      }
+     },
+     "responde": "iaProbada",
+     "limite": 150
+    },
+    "listaIA": {
+     "script": "ia.py",
+     "args": [
+      "lista"
+     ],
+     "entrada": null,
+     "datos": {},
+     "responde": "iaLista",
+     "limite": 30
+    }
+   }
+  },
+  "trabajos": {
+   "version": "0.2.1",
+   "archivos": {
+    "bin/trabajos.py": "fe1640aec0f3f364968501f169d4b9b58f6a746e72f81f338b027f5c392bcde3",
+    "app/Sources/PiezaTrabajos/LectorProgreso.swift": "7361eb8f02ba7fe42c5526e7e44bcea24d4f1f45bedf1090d6e16dbab6890b07"
+   },
+   "ficha": {
+    "requiere": [
+     "nucleo"
+    ],
+    "permisos": {},
+    "red": []
+   }
+  },
+  "cifrado": {
+   "version": "0.2.0",
+   "archivos": {
+    "ui/cifrado.js": "3e4973165712d8472a5641c9ac917857a410656309df08279ea3d4d4f59e7ebf"
+   },
+   "ficha": {
+    "requiere": [],
+    "permisos": {},
+    "red": []
+   }
+  },
+  "red": {
+   "version": "0.2.0",
+   "archivos": {
+    "bin/red.py": "2f593085c352e52383fa4982e367827e2a794495cf29076d25085ec8349c6a6f"
+   },
+   "ficha": {
+    "requiere": [
+     "nucleo"
+    ],
+    "permisos": {},
+    "red": []
+   }
+  },
+  "host-ui": {
+   "version": "0.2.0",
+   "archivos": {
+    "ui/host.js": "cdca43b52982db53c3c018b807a8df0bc9282c9ff61b4ecee8037ddc3e5521aa"
+   },
+   "ficha": {
+    "requiere": [],
+    "permisos": {},
+    "red": []
+   }
+  },
+  "i18n": {
+   "version": "0.3.1",
+   "archivos": {
+    "ui/i18n.js": "3f4d071fd5b2b137cb0a6413e4d1e588ae79081a61f21e3f7d240cf3cf55bce9"
+   },
+   "ficha": {
+    "requiere": [],
+    "permisos": {},
+    "red": []
+   }
+  },
+  "tema": {
+   "version": "0.2.1",
+   "archivos": {
+    "ui/tema.css": "1d43c1cf027fafcbd282bd90bc87ae3937059f247fb823cd1aab2a26f7c9363e",
+    "ui/tema.js": "b679ecb7bc80556b70e3f3fe768f0e3af0086bdf44c0d73ed0867da6a8f33f6e"
+   },
+   "ficha": {
+    "requiere": [],
+    "permisos": {},
+    "red": []
+   }
+  },
+  "componentes": {
+   "version": "0.3.0",
+   "archivos": {
+    "ui/componentes.js": "310712e40f69b674f5d64fc723ccd2dbf2ad114f6ac68ee72a598cf4c36bb76a",
+    "ui/componentes.css": "101586f0fa7aa509f42b626de378c5ad32d176da5a4c0ad85b081a47908fe56f"
+   },
+   "ficha": {
+    "requiere": [
+     "i18n",
+     "tema"
+    ],
+    "permisos": {},
+    "red": []
+   }
+  },
+  "bienvenida": {
+   "version": "0.4.1",
+   "archivos": {
+    "ui/bienvenida.js": "0265e1d4f6f9cea46eff5d0df1d1098c28bd0d889e0b26e8a8fb3936c8ccbd12",
+    "ui/bienvenida.css": "cebd589f28a4fc2f1e08e143abd5b1a6531f8060dc346f53d2b9479b7c995719"
+   },
+   "ficha": {
+    "requiere": [
+     "i18n"
+    ],
+    "permisos": {},
+    "red": []
+   }
+  },
+  "contrato": {
+   "version": "0.1.2",
+   "archivos": {
+    "pruebas/contrato.py": "948519d5ef6e2bf485d396a04dba8ca4650ed4093537f48a6d1bf7aa9e4b7cc4"
+   },
+   "ficha": {
+    "requiere": [],
+    "permisos": {},
+    "red": []
+   }
+  },
+  "actualizaciones": {
+   "version": "0.3.0",
+   "archivos": {
+    "app/Sources/PiezaActualizaciones/Actualizaciones.swift": "ab8c92a4ce314a388cbc0975f7b25d4fb4a8ad6fdbca6da60e3bcb0a4426e144"
+   },
+   "ficha": {
+    "requiere": [],
+    "permisos": {},
+    "red": [
+     "api.github.com",
+     "github.com",
+     "objects.githubusercontent.com",
+     "release-assets.githubusercontent.com"
+    ]
+   }
+  },
+  "empaquetado": {
+   "version": "0.1.0",
+   "archivos": {
+    "herramientas/python.lock": "a038e911e34657048ee048b563506591fc62fdeaa08fb071926b54da57b75d42"
+   },
+   "ficha": {
+    "requiere": [],
+    "permisos": {},
+    "red": []
+   },
+   "generados": {
+    ".github/workflows/publicar.yml": "42e96f465997c3458c8292d8416f02e1813827669814625306697c3f309e8c2c",
+    "app/Info.plist": "0995ca72ccb119546c008d07eba295300663e8849fb935af4a0c7477559fc9be",
+    "app/Package.swift": "2d04c3f6eeabfed4f949f83937615357900a5f7c94d4e9717540f4b5d1744b44",
+    "build.sh": "1dd347c343903442a6c1336e2dc11455be131819b381036c037d554a175df830",
+    "herramientas/empaquetar.sh": "8ff4c3f8d9188f870f9a7b78342084f4eff32f45db7ceeea7dda08c9df0f6224",
+    "instalar.sh": "d7ce2eb79e6b17f6434eee1bbb11b3cad2be5a37bbccaf57cdcaf3ba712d8813"
+   }
+  },
+  "host-ios": {
+   "version": "0.1.0",
+   "archivos": {
+    "movil/ios/Fuentes/PiezaHost/Host.swift": "3ffa71646a37c8c447a1c94a9e322a8b091f2a1c4ae16bb85a610cd090efe756",
+    "movil/ios/Fuentes/PiezaHost/Puente.swift": "8407d468851fecf7bf18313e72518e1c7c3714e4a3b3f83aed1e77b3b7cd26b8"
+   },
+   "ficha": {
+    "requiere": [
+     "nucleo",
+     "host-ui"
+    ],
+    "permisos": {},
+    "red": []
+   },
+   "generados": {
+    "movil/ios/App.xcodeproj/project.pbxproj": "e6d8ec410e504ca65ebc76b8b081d0d621a1160e5f5f028964f48da09ee2bff4",
+    "movil/ios/Info.plist": "002db404e6deacac64094efb8a79a61d960918b2fabc78088399011688344221",
+    "movil/ios/recursos.sh": "2fb9f2c5a883f608b2a1f21e3abbd7f674519c5864e0a0387318f38f00dcaf9c"
+   },
+   "una_vez": [
+    "movil/ios/Fuentes/App.swift"
+   ]
+  },
+  "host-mac": {
+   "version": "0.3.0",
+   "archivos": {
+    "app/Sources/PiezaHost/Host.swift": "75342959251cc9d8921d23992c6e7cbb313a2a069bae1525a8bddc6d8ec38b59",
+    "app/Sources/PiezaHost/Procesador.swift": "92a11d93f07d381ba539f6bd45db6f1fa9d0e03e25f071e982d74bf32eea04dd",
+    "app/Sources/PiezaHost/Enchufe.swift": "7687d04c080e560be52d90b26d36e7cfad665f8792b2887b98f5214194038d4e",
+    "app/Sources/PiezaHost/Puente.swift": "be49c68045d6cd0371a55b84d5e7b3c7ded07badd0c984e1f26ff8c3aa73ec0a",
+    "app/Sources/PiezaHost/Carpeta.swift": "60676fa9a24d09105577ae1ab06bad3f379805490334e6e47afedb114292aa22",
+    "app/Sources/PiezaHost/Sistema.swift": "ec7219eee6a8b7678ce795572cd9225b1407200aa042e686bb7c833849df1277"
+   },
+   "ficha": {
+    "requiere": [
+     "nucleo",
+     "host-ui"
+    ],
+    "permisos": {
+     "mac": [
+      {
+       "clave": "Notificaciones",
+       "por": "solo si la app usa Notificaciones: macOS pregunta cuando la app lo pide (pedirPermiso), nunca al abrir"
+      },
+      {
+       "clave": "Llavero",
+       "por": "solo si la app usa Secretos: los tokens quedan en el Llavero de la persona, solo en este Mac"
+      }
+     ]
+    },
+    "red": []
+   }
+  },
+  "pagina": {
+   "version": "0.1.0",
+   "archivos": {
+    "docs/pagina.js": "c9e58a2e25475ad54735db260f4399809f8f20751abe6c2a6eff44466de68a43",
+    "docs/pagina.css": "61bfe8b32e7d864f37540c48e38be7f25035390a0f54ba7a7773d2b640f8ee6c",
+    "docs/tema.css": "1d43c1cf027fafcbd282bd90bc87ae3937059f247fb823cd1aab2a26f7c9363e",
+    "docs/sello.svg": "570728f16d129abfbc097419174d53491d7a5e58507dc3e679a592e23464dcf9",
+    "docs/sello-en.svg": "5fb96b00af24dd3782c6a316d31be7c1c8b0cc5feafc1308464a31c9ad3c4822",
+    "docs/pagina-comunes.json": "6289f38a82450911f213a3455e862baac5b1b59c70de4e62206fdf4641a5159b",
+    "herramientas/pagina_capturas.mjs": "8acd3f4c65b6327f4005b354ff9e07cbba3f345ab9d8938179e35378a2a8a893"
+   },
+   "ficha": {
+    "requiere": [],
+    "permisos": {},
+    "red": []
+   },
+   "generados": {
+    ".github/workflows/pagina.yml": "e4278ce966e6b89fa55f4809b8f2dda0159b5a4b702404a5ee6c7c7e49f8ab70",
+    "docs/colores.css": "ee9f523cc402aca0986951b45f566f6412af9325f163453e15030b72fdd20d3b",
+    "docs/index.html": "079815508ba0d14d3d3c7f24cb575c3a25908219db25f099d2e3b5b412e7b0fd",
+    "docs/sitemap.xml": "bd82e6ee0f3c435f478aa8e11e8671610a4cc2a9e5b6d7663fb24abe2cacbc99",
+    "herramientas/org.github.io/index.html": "0eb4cb2c5b061fdf912b1ce879cd5d3ff02eaa8f2b0acdac3658ea5f4a25c5ac",
+    "herramientas/org.github.io/robots.txt": "c05f61f58d258c98ac2856c00c6bf805120b870fd0b9751747371f59b8b057ab"
+   },
+   "una_vez": [
+    "docs/favicon.svg",
+    "docs/pagina.json"
+   ]
+  },
+  "esqueleto": {
+   "version": "0.1.0",
+   "archivos": {},
+   "ficha": {
+    "requiere": [
+     "nucleo",
+     "host-ui",
+     "i18n",
+     "tema",
+     "componentes",
+     "bienvenida",
+     "contrato"
+    ],
+    "permisos": {},
+    "red": []
+   },
+   "una_vez": [
+    "README.md",
+    "app/Sources/Despeja/DespejaApp.swift",
+    "bin/ejemplo.py",
+    "pruebas/contrato_app.py",
+    "pruebas/correr.sh",
+    "pruebas/interfaz.mjs",
+    "pruebas/test_app.py",
+    "ui/app.css",
+    "ui/app.js",
+    "ui/demo.json",
+    "ui/index.html"
+   ]
+  },
+  "github": {
+   "version": "0.1.0",
+   "archivos": {},
+   "ficha": {
+    "requiere": [],
+    "permisos": {},
+    "red": []
+   },
+   "generados": {
+    ".claude/settings.json": "3f631db8a31c18e215313f6af051769001c740a97112167593a66b7222e4b936",
+    ".github/ISSUE_TEMPLATE/config.yml": "8b83d182bee32f95352af654b05412fa2272d860a96dc5682bda23601ab0c3f5",
+    ".github/ISSUE_TEMPLATE/error.yml": "49ce637f279b4de7771634b8729c4f89e4f90fc1517d779211b76beb1f7383e8",
+    ".github/ISSUE_TEMPLATE/idea.yml": "3a42f59aa8460473f3e0b2df38c62a0375784dce512816f85d5b68475e86a390",
+    ".github/dependabot.yml": "6479120f2c6b5a6096f8451c7f4775ba8524340285c9caf05e4889c11f592934",
+    ".github/workflows/pieza-al-dia.yml": "107931ebcd4c9094e85e2f8c2a3c2febc23ba24f1a246193a53ae8b41e09a5a4",
+    ".github/workflows/revisar.yml": "3547e13c3041920066285b70b759ea7a9cff460e3c1641d5d955cd6bf9f4f500",
+    "herramientas/revisar_privacidad.sh": "73aa3a2b66a61b1f9c8d06af8840a9f24725ed4f2156245283b0b94dfae6cfd4"
+   },
+   "una_vez": [
+    ".claude/agents/despeja-privacidad.md",
+    ".claude/agents/despeja-revisor.md",
+    ".github/ISSUE_TEMPLATE/probar.yml",
+    ".github/pull_request_template.md",
+    ".gitignore",
+    "AGENTS.md",
+    "CHANGELOG.md",
+    "CLAUDE.md",
+    "CODE_OF_CONDUCT.md",
+    "CONTRIBUTING.md",
+    "GEMINI.md",
+    "LICENSE",
+    "SECURITY.md"
+   ]
+  }
+ }
+}

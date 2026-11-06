@@ -1,0 +1,20 @@
+# Dependabot: avisa cuando hay versiones nuevas de las actions (fijadas por SHA) y de la app del celular (movil/) y abre un pull request para revisarlas.
+# `cooldown`: espera unos días antes de proponer una versión recién publicada; si una action o un paquete fue secuestrado, casi
+# siempre se descubre y se retira en ese plazo. Las alertas de seguridad no esperan. Nada se junta solo: cada PR se revisa.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+    cooldown: { default-days: 7 }
+    groups:
+      actions: { patterns: ["*"] }
+    commit-message: { prefix: "Actions" }
+  - package-ecosystem: npm
+    directory: /movil
+    schedule: { interval: weekly }
+    cooldown: { default-days: 7, semver-major-days: 30 }
+    open-pull-requests-limit: 5
+    groups:
+      movil: { patterns: ["*"] }
+    commit-message: { prefix: "Dependencias" }

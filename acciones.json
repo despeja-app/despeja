@@ -1,0 +1,56 @@
+{
+ "formato": 1,
+ "acciones": {
+  "iphoneApps": {
+   "script": "iphone.py",
+   "args": [
+    "apps"
+   ],
+   "datos": {},
+   "responde": "iphoneApps",
+   "limite": 900,
+   "pieza": "app"
+  },
+  "iphoneEstado": {
+   "script": "iphone.py",
+   "args": [
+    "estado"
+   ],
+   "datos": {},
+   "responde": "iphoneEstado",
+   "limite": 60,
+   "pieza": "app"
+  },
+  "listaIA": {
+   "script": "ia.py",
+   "args": [
+    "lista"
+   ],
+   "entrada": null,
+   "datos": {},
+   "responde": "iaLista",
+   "limite": 30,
+   "pieza": "ia"
+  },
+  "probarIA": {
+   "script": "ia.py",
+   "args": [
+    "probar"
+   ],
+   "entrada": "archivo",
+   "datos": {
+    "ia": {
+     "tipo": "enum",
+     "valores": [
+      "claude",
+      "codex",
+      "gemini"
+     ]
+    }
+   },
+   "responde": "iaProbada",
+   "limite": 150,
+   "pieza": "ia"
+  }
+ }
+}

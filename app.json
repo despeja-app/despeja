@@ -1,0 +1,72 @@
+{
+ "nombre": "Despeja",
+ "id": "despeja",
+ "version": "0.1.0",
+ "repo": "despeja-app/despeja",
+ "datos": "sistema",
+ "icono": "docs/favicon.svg",
+ "plataformas": [
+  "mac",
+  "ios"
+ ],
+ "config": {
+  "idioma_ui": [
+   "es",
+   "en"
+  ],
+  "bienvenida": "bool",
+  "ia": [
+   "claude",
+   "codex",
+   "gemini"
+  ],
+  "tema": [
+   "sistema",
+   "claro",
+   "oscuro"
+  ]
+ },
+ "empaquetado": {
+  "descripcion": "Deja tu iPhone solo con lo necesario: catastro, respaldo y limpieza, con tu propia IA.",
+  "categoria": "public.app-category.utilities",
+  "linux_categoria": "Utility",
+  "carpetas": [],
+  "permisos": [],
+  "ocupada": []
+ },
+ "acciones": {
+  "iphoneEstado": {
+   "script": "iphone.py",
+   "args": [
+    "estado"
+   ],
+   "datos": {},
+   "responde": "iphoneEstado",
+   "limite": 60
+  },
+  "iphoneApps": {
+   "script": "iphone.py",
+   "args": [
+    "apps"
+   ],
+   "datos": {},
+   "responde": "iphoneApps",
+   "limite": 900
+  }
+ },
+ "ios": {
+  "permisos": [
+   {
+    "clave": "NSPhotoLibraryUsageDescription",
+    "texto": "Para revisar tus fotos y videos y respaldarlos en tu Mac antes de borrar algo."
+   },
+   {
+    "clave": "NSLocalNetworkUsageDescription",
+    "texto": "Para conectarte con Despeja en tu Mac por tu Wi-Fi, sin pasar por internet."
+   }
+  ],
+  "bonjour": [
+   "despeja"
+  ]
+ }
+}
