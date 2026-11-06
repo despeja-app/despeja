@@ -139,11 +139,19 @@
   "permisos": [
    {
     "clave": "NSPhotoLibraryUsageDescription",
-    "texto": "Para revisar tus fotos y videos y respaldarlos en tu Mac antes de borrar algo."
+    "texto": "Para revisar, respaldar, comprimir y, si lo pides, borrar tus fotos y videos. Nada sale del iPhone sin que lo pidas."
    },
    {
     "clave": "NSLocalNetworkUsageDescription",
     "texto": "Para conectarte con Despeja en tu Mac por tu Wi-Fi, sin pasar por internet."
+   },
+   {
+    "clave": "NSContactsUsageDescription",
+    "texto": "Para encontrar contactos repetidos o incompletos y juntarlos si lo pides."
+   },
+   {
+    "clave": "NSCalendarsFullAccessUsageDescription",
+    "texto": "Para encontrar eventos antiguos del calendario y borrarlos si lo pides."
    }
   ],
   "bonjour": [

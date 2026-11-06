@@ -91,11 +91,14 @@ final class Limpieza {
         pedido.resizeMode = .fast
         pedido.isNetworkAccessAllowed = false     // solo lo que ya está en el iPhone: rápido y sin gastar datos
         var huellas: [String: UInt64] = [:]
+        var nitidez: [String: Double] = [:]
         let total = candidatas.count
         for (i, a) in candidatas.enumerated() {
             autoreleasepool {
-                _ = gestor.requestImage(for: a, targetSize: CGSize(width: 64, height: 64), contentMode: .aspectFill, options: pedido) { img, _ in
-                    if let cg = img?.cgImage, let h = dHash(cg) { huellas[a.localIdentifier] = h }
+                _ = gestor.requestImage(for: a, targetSize: CGSize(width: 128, height: 128), contentMode: .aspectFill, options: pedido) { img, _ in
+                    guard let cg = img?.cgImage else { return }
+                    if let h = dHash(cg) { huellas[a.localIdentifier] = h }
+                    if let n = enfoque(cg) { nitidez[a.localIdentifier] = n }
                 }
             }
             if i % 50 == 0 { avance(i, total) }
@@ -173,10 +176,66 @@ final class Limpieza {
             g["utiles"] = utiles
         }
 
+        // Borrosas: muy poco detalle (varianza del laplaciano baja). Sin marcar: es una sugerencia y puede fallar con fondos lisos.
+        g["borrosas"] = candidatas.filter { !yaEnGrupo.contains($0.localIdentifier) && (nitidez[$0.localIdentifier] ?? 999) < 25 && !$0.isFavorite }
+            .map { Item(id: $0.localIdentifier, bytes: t($0), marcada: false, guardar: false) }
+
+        // Videos repetidos: misma duración (al segundo), mismo tamaño en píxeles y la misma imagen de portada
+        var porVideo: [String: [PHAsset]] = [:]
+        for v in videos {
+            var hv: UInt64 = 0
+            autoreleasepool {
+                _ = gestor.requestImage(for: v, targetSize: CGSize(width: 64, height: 64), contentMode: .aspectFill, options: pedido) { img, _ in
+                    if let cg = img?.cgImage, let h = dHash(cg) { hv = h }
+                }
+            }
+            porVideo["\(Int(v.duration.rounded()))-\(v.pixelWidth)x\(v.pixelHeight)-\(hv >> 8)", default: []].append(v)
+        }
+        var videosRep: [Item] = []
+        for (_, grupo) in porVideo where grupo.count > 1 {
+            let mejor = grupo.max { puntaje($0) < puntaje($1) }!
+            for v in grupo { videosRep.append(Item(id: v.localIdentifier, bytes: t(v), marcada: v != mejor && !v.isFavorite, guardar: v == mejor)) }
+        }
+        g["videosRepetidos"] = videosRep
+
+        // Live Photos: el video escondido de cada una se puede quitar (queda la foto). Lo que se ahorra es ese video.
+        g["live"] = imagenes.filter { $0.mediaSubtypes.contains(.photoLive) }.compactMap { a -> Item? in
+            let video = PHAssetResource.assetResources(for: a).filter { $0.type == .pairedVideo || $0.type == .fullSizePairedVideo }
+                .reduce(Int64(0)) { $0 + ((($1.value(forKey: "fileSize") as? NSNumber)?.int64Value) ?? 0) }
+            return video > 0 ? Item(id: a.localIdentifier, bytes: video, marcada: !a.isFavorite, guardar: false) : nil
+        }
+
+        // Videos que se pueden comprimir: lo que se ahorraría pasándolos a HEVC 1080p (~6 Mbps), si es al menos un 25 %.
+        g["comprimir"] = videos.compactMap { v -> Item? in
+            let tam = t(v)
+            let estimado = Int64(v.duration * 6_500_000 / 8)
+            let ahorro = tam - estimado
+            return tam > 50_000_000 && ahorro > tam / 4 ? Item(id: v.localIdentifier, bytes: ahorro, marcada: !v.isFavorite, guardar: false) : nil
+        }.sorted { $0.bytes > $1.bytes }
+
         // Videos grandes
         g["videos"] = videos.map { ($0, t($0)) }.filter { $0.1 > 100_000_000 }.sorted { $0.1 > $1.1 }
             .map { Item(id: $0.0.localIdentifier, bytes: $0.1, marcada: false, guardar: false) }
         return g
+    }
+
+    /// Qué tan nítida es una imagen: varianza del laplaciano sobre la miniatura en gris (baja = borrosa o sin detalle).
+    nonisolated private static func enfoque(_ img: CGImage) -> Double? {
+        let w = 96, h = 96
+        var px = [UInt8](repeating: 0, count: w * h)
+        guard let ctx = CGContext(data: &px, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w,
+                                  space: CGColorSpaceCreateDeviceGray(), bitmapInfo: CGImageAlphaInfo.none.rawValue) else { return nil }
+        ctx.draw(img, in: CGRect(x: 0, y: 0, width: w, height: h))
+        var suma = 0.0, suma2 = 0.0, n = 0.0
+        for y in 1..<(h - 1) {
+            for x in 1..<(w - 1) {
+                let c = Double(px[y * w + x]) * 4
+                let l = c - Double(px[y * w + x - 1]) - Double(px[y * w + x + 1]) - Double(px[(y - 1) * w + x]) - Double(px[(y + 1) * w + x])
+                suma += l; suma2 += l * l; n += 1
+            }
+        }
+        let media = suma / n
+        return suma2 / n - media * media
     }
 
     /// Para elegir cuál se guarda de un grupo: favorita > más resolución > más antigua.
@@ -255,6 +314,26 @@ final class Limpieza {
             lista[i].marcada = marcada
         }
         grupos[grupo] = lista
+    }
+
+    // MARK: Ahorrar sin borrar (comprimir videos, Live Photos a fotos)
+
+    private var detener = false
+    func pararProceso() { detener = true }
+
+    func procesar(_ grupo: String, avance: @escaping @MainActor ([String: Any]) -> Void) async -> [String: Any] {
+        guard grupo == "comprimir" || grupo == "live", let lista = grupos[grupo] else { return ["ok": false, "codigo": "datos"] }
+        let ids = lista.filter(\.marcada).map(\.id)
+        guard !ids.isEmpty else { return ["ok": true, "hechos": 0, "ahorro": 0, "grupos": resumen()] }
+        detener = false
+        var r = await Compresion.procesar(ids, tipo: grupo, avance: avance, detenido: { [weak self] in self?.detener ?? true })
+        let hechos = Set((r["ids"] as? [String]) ?? [])
+        grupos[grupo] = lista.filter { !hechos.contains($0.id) }
+        // Lo reemplazado ya no está en los demás grupos (era otro archivo)
+        for k in grupos.keys where k != grupo { grupos[k] = grupos[k]?.filter { !hechos.contains($0.id) } }
+        r["grupo"] = grupo
+        r["grupos"] = resumen()
+        return r
     }
 
     // MARK: Borrar

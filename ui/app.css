@@ -87,3 +87,18 @@ img.grande { display: block; max-width: 100%; max-height: 70vh; margin: 0 auto; 
 .sugeridas ul { list-style: none; margin: 0; padding: 0; }
 .sugeridas li label { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 8px 0; cursor: pointer; }
 .sugeridas input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--acento); }
+
+/* Ahorrar sin borrar, uno por uno, contactos y calendario */
+h3.sub { margin: 16px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--texto-suave); }
+.lista-chica { list-style: none; margin: 4px 0 8px; padding: 0; font-size: 14px; }
+.lista-chica li { padding: 4px 0; border-top: 1px solid var(--linea); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lista-chica label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.procesando { width: min(520px, 100%); }
+.procesando p { margin: 4px 0 8px; font-size: 14px; }
+.contenido.uno { display: grid; gap: 12px; justify-items: center; }
+.tarjeta-uno { position: relative; width: min(520px, 100%); border-radius: 14px; overflow: hidden; background: var(--panel-2); touch-action: pan-y; user-select: none; }
+.tarjeta-uno img { display: block; width: 100%; max-height: 62vh; object-fit: contain; background: #000; pointer-events: none; }
+.tarjeta-uno.marcada { outline: 3px solid var(--rojo); }
+.tarjeta-uno .estado { position: absolute; left: 10px; bottom: 10px; padding: 3px 10px; border-radius: 8px; background: rgba(0,0,0,.65); color: #fff; font-size: 14px; }
+.tarjeta-uno .etiqueta.queda { position: absolute; left: 10px; top: 10px; padding: 3px 10px; border-radius: 8px; background: var(--acento); color: var(--sobre-acento, #fff); font-size: 13px; }
+.botones-uno { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: min(520px, 100%); }

@@ -17,5 +17,12 @@ EXCEPCIONES = {
     "mac:grupoMarcar": _IPHONE,
     "mac:grupoBorrar": _IPHONE,
     "mac:fotoGrande": _IPHONE,
+    "mac:grupoProcesar": _IPHONE,
+    "mac:procesoParar": _IPHONE,
+    "mac:contactosAnalizar": _IPHONE,
+    "mac:contactosJuntar": _IPHONE,
+    "mac:contactosBorrar": _IPHONE,
+    "mac:calendarioAnalizar": _IPHONE,
+    "mac:calendarioBorrar": _IPHONE,
     "ios:elegirDestino": "solo en el Mac: la carpeta donde quedan los respaldos (en el iPhone la interfaz no la pide)",
 }

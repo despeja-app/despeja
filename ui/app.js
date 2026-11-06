@@ -22,7 +22,8 @@
     // iPhone: analizar y limpiar por grupos
     sugeridas: null, sugiriendo: false, elegidas: new Set(), desinstalando: [],
     analizando: false, analisisAvance: null, grupos: null, grupo: null, items: [], totalGrupo: 0, cargando: false,
-    grande: null, borrandoGrupo: false };
+    grande: null, borrandoGrupo: false, procesando: null, uno: null,
+    contactos: null, revisandoContactos: false, incompletosElegidos: new Set(), calendario: null, revisandoCalendario: false };
   // ?iphone en la vista previa muestra la pantalla del iPhone.
   const enIphone = host.plataforma === "movil" || (host.plataforma === "web" && new URLSearchParams(location.search).has("iphone"));
   const raiz = document.getElementById("app");
@@ -264,9 +265,18 @@
     ["parecidas", "Fotos parecidas", "Varias tomas seguidas de lo mismo. Se queda la mejor; las demás están marcadas."],
     ["capturas", "Capturas de pantalla", "Todas están marcadas: desmarca las que quieras conservar."],
     ["rafagas", "Ráfagas", "Las fotos de cada ráfaga que no son la elegida."],
+    ["videosRepetidos", "Videos repetidos", "El mismo video más de una vez. Se queda uno; los demás están marcados."],
+    ["borrosas", "Fotos borrosas", "Fotos con muy poco detalle. Ninguna está marcada: revísalas antes, a veces es un fondo liso."],
     ["utiles", "Memes, documentos y recibos", "Imágenes que no parecen fotos tuyas. Ninguna está marcada: elige las que sobran."],
     ["videos", "Videos grandes", "Los de más de 100 MB, del más pesado al más liviano. Ninguno está marcado."],
   ];
+  // Ahorrar sin borrar: el original se reemplaza por una versión más liviana (y va a «Eliminados recientemente»).
+  const AHORRO = [
+    ["comprimir", "Comprimir videos", "Se reemplazan por una versión HEVC de hasta 1080p, con la misma fecha, lugar y favorita. Se ven igual en el iPhone."],
+    ["live", "Live Photos a fotos", "Se quita el video corto de cada Live Photo; la foto queda igual. Las favoritas no están marcadas."],
+  ];
+  const esAhorro = (k) => AHORRO.some(([x]) => x === k);
+  const defGrupo = (k) => GRUPOS.concat(AHORRO).find(([x]) => x === k) || [k, k, ""];
 
   function tarjetaLimpiar() {
     let cuerpo;
@@ -280,17 +290,23 @@
       cuerpo = `<p class="suave">Despeja busca fotos repetidas y parecidas, capturas, ráfagas, memes y videos grandes, y te propone qué borrar. Tú decides; nada sale del iPhone.</p>
         <div class="pz-pie"><button type="button" class="pz-boton pz-principal" id="analizar">Analizar mi iPhone</button></div>`;
     } else {
-      const filas = GRUPOS.filter(([k]) => E.grupos[k] && E.grupos[k].n).map(([k, titulo]) => {
+      const fila = ([k, titulo]) => {
         const g = E.grupos[k];
+        const ahorro = esAhorro(k);
         return `<li><button type="button" class="fila-grupo" data-grupo="${k}">
           <span class="g-titulo">${esc(titulo)}</span>
-          <span class="g-cifras" data-sin-traducir>${esc(Tp("{n} · {b}", { n: entero(g.n), b: tamano(g.bytes) }))}</span>
-          <span class="g-propuesta" data-sin-traducir>${g.marcadas ? esc(Tp("Borrar {m} libera {b}", { m: entero(g.marcadas), b: tamano(g.bytesMarcadas) })) : esc(Tp("Revisar"))}</span>
+          <span class="g-cifras" data-sin-traducir>${esc(ahorro ? entero(g.n) : Tp("{n} · {b}", { n: entero(g.n), b: tamano(g.bytes) }))}</span>
+          <span class="g-propuesta" data-sin-traducir>${g.marcadas ? esc(Tp(ahorro ? "Ahorra ~{b} con {m}" : "Borrar {m} libera {b}", { m: entero(g.marcadas), b: tamano(g.bytesMarcadas) })) : esc(Tp("Revisar"))}</span>
         </button></li>`;
-      }).join("");
+      };
+      const hay = ([k]) => E.grupos[k] && E.grupos[k].n;
+      const filas = GRUPOS.filter(hay).map(fila).join("");
+      const filasAhorro = AHORRO.filter(hay).map(fila).join("");
       const libera = Object.values(E.grupos).reduce((t, g) => t + (g.bytesMarcadas || 0), 0);
-      cuerpo = filas
-        ? `<p data-sin-traducir><b>${esc(Tp("Puedes liberar {b}", { b: tamano(libera) }))}</b> ${esc(Tp("con lo que está marcado."))}</p><ul class="grupos">${filas}</ul>
+      cuerpo = filas || filasAhorro
+        ? `<p data-sin-traducir><b>${esc(Tp("Puedes liberar {b}", { b: tamano(libera) }))}</b> ${esc(Tp("con lo que está marcado."))}</p>
+           ${filas ? `<h3 class="sub">Para borrar</h3><ul class="grupos">${filas}</ul>` : ""}
+           ${filasAhorro ? `<h3 class="sub">Ahorrar sin borrar</h3><ul class="grupos">${filasAhorro}</ul>` : ""}
            <div class="pz-pie"><button type="button" class="pz-boton" id="analizar">Analizar de nuevo</button></div>`
         : `<p class="hecho">No encontré nada que sobre. Tu biblioteca está ordenada.</p>
            <div class="pz-pie"><button type="button" class="pz-boton" id="analizar">Analizar de nuevo</button></div>`;
@@ -299,8 +315,10 @@
   }
 
   function vistaGrupo() {
-    const def = GRUPOS.find(([k]) => k === E.grupo) || [E.grupo, E.grupo, ""];
+    const def = defGrupo(E.grupo);
     const g = (E.grupos || {})[E.grupo] || { n: 0, marcadas: 0, bytesMarcadas: 0 };
+    const ahorro = esAhorro(E.grupo);
+    if (E.uno !== null && E.items[E.uno]) return vistaUno(def);
     const cuadros = E.items.map((x) => `<li class="cuadro${x.marcada ? " marcada" : ""}${x.guardar ? " guardar" : ""}">
         <button type="button" class="cuadro-elegir" data-marcar="${esc(x.id)}" aria-pressed="${x.marcada}"
           aria-label="${esc(Tp(x.marcada ? "Desmarcar ({b})" : "Marcar para borrar ({b})", { b: tamano(x.bytes) }))}" data-sin-traducir>
@@ -314,21 +332,110 @@
       <main class="contenido grupo">
         <p class="suave">${esc(def[2])}</p>
         <div class="pz-pie izquierda"><button type="button" class="pz-boton pz-chico" id="marcar-todas">Marcar todas</button>
-          <button type="button" class="pz-boton pz-chico" id="marcar-ninguna">Ninguna</button></div>
+          <button type="button" class="pz-boton pz-chico" id="marcar-ninguna">Ninguna</button>
+          ${E.items.length ? `<button type="button" class="pz-boton pz-chico" id="uno-por-uno">Uno por uno</button>` : ""}</div>
         <ul class="cuadros">${cuadros}</ul>
         ${E.items.length < E.totalGrupo ? `<div class="pz-pie"><button type="button" class="pz-boton" id="cargar-mas"${E.cargando ? " disabled" : ""}>${E.cargando ? "Cargando…" : "Ver más"}</button></div>`
           : E.cargando ? `<p class="suave" aria-busy="true">Cargando…</p>` : ""}
       </main>
-      <div class="barra-borrar"><button type="button" class="pz-boton pz-principal pz-peligro" id="borrar-grupo"${g.marcadas && !E.borrandoGrupo ? "" : " disabled"} data-sin-traducir>${esc(E.borrandoGrupo ? Tp("Borrando…")
-        : g.marcadas ? Tp("Borrar {m} ({b})", { m: entero(g.marcadas), b: tamano(g.bytesMarcadas) }) : Tp("Marca lo que quieras borrar"))}</button></div>
-      ${E.grande ? ui.dialogo({ id: "t-grande", titulo: "Vista", cuerpo: E.grande.img ? `<img class="grande" src="${esc(E.grande.img)}" alt="">` : `<p class="suave" aria-busy="true">Cargando…</p>`,
+      <div class="barra-borrar">${E.procesando ? `<div class="procesando"><div class="espacio" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+          aria-valuenow="${pctProceso()}" aria-label="${esc(Tp("Avance"))}" data-sin-traducir><span data-medida="${pctProceso()}"></span></div>
+          <p data-sin-traducir>${esc(Tp("{h} de {t} · ahorrado {b}", { h: entero(E.procesando.hechos), t: entero(E.procesando.total), b: tamano(E.procesando.ahorro) }))}</p>
+          <button type="button" class="pz-boton" id="parar-proceso">Detener</button></div>`
+        : `<button type="button" class="pz-boton pz-principal${ahorro ? "" : " pz-peligro"}" id="${ahorro ? "procesar-grupo" : "borrar-grupo"}"${g.marcadas && !E.borrandoGrupo ? "" : " disabled"} data-sin-traducir>${esc(E.borrandoGrupo ? Tp("Borrando…")
+        : !g.marcadas ? Tp(ahorro ? "Marca lo que quieras aligerar" : "Marca lo que quieras borrar")
+        : ahorro ? Tp(E.grupo === "comprimir" ? "Comprimir {m} (ahorra ~{b})" : "Convertir {m} (ahorra ~{b})", { m: entero(g.marcadas), b: tamano(g.bytesMarcadas) })
+        : Tp("Borrar {m} ({b})", { m: entero(g.marcadas), b: tamano(g.bytesMarcadas) }))}</button>`}</div>
+      ${E.grande && !E.grande.soloUno ? ui.dialogo({ id: "t-grande", titulo: "Vista", cuerpo: E.grande.img ? `<img class="grande" src="${esc(E.grande.img)}" alt="">` : `<p class="suave" aria-busy="true">Cargando…</p>`,
         pie: '<button type="button" class="pz-boton pz-principal" data-pz-cerrar>Listo</button>' }) : ""}`;
   }
+  const pctProceso = () => E.procesando && E.procesando.total ? Math.round((E.procesando.hechos / E.procesando.total) * 100) : 0;
+
+  /** Uno por uno: una foto grande; «Borrar» o «Se queda» (también deslizando o con las flechas), y pasa a la siguiente. */
+  function vistaUno(def) {
+    const x = E.items[E.uno];
+    const img = E.grande && E.grande.id === x.id && E.grande.img ? E.grande.img : x.img;
+    const ahorro = esAhorro(E.grupo);
+    return `<header class="barra"><button type="button" class="pz-boton" id="uno-salir" data-sin-traducir>‹ ${esc(Tp("Cuadrícula"))}</button>
+        <h1 data-sin-traducir>${esc(Tp("{i} de {t}", { i: entero(E.uno + 1), t: entero(E.totalGrupo) }))}</h1><span></span></header>
+      <main class="contenido uno">
+        <div class="tarjeta-uno${x.marcada ? " marcada" : ""}" id="tarjeta-uno" data-sin-traducir>
+          <img src="${esc(img)}" alt="">
+          ${x.guardar ? `<span class="etiqueta queda">${esc(Tp("La mejor del grupo"))}</span>` : ""}
+          <span class="estado">${esc(Tp(x.marcada ? (ahorro ? "Se aligera" : "Se borra") : "Se queda"))} · ${esc(tamano(x.bytes))}</span>
+        </div>
+        <div class="botones-uno"><button type="button" class="pz-boton pz-peligro" id="uno-borrar" data-sin-traducir>← ${esc(Tp(ahorro ? "Aligerar" : "Borrar"))}</button>
+          <button type="button" class="pz-boton" id="uno-quedar" data-sin-traducir>${esc(Tp("Se queda"))} →</button></div>
+        <p class="nota">${ahorro ? "Desliza a la izquierda para aligerar y a la derecha para conservar." : "Desliza a la izquierda para borrar y a la derecha para conservar."}</p>
+      </main>`;
+  }
+  function decidirUno(marcar) {
+    const x = E.items[E.uno];
+    if (!x) return;
+    if (x.marcada !== marcar) { x.marcada = marcar; host.enviar("grupoMarcar", { grupo: E.grupo, id: x.id, marcada: marcar }); }
+    E.uno += 1;
+    if (E.uno >= E.items.length) {
+      if (E.items.length < E.totalGrupo) { E.cargando = true; host.enviar("grupoVer", { grupo: E.grupo, desde: E.items.length }); }
+      else { E.uno = null; toast("Listo: revisaste todo el grupo."); }
+    }
+    pedirGrande();
+    pintar();
+  }
+  function pedirGrande() {
+    const x = E.uno !== null && E.items[E.uno];
+    if (x) { E.grande = { id: x.id, img: "", soloUno: true }; host.enviar("fotoGrande", { id: x.id }); }
+  }
+  // Deslizar en «Uno por uno»
+  let inicioX = null;
+  document.addEventListener("pointerdown", (ev) => { if (ev.target.closest("#tarjeta-uno")) inicioX = ev.clientX; });
+  document.addEventListener("pointerup", (ev) => {
+    if (inicioX === null) return;
+    const d = ev.clientX - inicioX;
+    inicioX = null;
+    if (Math.abs(d) > 60) decidirUno(d < 0);
+  });
+  document.addEventListener("keydown", (ev) => {
+    if (E.uno === null || ev.target.closest("input, textarea")) return;
+    if (ev.key === "ArrowLeft") { ev.preventDefault(); decidirUno(true); }
+    else if (ev.key === "ArrowRight") { ev.preventDefault(); decidirUno(false); }
+  });
+
+  function tarjetaOrden() {
+    const c = E.contactos, k = E.calendario;
+    let contactos;
+    if (E.revisandoContactos) contactos = `<p class="suave" aria-busy="true">Revisando tus contactos…</p>`;
+    else if (!c) contactos = `<div class="pz-pie izquierda"><button type="button" class="pz-boton" id="revisar-contactos">Revisar contactos</button></div>`;
+    else if (!c.ok) contactos = `<p class="error" data-sin-traducir>${esc(Tp(c.error || "No se pudo."))}</p>`;
+    else {
+      const rep = c.repetidos || [], inc = c.incompletos || [];
+      contactos = `<p data-sin-traducir>${esc(Tp("{n} contactos revisados.", { n: entero(c.total) }))}</p>
+        ${rep.length ? `<p data-sin-traducir><b>${esc(Tp("{n} repetidos", { n: entero(rep.length) }))}</b></p>
+          <ul class="lista-chica" data-sin-traducir>${rep.slice(0, 8).map((g) => `<li>${esc(g.nombres.filter(Boolean).join(" · ") || "—")}</li>`).join("")}</ul>
+          ${rep.length > 8 ? `<p class="nota" data-sin-traducir>${esc(Tp("y {n} más", { n: entero(rep.length - 8) }))}</p>` : ""}
+          <div class="pz-pie izquierda"><button type="button" class="pz-boton pz-principal" id="juntar-contactos">Juntar repetidos</button></div>
+          <p class="nota">Queda el más completo, con todos los teléfonos y correos de los demás.</p>` : `<p class="suave">No hay contactos repetidos.</p>`}
+        ${inc.length ? `<p data-sin-traducir><b>${esc(Tp("{n} sin teléfono ni correo", { n: entero(inc.length) }))}</b></p>
+          <ul class="lista-chica">${inc.slice(0, 40).map((x) => `<li><label><input type="checkbox" data-incompleto="${esc(x.id)}"${E.incompletosElegidos.has(x.id) ? " checked" : ""}>
+            <span data-sin-traducir>${esc(x.nombre || Tp("(sin nombre)"))}</span></label></li>`).join("")}</ul>
+          <div class="pz-pie izquierda"><button type="button" class="pz-boton pz-peligro" id="borrar-incompletos"${E.incompletosElegidos.size ? "" : " disabled"} data-sin-traducir>${esc(Tp("Borrar {n}", { n: entero(E.incompletosElegidos.size) }))}</button></div>` : ""}`;
+    }
+    let calendario;
+    if (E.revisandoCalendario) calendario = `<p class="suave" aria-busy="true">Revisando tu calendario…</p>`;
+    else if (!k) calendario = `<div class="pz-pie izquierda"><button type="button" class="pz-boton" id="revisar-calendario">Revisar calendario</button></div>`;
+    else if (!k.ok) calendario = `<p class="error" data-sin-traducir>${esc(Tp(k.error || "No se pudo."))}</p>`;
+    else calendario = k.viejos
+      ? `<p data-sin-traducir>${esc(Tp("{n} eventos de hace más de 2 años.", { n: entero(k.viejos) }))}</p>
+         <div class="pz-pie izquierda"><button type="button" class="pz-boton pz-peligro" id="borrar-calendario">Borrar eventos viejos</button></div>
+         <p class="nota">Ordena tu calendario; casi no libera espacio. Nunca toca calendarios suscritos ni cumpleaños.</p>`
+      : `<p class="suave">No hay eventos viejos para borrar.</p>`;
+    return `<section class="tarjeta" id="orden"><h2>Contactos y calendario</h2><h3 class="sub">Contactos</h3>${contactos}<h3 class="sub">Calendario</h3>${calendario}</section>`;
+  }
+
   const duracion = (s) => `${Math.floor((s || 0) / 60)}:${String((s || 0) % 60).padStart(2, "0")}`;
 
   function principal() {
     if (enIphone && E.grupo) return vistaGrupo();
-    if (enIphone) return barra() + `<main class="contenido">${tarjetaLimpiar()}${tarjetaEnviar()}${tarjetaLiberar()}${tarjetaFotos()}</main>`;
+    if (enIphone) return barra() + `<main class="contenido">${tarjetaLimpiar()}${tarjetaEnviar()}${tarjetaLiberar()}${tarjetaOrden()}${tarjetaFotos()}</main>`;
     return barra() + `<main class="contenido">${tarjetaIphone()}${tarjetaPlan()}${tarjetaRecibir()}${tarjetaApps()}</main>`;
   }
   function ajustes() {
@@ -410,8 +517,21 @@
       pintar();
       host.enviar("grupoMarcar", { grupo: E.grupo, todas });
     } else if (b.id === "borrar-grupo") borrarGrupo();
+    else if (b.id === "procesar-grupo") procesarGrupo();
+    else if (b.id === "parar-proceso") host.enviar("procesoParar");
+    else if (b.id === "uno-por-uno") { E.uno = 0; pedirGrande(); pintar(); window.scrollTo(0, 0); }
+    else if (b.id === "uno-salir") { E.uno = null; E.grande = null; pintar(); }
+    else if (b.id === "uno-borrar") decidirUno(true);
+    else if (b.id === "uno-quedar") decidirUno(false);
+    else if (b.id === "revisar-contactos") { E.revisandoContactos = true; pintar(); host.enviar("contactosAnalizar"); }
+    else if (b.id === "juntar-contactos") juntarContactos();
+    else if (b.id === "borrar-incompletos") borrarIncompletos();
+    else if (b.id === "revisar-calendario") { E.revisandoCalendario = true; pintar(); host.enviar("calendarioAnalizar"); }
+    else if (b.id === "borrar-calendario") borrarCalendario();
   });
   document.addEventListener("change", (ev) => {
+    const inc = ev.target.dataset && ev.target.dataset.incompleto;
+    if (inc) { if (ev.target.checked) E.incompletosElegidos.add(inc); else E.incompletosElegidos.delete(inc); return pintar(); }
     const id = ev.target.dataset && ev.target.dataset.elegir;
     if (!id) return;
     if (ev.target.checked) E.elegidas.add(id); else E.elegidas.delete(id);
@@ -455,6 +575,34 @@
     pintar();
     window.scrollTo(0, 0);
     host.enviar("grupoVer", { grupo: k, desde: 0 });
+  }
+  async function procesarGrupo() {
+    const g = (E.grupos || {})[E.grupo] || {};
+    const comprimir = E.grupo === "comprimir";
+    const si = await ui.confirmar({ titulo: comprimir ? "¿Comprimir {m} videos?" : "¿Convertir {m} Live Photos en fotos?", valores: { m: entero(g.marcadas) },
+      si: comprimir ? "Comprimir" : "Convertir",
+      texto: "Se crea la versión liviana con la misma fecha y lugar y, cuando quedó bien, el original va a «Eliminados recientemente» (iOS pregunta). Deja Despeja abierto mientras trabaja." });
+    if (!si) return;
+    E.procesando = { hechos: 0, total: g.marcadas, ahorro: 0 };
+    pintar();
+    host.enviar("grupoProcesar", { grupo: E.grupo });
+  }
+  async function juntarContactos() {
+    const n = ((E.contactos || {}).repetidos || []).length;
+    const si = await ui.confirmar({ titulo: "¿Juntar {n} contactos repetidos?", valores: { n: entero(n) }, si: "Juntar",
+      texto: "De cada grupo queda el más completo, con todos los teléfonos y correos de los demás. Los otros se borran." });
+    if (si) { E.revisandoContactos = true; pintar(); host.enviar("contactosJuntar"); }
+  }
+  async function borrarIncompletos() {
+    const ids = [...E.incompletosElegidos];
+    const si = await ui.confirmar({ titulo: "¿Borrar {n} contactos?", valores: { n: entero(ids.length) }, peligro: true, si: "Borrar",
+      texto: "No tienen teléfono ni correo. Se borran de tus contactos (y de iCloud si los sincronizas)." });
+    if (si) { E.revisandoContactos = true; pintar(); host.enviar("contactosBorrar", { ids }); }
+  }
+  async function borrarCalendario() {
+    const si = await ui.confirmar({ titulo: "¿Borrar {n} eventos viejos?", valores: { n: entero((E.calendario || {}).viejos) }, peligro: true, si: "Borrar",
+      texto: "Eventos de hace más de dos años, solo de tus calendarios (nunca suscritos ni cumpleaños). Los que se repiten no se tocan." });
+    if (si) { E.revisandoCalendario = true; pintar(); host.enviar("calendarioBorrar"); }
   }
   async function borrarGrupo() {
     const g = (E.grupos || {})[E.grupo] || {};
@@ -583,15 +731,48 @@
       const ya = new Set(E.items.map((x) => x.id));
       E.items = E.items.concat((r.items || []).filter((x) => !ya.has(x.id) && (!x.img || /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(x.img))));
       E.totalGrupo = r.total || 0;
+      if (E.uno !== null && E.uno >= E.items.length) E.uno = null;
+      if (E.uno !== null) pedirGrande();
       pintar();
     },
     fotoGrande(r) {
       if (!E.grande || !r || r.id !== E.grande.id) return;
       E.grande.img = r.ok && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(r.img || "") ? r.img : "";
-      if (!E.grande.img) E.grande = null;
+      if (!E.grande.img && !E.grande.soloUno) E.grande = null;
       pintar();
     },
     grupos(r) { if (r && r.ok) { E.grupos = r.grupos || {}; pintar(); } },
+    procesoAvance(a) { if (E.procesando) { E.procesando = a; pintar(); } },
+    procesoListo(r) {
+      E.procesando = null;
+      if (r && r.ok) {
+        E.grupos = r.grupos || E.grupos;
+        if (r.originalesQuedaron) toast("Las versiones livianas quedaron, pero no se borraron los originales: ahora están los dos.", { error: true });
+        else if (r.hechos) toast("Listo: {n} más livianos, ahorraste {b}. Los originales están en «Eliminados recientemente».", { valores: { n: entero(r.hechos), b: tamano(r.ahorro) } });
+        else toast("No se pudo aligerar nada: ya estaban comprimidos o no se pudieron bajar de iCloud.");
+        if (r.fallas && r.hechos) toast("{f} no se pudieron (ya estaban livianos o no se bajaron de iCloud).", { valores: { f: entero(r.fallas) } });
+        E.grupo = null; E.items = [];
+      } else toast((r && r.error) || "No se pudo.", { error: true });
+      pintar();
+    },
+    contactosAnalizados(r) { E.revisandoContactos = false; E.contactos = r; E.incompletosElegidos = new Set(); pintar(); },
+    contactosJuntados(r) {
+      E.revisandoContactos = false;
+      if (r && r.ok) { toast("Listo: juntaste {n} contactos repetidos.", { valores: { n: entero(r.juntados) } }); E.contactos = null; }
+      pintar();
+    },
+    contactosBorrados(r) {
+      E.revisandoContactos = false;
+      if (r && r.ok) { toast("Se borraron {n} contactos.", { valores: { n: entero(r.borrados) } }); E.contactos = null; }
+      pintar();
+    },
+    calendarioAnalizado(r) { E.revisandoCalendario = false; E.calendario = r; pintar(); },
+    calendarioBorrado(r) {
+      E.revisandoCalendario = false;
+      if (r && r.ok) { toast("Se borraron {n} eventos.", { valores: { n: entero(r.borrados) } }); E.calendario = { ok: true, viejos: 0 }; }
+      else toast((r && r.error) || "No se pudo.", { error: true });
+      pintar();
+    },
     grupoBorrado(r) {
       E.borrandoGrupo = false;
       if (r && r.ok) {
@@ -696,6 +877,19 @@
         return c.responder("grupos", { ok: true, grupos: DEMO.grupos });
       }
       case "fotoGrande": return c.luego(200, () => c.responder("fotoGrande", { ok: true, id: d.id, img: DEMO.foto }));
+      case "grupoProcesar": {
+        const g = DEMO.grupos[d.grupo], n = g.marcadas, b = g.bytesMarcadas;
+        c.luego(200, () => c.responder("procesoAvance", { hechos: Math.ceil(n / 2), total: n, ahorro: b / 2 }));
+        DEMO.items[d.grupo] = (DEMO.items[d.grupo] || []).filter((x) => !x.marcada);
+        Object.assign(g, { n: g.n - n, bytes: g.bytes - b, marcadas: 0, bytesMarcadas: 0 });
+        return c.luego(700, () => c.responder("procesoListo", { ok: true, hechos: n, ahorro: b, fallas: 0, grupo: d.grupo, grupos: DEMO.grupos }));
+      }
+      case "procesoParar": return;
+      case "contactosAnalizar": return c.luego(300, () => c.responder("contactosAnalizados", DEMO.contactos));
+      case "contactosJuntar": return c.luego(300, () => c.responder("contactosJuntados", { ok: true, juntados: DEMO.contactos.repetidos.length }));
+      case "contactosBorrar": return c.luego(300, () => c.responder("contactosBorrados", { ok: true, borrados: d.ids.length }));
+      case "calendarioAnalizar": return c.luego(300, () => c.responder("calendarioAnalizado", { ok: true, viejos: 214 }));
+      case "calendarioBorrar": return c.luego(300, () => c.responder("calendarioBorrado", { ok: true, borrados: 214 }));
       case "grupoBorrar": {
         const g = DEMO.grupos[d.grupo], n = g.marcadas, b = g.bytesMarcadas;
         DEMO.items[d.grupo] = (DEMO.items[d.grupo] || []).filter((x) => !x.marcada);

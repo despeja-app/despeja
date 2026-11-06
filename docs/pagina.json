@@ -58,6 +58,26 @@
   },
   {
    "titulo": {
+    "es": "Limpia sola",
+    "en": "Cleans up for you"
+   },
+   "texto": {
+    "es": "Agrupa fotos repetidas y parecidas, capturas, ráfagas, borrosas, memes y videos repetidos, con lo que sobra ya marcado. Revisas en cuadrícula o una por una, deslizando.",
+    "en": "Groups duplicate and similar photos, screenshots, bursts, blurry shots, memes and duplicate videos, with the extras already selected. Review in a grid or one by one, swiping."
+   }
+  },
+  {
+   "titulo": {
+    "es": "Ahorra sin borrar",
+    "en": "Save without deleting"
+   },
+   "texto": {
+    "es": "Comprime videos a HEVC y convierte Live Photos en fotos, con la misma fecha y lugar. También junta contactos repetidos.",
+    "en": "Compresses videos to HEVC and turns Live Photos into photos, with the same date and place. It also merges duplicate contacts."
+   }
+  },
+  {
+   "titulo": {
     "es": "Borra sin miedo",
     "en": "Delete without fear"
    },
@@ -326,6 +346,17 @@
    "por": {
     "es": "Para encontrar tu Mac en tu Wi-Fi y mandarle los respaldos, sin pasar por internet.",
     "en": "To find your Mac on your Wi-Fi and send it the backups, without going through the internet."
+   }
+  },
+  {
+   "sistema": "iPhone",
+   "nombre": {
+    "es": "Contactos y Calendario",
+    "en": "Contacts and Calendar"
+   },
+   "por": {
+    "es": "Solo si tocas «Revisar contactos» o «Revisar calendario», para encontrar repetidos y eventos viejos.",
+    "en": "Only if you tap “Check contacts” or “Check calendar”, to find duplicates and old events."
    }
   }
  ],

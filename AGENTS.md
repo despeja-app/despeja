@@ -42,7 +42,7 @@ PhotoKit, manda cada foto y video al Mac y borra del iPhone **solo lo que el Mac
 | `bin/iphone.py` | El Mac habla con el iPhone (usbmuxd → lockdownd con TLS y el registro de emparejamiento): `estado` (modelo, iOS, capacidad, libre), `apps` (con su tamaño; queda en `catastro.json`) y `desinstalar` (solo una app de la última lista revisada). |
 | `bin/respaldo.py` | El Mac recibe: servidor HTTPS en la red local anunciado por Bonjour (`_despeja._tcp`), código de 8 letras, verificación SHA-256 y `respaldo/indice.json`. |
 | `bin/plan.py` | El catastro y el plan con la IA de la persona (`armar`) y la versión de iOS más nueva para el modelo (`ios`, api.ipsw.me). |
-| `movil/ios/Fuentes/` | La app de iPhone: `App.swift` (lo que atiende), `Fotos.swift` (resumen con PhotoKit), `Respaldo.swift` (buscar el Mac, conectar, mandar, borrar). El proyecto de Xcode y su `Info.plist` los genera «host-ios». |
+| `movil/ios/Fuentes/` | La app de iPhone: `App.swift` (lo que atiende), `Fotos.swift` (resumen), `Respaldo.swift` (buscar el Mac, conectar, mandar, borrar), `Limpieza.swift` (analizar y agrupar), `Compresion.swift` (comprimir videos, Live Photos a fotos), `Contactos.swift`, `Calendario.swift`. El proyecto de Xcode y su `Info.plist` los genera «host-ios». |
 | `herramientas/compilar_iphone.sh`, `instalar_iphone.sh` | Compilar la app de iPhone para el simulador; instalarla con `devicectl` (si Xcode no tiene la sesión, se instala con ▶︎ desde Xcode). |
 | `docs/ficha.md` | La ficha del proyecto: qué es, decisiones y límites. |
 
@@ -58,6 +58,9 @@ PhotoKit, manda cada foto y video al Mac y borra del iPhone **solo lo que el Mac
 | iPhone | Resumen de fotos | `fotosResumen` (PhotoKit; el permiso se pide recién al tocar) |
 | iPhone | Mandar al Mac | `macBuscar` → `macConectar {mac, codigo}` → `respaldar` (avisa `respaldoAvance`) → `respaldoListo`; `respaldoParar` |
 | iPhone | Borrar lo verificado | `borrarRespaldadas` → `borradas` (iOS pregunta; va a «Eliminados recientemente») |
+| iPhone | Analizar y limpiar | `analizar` → `analisisListo {grupos}` (`Limpieza.swift`: repetidas por dHash, parecidas por tomas seguidas, capturas, ráfagas, videos repetidos, borrosas por varianza del laplaciano, memes con Vision en iOS 18, videos grandes); `grupoVer`, `fotoGrande`, `grupoMarcar`, `grupoBorrar` |
+| iPhone | Ahorrar sin borrar | `grupoProcesar` para `comprimir` (HEVC hasta 1080p) y `live` (quitar el video de la Live Photo) → `procesoAvance` / `procesoListo` (`Compresion.swift`: crea la versión nueva, comprueba que quedó y recién ahí manda el original a «Eliminados recientemente»); `procesoParar` |
+| iPhone | Contactos y calendario | `contactosAnalizar`, `contactosJuntar`, `contactosBorrar` (`Contactos.swift`), `calendarioAnalizar`, `calendarioBorrar` (`Calendario.swift`: más de 2 años, nunca suscritos ni cumpleaños) |
 
 **El respaldo, paso a paso** (las mismas reglas en `bin/respaldo.py` y `Respaldo.swift`; si cambias una, cambia las dos y su prueba):
 - Llave: `PBKDF2-SHA256(código sin guion, sal "despeja-respaldo-1", 200.000 vueltas)`. Firma: `HMAC-SHA256(llave, partes unidas por "|")`.

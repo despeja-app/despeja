@@ -5,9 +5,13 @@
 <plist version="1.0">
 <dict>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Para revisar tus fotos y videos y respaldarlos en tu Mac antes de borrar algo.</string>
+	<string>Para revisar, respaldar, comprimir y, si lo pides, borrar tus fotos y videos. Nada sale del iPhone sin que lo pidas.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Para conectarte con Despeja en tu Mac por tu Wi-Fi, sin pasar por internet.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Para encontrar contactos repetidos o incompletos y juntarlos si lo pides.</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Para encontrar eventos antiguos del calendario y borrarlos si lo pides.</string>
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_despeja._tcp</string>

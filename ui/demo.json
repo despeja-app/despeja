@@ -506,19 +506,5 @@
    "bytesMarcadas": 0,
    "guardadas": 0
   }
- },
- "sugeridas": [
-  {
-   "id": "com.ejemplo.fotos",
-   "motivo": "Es la más pesada y otra app de fotos cumple lo mismo."
-  },
-  {
-   "id": "com.ejemplo.taxi",
-   "motivo": "Se puede pedir desde el navegador cuando lo necesites."
-  },
-  {
-   "id": "com.ejemplo.tienda",
-   "motivo": "Tiene una versión web completa."
-  }
- ]
+ }
 }

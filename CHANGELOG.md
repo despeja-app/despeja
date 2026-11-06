@@ -7,6 +7,9 @@ Lo que cambia para quien usa Despeja, en palabras simples. Las descargas de cada
 ## Sin publicar · Unreleased
 <!-- Una línea por cambio que se nota, en lenguaje de persona («Ahora puedes…»), en español · *e inglés*. Al publicar una
 versión (subir «version» en app.json), estas líneas pasan a «## X.Y.Z». -->
+- Más limpieza en el iPhone: videos repetidos, fotos borrosas, comprimir videos, Live Photos a fotos, revisar una por una
+  deslizando, juntar contactos repetidos y borrar eventos viejos del calendario. · *More cleanup on the iPhone: duplicate videos,
+  blurry photos, video compression, Live Photos to stills, one-by-one swipe review, merge duplicate contacts and delete old events.*
 
 ## 0.2.0
 - Tu Mac ve tu iPhone por cable o Wi-Fi: espacio libre, apps de la más pesada a la más liviana y si hay un iOS más nuevo. ·

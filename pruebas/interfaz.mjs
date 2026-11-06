@@ -138,6 +138,31 @@ await page.click('[data-grupo="repetidas"]');
 await page.waitForSelector(".cuadros li.guardar");
 assert.equal(await page.locator(".cuadros li.guardar.marcada").count(), 0, "lo que se queda nunca va marcado");
 await page.click("#volver");
+// Uno por uno en «parecidas»: deslizar con las flechas.
+await page.click('[data-grupo="parecidas"]');
+await page.waitForSelector("#uno-por-uno");
+await page.click("#uno-por-uno");
+await page.waitForSelector("#tarjeta-uno");
+await page.keyboard.press("ArrowRight");
+await page.waitForSelector("h1:has-text('2 of 5')");
+await capturar(page, "6d-iphone-uno-en");
+await page.click("#uno-salir");
+await page.click("#volver");
+// Ahorrar sin borrar: comprimir videos.
+await page.click('[data-grupo="comprimir"]');
+await page.waitForSelector("#procesar-grupo:not([disabled])");
+await page.click("#procesar-grupo");
+await page.click('[data-pz-confirmar="si"]');
+await page.waitForSelector("#limpiar .grupos");
+// Contactos y calendario.
+await page.click("#revisar-contactos");
+await page.waitForSelector("#juntar-contactos");
+await page.check("[data-incompleto]");
+await page.waitForSelector("#borrar-incompletos:not([disabled])");
+await page.click("#revisar-calendario");
+await page.waitForSelector("#borrar-calendario");
+await sinDesborde(page, "contactos y calendario a 390 px");
+await capturar(page, "6e-iphone-orden-en");
 await page.click("#buscar-mac");
 await page.click("[data-mac]");
 await page.fill("#codigo", "aaaa1111");

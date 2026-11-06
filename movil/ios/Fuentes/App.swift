@@ -61,6 +61,27 @@ struct DespejaApp: App {
                     p.llamar("respaldoEstado", Respaldo.shared.resumen())
                 }
             }
+            // Ahorrar sin borrar: comprimir videos y Live Photos a fotos (Compresion.swift)
+            p.registrar("grupoProcesar") { d in
+                guard let g = d["grupo"] as? String, g == "comprimir" || g == "live" else { return }
+                p.ocupar()
+                Task {
+                    let r = await l.procesar(g) { p.llamar("procesoAvance", $0) }
+                    p.soltar()
+                    p.llamar("procesoListo", r)
+                }
+            }
+            p.registrar("procesoParar") { _ in l.pararProceso() }
+            // Contactos y calendario
+            let c = Contactos.shared, cal = Calendario.shared
+            p.registrar("contactosAnalizar") { _ in Task { p.llamar("contactosAnalizados", await c.analizar()) } }
+            p.registrar("contactosJuntar") { _ in Task { p.llamar("contactosJuntados", await c.juntar()) } }
+            p.registrar("contactosBorrar") { d in
+                let ids = ((d["ids"] as? [Any]) ?? []).compactMap { $0 as? String }.filter { $0.count <= 200 }.prefix(5000)
+                Task { p.llamar("contactosBorrados", await c.borrarIncompletos(Array(ids))) }
+            }
+            p.registrar("calendarioAnalizar") { _ in Task { p.llamar("calendarioAnalizado", await cal.analizar()) } }
+            p.registrar("calendarioBorrar") { _ in Task { p.llamar("calendarioBorrado", await cal.borrarViejos()) } }
             p.registrar("borrarRespaldadas") { _ in
                 Task { p.llamar("borradas", await r.borrar()) }
             }
