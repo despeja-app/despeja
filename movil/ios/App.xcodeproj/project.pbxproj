@@ -6,16 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Pieza «host-ios» (generado desde app.json): una app de iPhone sin dependencias. Fuentes/ se sincroniza sola (Xcode 16+):
+   un archivo nuevo ahí entra sin tocar este proyecto. La interfaz y app.json los copia recursos.sh en cada compilación. */
+
 /* Begin PBXFileReference section */
 		D0000000000000000000A001 /* Despeja.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Despeja.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		D0000000000000000000A002 /* Fuentes */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Fuentes;
-			sourceTree = "<group>";
-		};
+		D0000000000000000000A002 /* Fuentes */ = {isa = PBXFileSystemSynchronizedRootGroup; path = Fuentes; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,7 +49,7 @@
 /* Begin PBXNativeTarget section */
 		D0000000000000000000A006 /* Despeja */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = D0000000000000000000A00A /* Build configuration list for PBXNativeTarget "Despeja" */;
+			buildConfigurationList = D0000000000000000000A00A /* Build configuration list for PBXNativeTarget */;
 			buildPhases = (
 				D0000000000000000000A007 /* Sources */,
 				D0000000000000000000A003 /* Frameworks */,
@@ -79,7 +78,7 @@
 				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 2600;
 			};
-			buildConfigurationList = D0000000000000000000A00C /* Build configuration list for PBXProject "App" */;
+			buildConfigurationList = D0000000000000000000A00C /* Build configuration list for PBXProject */;
 			developmentRegion = es;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -183,7 +182,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.despeja.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -204,7 +203,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 0.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.despeja.ios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -216,7 +215,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		D0000000000000000000A00A /* Build configuration list for PBXNativeTarget "Despeja" */ = {
+		D0000000000000000000A00A /* Build configuration list for PBXNativeTarget */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D0000000000000000000A00F /* Debug */,
@@ -225,7 +224,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D0000000000000000000A00C /* Build configuration list for PBXProject "App" */ = {
+		D0000000000000000000A00C /* Build configuration list for PBXProject */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				D0000000000000000000A00D /* Debug */,
