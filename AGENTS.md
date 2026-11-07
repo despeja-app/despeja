@@ -32,11 +32,11 @@ PhotoKit, manda cada foto y video al Mac y borra del iPhone **solo lo que el Mac
 |---|---|
 | `bin/` | Python **solo biblioteca estándar**: lo que corren las apps. El último argumento siempre es el JSON de salida; lo que escribe la persona llega en un JSON de entrada, nunca como argumento. |
 | `ui/` | La interfaz única (`index.html` con CSP, `app.js`, `app.css`), las piezas de interfaz (ver «Piezas») e `idiomas/en.json`. |
-| `app/` | App de Mac (SwiftPM, macOS 15): lo propio en `Sources/Despeja/`, las piezas en `Sources/Pieza*/`. `Info.plist` y `Package.swift` los genera la pieza «empaquetado». |
+| `escritorio/` | App de Mac (Rust + Tauri, pieza «host-tauri», con el WebView del sistema): lo propio en `src/main.rs` (la carpeta de los respaldos, `elegirDestino`, `abrirAccesoDisco` y el `destino` en el estado), el host en `src/pieza/`. `Cargo.toml`, `tauri.conf.json`, `Info.plist` y `pruebas/arranque.sh` los genera la pieza. Íconos en `iconos/` (`herramientas/iconos.sh` los arma desde `iconos/icono-1024.png`). Pruebas: `cd escritorio && cargo test`, `cargo clippy -- -D warnings` y `bash escritorio/pruebas/arranque.sh` (la abre con Xvfb en Linux). |
 | `movil/` | App del celular. |
 | `docs/` | La página pública (GitHub Pages). |
 | `pruebas/` | `correr.sh` (todo lo que revisa GitHub en cada cambio) y las pruebas. |
-| `herramientas/` | `revisar_privacidad.sh` (antes de cada commit), `empaquetar.sh` (arma la app de Mac). |
+| `herramientas/` | `revisar_privacidad.sh` (antes de cada commit), `empaquetar.sh mac` (arma la app de Mac con Tauri), `iconos.sh`. |
 | `app.json`, `piezas.json`, `acciones.json` | **Pieza** (ver «Piezas»): `app.json` describe la app (id, nombre, versión, datos, plataformas, config y sus acciones); `piezas.json` y `acciones.json` los escribe `pieza.py`. |
 | `CHANGELOG.md` | Lo que cambia para quien usa la app, en palabras simples (ver «Lo que rodea a un cambio»). |
 | `bin/iphone.py` | El Mac habla con el iPhone (usbmuxd → lockdownd con TLS y el registro de emparejamiento): `estado` (modelo, iOS, capacidad, libre), `apps` (con su tamaño; queda en `catastro.json`) y `desinstalar` (solo una app de la última lista revisada). |
@@ -82,31 +82,31 @@ Despeja usa piezas de Pieza, la base de la familia de apps: código probado que 
 
 | Pieza | Versión | Archivos | Qué usa Despeja |
 |---|---|---|---|
-| `actualizaciones` | 0.3.0 | `app/Sources/PiezaActualizaciones/Actualizaciones.swift` | Avisos de versión nueva de la app de Mac y actualizar en un clic. |
+| `actualizaciones` | 0.4.0 | `escritorio/src/pieza/actualizaciones.rs` | Avisos de versión nueva de la app de Mac y actualizar en un clic. |
 | `bienvenida` | 0.4.1 | `ui/bienvenida.css`, `ui/bienvenida.js` | El primer uso: idioma, qué hace, tu IA (Mac) y cómo conectar el iPhone. |
 | `cifrado` | 0.2.0 | `ui/cifrado.js` | Todavía no se usa: quedará para el respaldo cifrado en una carpeta de la nube. |
 | `componentes` | 0.3.0 | `ui/componentes.css`, `ui/componentes.js` | Diálogos de confirmación (desinstalar, borrar), avisos, filas de Tu IA, Acerca de. |
-| `contrato` | 0.1.2 | `pruebas/contrato.py` | Revisa que Mac, iPhone y la vista previa atiendan lo que pide la interfaz (excepciones de un solo lado en `pruebas/contrato_app.py`). |
-| `empaquetado` | 0.1.0 | `herramientas/python.lock` | Arma y publica la app de Mac con su Python portátil. |
-| `esqueleto` | 0.1.0 |  | El punto de partida (ya reemplazado por lo propio). |
-| `github` | 0.1.0 |  | Plantillas de issues y PR, workflows, agentes y revisión de privacidad. |
+| `contrato` | 0.1.3 | `pruebas/contrato.py` | Revisa que Mac, iPhone y la vista previa atiendan lo que pide la interfaz (excepciones de un solo lado en `pruebas/contrato_app.py`). |
+| `empaquetado` | 0.2.0 | `herramientas/python.lock`, `escritorio/herramientas/preparar.sh` | Arma y publica la app de Mac con Tauri y su Python portátil (`Despeja-macOS.zip` + `.sha256`). |
+| `esqueleto` | 0.2.0 |  | El punto de partida (ya reemplazado por lo propio). |
+| `github` | 0.2.0 |  | Plantillas de issues y PR, workflows, agentes y revisión de privacidad. |
 | `host-ios` | 0.1.1 | `movil/ios/Fuentes/PiezaHost/Host.swift`, `movil/ios/Fuentes/PiezaHost/Puente.swift` | La app de iPhone: la misma interfaz (`plataforma «movil»`), el proyecto de Xcode y los permisos de `app.json → ios`. |
-| `host-mac` | 0.3.0 | `app/Sources/PiezaHost/Carpeta.swift`, `app/Sources/PiezaHost/Enchufe.swift`, `app/Sources/PiezaHost/Host.swift`, `app/Sources/PiezaHost/Procesador.swift`, `app/Sources/PiezaHost/Puente.swift`, `app/Sources/PiezaHost/Sistema.swift` | La app de Mac: acciones declaradas, `CarpetaElegida` para el destino del respaldo, el estado y el lector de progreso. |
-| `host-ui` | 0.2.0 | `ui/host.js` | `host.enviar` y las respuestas en `window.Despeja`, iguales en Mac, iPhone y la vista previa. |
+| `host-tauri` | 0.1.0 | `escritorio/src/pieza/*.rs` y lo generado de `escritorio/` | La app de Mac (Rust + Tauri, la misma para Windows y Linux si algún día se suman): ventana, puente con sus guardas, acciones declaradas, la carpeta de los respaldos (`config.carpeta`, inyector `carpetaActual`), menús, actualizaciones y el lector de progreso. Reemplaza a «host-mac» (Swift). |
+| `host-ui` | 0.3.0 | `ui/host.js` | `host.enviar` y las respuestas en `window.Despeja`, iguales en Mac, iPhone y la vista previa. |
 | `i18n` | 0.3.1 | `ui/i18n.js` | Español e inglés en toda la interfaz. |
 | `ia` | 0.6.3 | `bin/ia.py` | El plan (`bin/plan.py`) con la IA de la persona, sin herramientas ni memoria. |
 | `nucleo` | 0.7.1 | `bin/nucleo.py` | `app.json`, la carpeta de datos y el contrato de los scripts. |
-| `pagina` | 0.1.1 | `docs/pagina-comunes.json`, `docs/pagina.css`, `docs/pagina.js`, `docs/sello-en.svg`, `docs/sello.svg`, `docs/tema.css`, `herramientas/pagina_capturas.mjs` | La página pública bilingüe con su SEO y la demo. |
+| `pagina` | 0.1.2 | `docs/pagina-comunes.json`, `docs/pagina.css`, `docs/pagina.js`, `docs/sello-en.svg`, `docs/sello.svg`, `docs/tema.css`, `herramientas/pagina_capturas.mjs` | La página pública bilingüe con su SEO y la demo. |
 | `red` | 0.2.0 | `bin/red.py` | La versión de iOS disponible (solo `api.ipsw.me`). |
 | `tema` | 0.2.1 | `ui/tema.css`, `ui/tema.js` | Claro, oscuro o como el sistema. |
-| `trabajos` | 0.2.1 | `app/Sources/PiezaTrabajos/LectorProgreso.swift`, `bin/trabajos.py` | El latido y el avance del respaldo (`LectorProgreso`); `bin/trabajos.py` aún no se usa. |
+| `trabajos` | 0.2.2 | `escritorio/src/pieza/progreso.rs`, `bin/trabajos.py` | El latido y el avance del respaldo (`progreso::Lector`); `bin/trabajos.py` aún no se usa. |
 
 - **No edites a mano los archivos de una pieza.** Se actualizan con «Pieza al día» (`.github/workflows/pieza-al-dia.yml`, una vez por
   semana abre un PR o un issue) o con `python3 <pieza>/herramientas/pieza.py actualizar .`. Si hay que cambiar algo, el cambio va
   primero a Pieza (`pieza.py diferencias . <pieza>` lo muestra) y vuelve desde allá; `pieza.py estado .` dice si algo quedó distinto.
 - Lo que **generan** las piezas desde `app.json` (el empaquetado, los workflows, las plantillas de GitHub) se vuelve a generar con
   `pieza.py generar .` después de cambiar `app.json`; si lo cambias a mano, desde ahí es de la app y Pieza ya no lo toca.
-- `app.json` y `acciones.json` van dentro de las apps (los empaqueta `herramientas/empaquetar.sh` y `extraResources`). Después de
+- `app.json` y `acciones.json` van dentro de las apps (van en `recursos/`, `bundle.resources` de `escritorio/tauri.conf.json`). Después de
   cambiar una acción de `app.json`: `python3 <pieza>/herramientas/pieza.py acciones .`.
 - `.gitignore` es una lista blanca: un archivo o carpeta nueva de la raíz se agrega ahí.
 - Al agregar o actualizar una pieza, pon al día esta tabla (`pieza.py estado .` dice las versiones).
@@ -124,7 +124,8 @@ Despeja usa piezas de Pieza, la base de la familia de apps: código probado que 
 - Privacidad: `bash herramientas/revisar_privacidad.sh` antes de cada commit (usa `.terminos-privados`, local y nunca versionado).
   Jamás subas datos reales, ni siquiera "para probar".
 - Commits con autor `@users.noreply.github.com`. El repo es público: cada commit se ve al tiro.
-- Swift solo compila en un Mac (o en el job `mac` de GitHub): imita código que ya compila y anota qué revisar en el Mac.
+- La app de Mac es Rust: compila en cualquier sistema (`cd escritorio && cargo build`) y GitHub la prueba en Mac y Linux (job
+  `app`). Lo del iPhone (`movil/ios`) es Swift y solo compila en un Mac: imita código que ya compila y anota qué revisar ahí.
 - El protocolo del respaldo (llave, firmas, cabeceras, `respaldados.json`, `respaldo/indice.json`) no se cambia sin
   compatibilidad: un iPhone y un Mac con versiones distintas tienen que seguir entendiéndose, o el cambio sube la sal
   (`despeja-respaldo-2`) y lo dice en el `CHANGELOG.md`.

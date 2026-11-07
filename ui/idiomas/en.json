@@ -408,6 +408,16 @@
   "Ya tienes la versión liviana de cada uno en tu biblioteca, con la misma fecha y lugar. Todos están marcados: bórralos y te quedas con la liviana.": "You already have the lighter version of each one in your library, with the same date and place. All are selected: delete them and keep the lighter one.",
   "Quedaron los originales": "The originals are still there",
   "Borrar originales": "Delete originals",
-  "Ya tienes las versiones livianas, pero los {m} originales siguen en el iPhone ({b}). ¿Los borro? Si no, quedan en «Originales ya comprimidos».": "You have the lighter versions, but the {m} originals are still on the iPhone ({b}). Delete them? If not, they stay in “Originals already compressed”."
+  "Ya tienes las versiones livianas, pero los {m} originales siguen en el iPhone ({b}). ¿Los borro? Si no, quedan en «Originales ya comprimidos».": "You have the lighter versions, but the {m} originals are still on the iPhone ({b}). Delete them? If not, they stay in “Originals already compressed”.",
+  "Ocultar otras": "Hide Others",
+  "Abrir {app}": "Open {app}",
+  "La app: en una o dos frases, qué hace y para quién.": "The app: in one or two sentences, what it does and for whom.",
+  "Usa la IA que ya tienes, con tu cuenta. La probamos con una pregunta corta.": "It uses the AI you already have, with your account. We test it with a short question.",
+  "Prueba el ejemplo": "Try the example",
+  "La app: aquí va la pantalla principal.": "The app: the main screen goes here.",
+  "Escribe algo": "Write something",
+  "Contar palabras": "Count words",
+  "Contando…": "Counting…",
+  "{n} palabras y {l} letras": "{n} words and {l} letters"
  }
 }
