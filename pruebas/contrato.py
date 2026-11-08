@@ -51,13 +51,13 @@ import os
 import re
 import sys
 
-PLATAFORMAS_HOST = {"mac": "app/Sources", "escritorio": "escritorio/src/main.js", "movil": "movil/host/host.js",
+PLATAFORMAS_HOST = {"tauri": "escritorio/src/pieza/host.rs", "mac": "app/Sources", "escritorio": "escritorio/src/main.js", "movil": "movil/host/host.js",
                     "ios": "movil/ios/Fuentes"}
 #: Lo que trae cada host (pieza «host-mac» y «host-escritorio») sin que la app lo registre.
 DEL_HOST = {"listo", "config", "abrirEnlace", "copiar"}
 DEL_HOST_ACTUALIZACIONES = {"buscarActualizacion", "actualizar"}
 #: Respuestas que el host manda solo si la interfaz pidió algo que la app quizás no usa.
-RESPUESTAS_OPCIONALES = {"copiado": "copiar", "archivoCambiado": None,
+RESPUESTAS_OPCIONALES = {"copiado": "copiar", "archivoCambiado": None, "soltados": None, "soltando": None,
                          "error": None}   # host-ios: una acción que el iPhone no atiende (la interfaz puede mostrarlo o no)
 #: Señales de que un archivo arma el comando de una IA (eso es de bin/ia.py, pieza «ia»).
 COMANDO_IA = re.compile(r'"--disallowedTools"|"--strict-mcp-config"|"--skip-git-repo-check"|["\'](claude|codex|gemini|agy)["\']\s*,\s*\[')
@@ -259,16 +259,20 @@ class Contrato:
         """Las plataformas con código en el repo: mac (app/Sources), escritorio (Electron), movil (Capacitor) e ios (host-ios)."""
         declaradas = set(self.app.get("plataformas") or [])
         hay = {}
-        if self.existe("app/Sources"):
+        # host-tauri: un solo host (Rust) para Mac, Windows y Linux. Con él, lo de antes (Swift, Electron) ya no cuenta.
+        tauri = self.existe("escritorio/src/pieza/host.rs")
+        if tauri:
+            hay["tauri"] = True
+        if self.existe("app/Sources") and not tauri:
             hay["mac"] = True
-        if self.existe("escritorio/src/main.js"):
+        if self.existe("escritorio/src/main.js") and not tauri:
             hay["escritorio"] = True
         if self.existe("movil/host/host.js"):
             hay["movil"] = True
         if self.existe("movil/ios/Fuentes/PiezaHost/Puente.swift"):   # pieza «host-ios» (Swift, sin Capacitor)
             hay["ios"] = True
         for p, donde in (("mac", "mac"), ("windows", "escritorio"), ("linux", "escritorio"), ("ios", "movil"), ("android", "movil")):
-            if p == "ios" and "ios" in hay:
+            if (p == "ios" and "ios" in hay) or (p in ("mac", "windows", "linux") and "tauri" in hay):
                 continue
             if p in declaradas and donde not in hay:
                 self.aviso(f"app.json dice «{p}» y no encuentro {PLATAFORMAS_HOST[donde]}: no lo reviso (¿todavía no existe?)")
@@ -308,6 +312,8 @@ class Contrato:
                     break
                 self.funciones |= claves(bloque(texto[i:], "host.responder({"))
                 i += 1
+            # Lo que la app le pide a la página y espera (host-tauri: pedir) también queda en window.<App>.
+            self.funciones |= set(re.findall(r'host\.atender\(\s*"(\w+)"', sin_comentarios(texto)))
         if not self.funciones:
             self.problema("host-ui", "responder", f"ui/: no encuentro host.responder({{…}}): las respuestas quedan en window.{self.global_}")
 
@@ -389,6 +395,17 @@ class Contrato:
             con_act = "p.actualizaciones = " in propio or "actualizaciones = .init(" in propio
             llama = set(re.findall(r'llamar\("(\w+)"', sin_comentarios(propio + "\n" + host)))
             etiqueta = "Mac"
+        elif nombre == "tauri":
+            # Lo propio es el Rust de escritorio/src fuera de pieza/ (main.rs y lo que la app sume); el host, escritorio/src/pieza/.
+            propio = "\n".join(self.leer(r) or "" for r in self.archivos("escritorio/src/**/*.rs") if "/pieza/" not in r.replace(os.sep, "/"))
+            host = self.juntar("escritorio/src/pieza/*.rs", propios=False)
+            registradas = set(re.findall(r'\.registrar\("(\w+)"', sin_comentarios(propio)))
+            interna = bloque(self.leer("escritorio/src/pieza/host.rs") or "", "fn interna(")
+            del_host = set(re.findall(r'^\s*"(\w+)"(?:\s+if\s[^=]*)?\s*=>', interna, re.M))
+            con_act = bool(re.search(r"^\s*actualizaciones:\s", sin_comentarios(propio), re.M))
+            # `h.pedir("x", …)` también llama window.<App>.x (la página lo atiende con host.atender).
+            llama = set(re.findall(r'(?:llamar|pedir)\("(\w+)"', sin_comentarios(propio + "\n" + host)))
+            etiqueta = "Mac/Windows/Linux"
         elif nombre == "escritorio":
             main = self.leer("escritorio/src/main.js") or ""
             propio = self.juntar("escritorio/src/**/*.js")
@@ -482,6 +499,22 @@ class Contrato:
             v = re.search(r"<key>CFBundleShortVersionString</key>\s*<string>([^<]+)</string>", plist)
             if paquete and v and paquete.get("version") != v.group(1):
                 self.problema("version", "", f"La versión de app/Info.plist ({v.group(1)}) y la de escritorio/package.json ({paquete.get('version')}) tienen que ser iguales")
+        if "tauri" in plataformas:
+            conf = self.json("escritorio/tauri.conf.json") or {}
+            emp = self.leer("herramientas/empaquetar.sh") or ""
+            firma = re.search(r'designated\s*=>\s*identifier\s+"([^"]+)"', emp)
+            if emp and (not firma or firma.group(1) != conf.get("identifier")):
+                self.problema("bundle", "", f"El identificador de escritorio/tauri.conf.json ({conf.get('identifier')}) no es el de la firma de "
+                                            f"herramientas/empaquetar.sh ({firma.group(1) if firma else 'sin --requirements designated'}): los permisos no sobrevivirían a una actualización")
+            recursos = (conf.get("bundle") or {}).get("resources") or {}
+            if self.existe("acciones.json") and "../acciones.json" not in recursos:
+                self.problema("empaquetar", "tauri", "escritorio/tauri.conf.json: acciones.json va dentro de la app (bundle.resources)")
+            if conf.get("app", {}).get("withGlobalTauri"):
+                self.problema("tauri-global", "", "escritorio/tauri.conf.json: withGlobalTauri expone toda la API de Tauri a la página: la interfaz solo usa el puente")
+            if "NSAppTransportSecurity" in (self.leer("escritorio/Info.plist") or ""):
+                self.problema("ats", "escritorio/Info.plist", "escritorio/Info.plist: sin excepciones de App Transport Security")
+            if COMANDO_IA.search(self.juntar("escritorio/src/**/*.rs") or ""):
+                pass  # lo revisa plataforma(«tauri») con lo propio
         if "escritorio" in plataformas:
             paquete = self.json("escritorio/package.json") or {}
             extra = json.dumps((paquete.get("build") or {}).get("extraResources") or [])
@@ -546,8 +579,10 @@ class Contrato:
             return
         swift = self._swift_propio() if "mac" in plataformas else ""
         electron = self.juntar("escritorio/src/**/*.js") if "escritorio" in plataformas else ""
-        usa = {"llavero": bool(re.search(r"\bSecretos\(", sin_comentarios(swift))),
-               "notificaciones": bool(re.search(r"\bNotificaciones\b", sin_comentarios(swift)) or re.search(r"host\.notificaciones\b", electron))}
+        rust = "\n".join(self.leer(r) or "" for r in self.archivos("escritorio/src/**/*.rs") if "/pieza/" not in r.replace(os.sep, "/")) if "tauri" in plataformas else ""
+        usa = {"llavero": bool(re.search(r"\bSecretos\(", sin_comentarios(swift)) or re.search(r"\.secretos\(", sin_comentarios(rust))),
+               "notificaciones": bool(re.search(r"\bNotificaciones\b", sin_comentarios(swift)) or re.search(r"host\.notificaciones\b", electron)
+                                      or re.search(r"\.notificaciones\(\)", sin_comentarios(rust)))}
         for clave, de_verdad in usa.items():
             dice = bool(d["usa"].get(clave))
             if dice != de_verdad:
@@ -594,7 +629,7 @@ class Contrato:
         partes = [f"{len(self.acciones)} acciones", f"{len(self.funciones)} funciones en window.{self.global_}",
                   f"{len(self.declaradas)} declaradas"]
         for p in self.plataformas_:
-            partes.append(f"{ {'mac': 'Mac', 'escritorio': 'Windows/Linux', 'movil': 'celular', 'ios': 'iPhone'}[p]}: {len(self.registradas[p])} registradas")
+            partes.append(f"{ {'tauri': 'Mac/Windows/Linux', 'mac': 'Mac', 'escritorio': 'Windows/Linux', 'movil': 'celular', 'ios': 'iPhone'}[p]}: {len(self.registradas[p])} registradas")
         return ", ".join(partes)
 
 

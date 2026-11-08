@@ -7,6 +7,9 @@ Lo que cambia para quien usa Despeja, en palabras simples. Las descargas de cada
 ## Sin publicar · Unreleased
 <!-- Una línea por cambio que se nota, en lenguaje de persona («Ahora puedes…»), en español · *e inglés*. Al publicar una
 versión (subir «version» en app.json), estas líneas pasan a «## X.Y.Z». -->
+- La app de Mac es más liviana: ahora está hecha con Rust y Tauri, sobre el navegador del sistema. Todo sigue igual: tus
+  respaldos, la carpeta elegida y tus ajustes. · *The Mac app is lighter: it's now built with Rust and Tauri, on the system's
+  browser. Everything stays the same: your backups, the chosen folder and your settings.*
 
 ## 0.3.1
 - Si al comprimir videos o Live Photos dices que no a borrar los originales, Despeja te ofrece borrarlos ahí mismo; si no,

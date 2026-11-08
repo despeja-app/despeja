@@ -8,7 +8,7 @@
 !/docs/
 !/herramientas/
 !/pruebas/
-!/app/
+!/escritorio/
 !/movil/
 !/README.md
 !/AGENTS.md
@@ -26,9 +26,8 @@
 !/piezas.json
 !/acciones.json
 # Despeja no tiene más carpetas propias en la raíz (poc/ es local: la prueba de concepto no se sube).
-app/.build/
-escritorio/node_modules/
-escritorio/dist/
+escritorio/target/
+escritorio/gen/
 escritorio/vendor/
 movil/node_modules/
 node_modules/

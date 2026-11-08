@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
-# Arma app/Despeja.icns desde app/icono-1024.png (en un Mac: sips + iconutil). El ícono del iPhone está en
-# movil/ios/Fuentes/Assets.xcassets/AppIcon.appiconset/icono.png (1024×1024, sin esquinas: iOS las pone).
+# Arma los íconos de la app de escritorio desde escritorio/iconos/icono-1024.png (el de Mac, con su margen y sombra):
+# icon.icns (Mac), icon.ico (Windows) y los PNG que pide Tauri. Solo para desarrollo: se versionan los resultados.
+# Necesita Pillow (pip install pillow). El ícono del iPhone está en movil/ios.
 set -euo pipefail
-RAIZ="$(cd "$(dirname "$0")/.." && pwd)"
-T="$(mktemp -d)/Despeja.iconset"; mkdir -p "$T"
-for s in 16 32 128 256 512; do
-  sips -z $s $s "$RAIZ/app/icono-1024.png" --out "$T/icon_${s}x${s}.png" >/dev/null
-  sips -z $((s*2)) $((s*2)) "$RAIZ/app/icono-1024.png" --out "$T/icon_${s}x${s}@2x.png" >/dev/null
-done
-iconutil -c icns "$T" -o "$RAIZ/app/Despeja.icns"
-echo "✓ app/Despeja.icns"
+D="$(cd "$(dirname "$0")/.." && pwd)/escritorio/iconos"
+python3 - "$D" <<'PY'
+import sys
+from pathlib import Path
+from PIL import Image
+d = Path(sys.argv[1])
+base = Image.open(d / "icono-1024.png").convert("RGBA")
+for lado, nombre in [(32, "32x32.png"), (128, "128x128.png"), (256, "128x128@2x.png"), (512, "icono.png")]:
+    base.resize((lado, lado), Image.LANCZOS).save(d / nombre)
+base.save(d / "icon.icns", sizes=[(16, 16), (32, 32), (64, 64), (128, 128), (256, 256), (512, 512), (1024, 1024)])
+base.resize((256, 256), Image.LANCZOS).save(d / "icon.ico", sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
+print("✓ escritorio/iconos/")
+PY

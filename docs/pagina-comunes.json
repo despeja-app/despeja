@@ -70,6 +70,30 @@
    },
    "es": "Solo para grabar tu voz cuando tú lo pides. La transcripción pasa en tu computador.",
    "en": "Only to record your voice when you ask. Transcription happens on your computer."
+  },
+  "credenciales": {
+   "nombre": {
+    "es": "Credenciales",
+    "en": "Credentials"
+   },
+   "sistema": {
+    "es": "Windows",
+    "en": "Windows"
+   },
+   "es": "Para guardar las llaves que tú le das en el Administrador de credenciales de Windows, solo para tu usuario. Nunca se escriben en un archivo.",
+   "en": "To keep the keys you give it in Windows Credential Manager, only for your user. They are never written to a file."
+  },
+  "llaverolinux": {
+   "nombre": {
+    "es": "Llavero",
+    "en": "Keyring"
+   },
+   "sistema": {
+    "es": "Linux",
+    "en": "Linux"
+   },
+   "es": "Para guardar las llaves que tú le das en el llavero de tu sesión (gnome-keyring o KWallet). Si no tienes uno, la app no guarda nada.",
+   "en": "To keep the keys you give it in your session keyring (gnome-keyring or KWallet). If you don't have one, the app saves nothing."
   }
  },
  "sin_permisos": {
