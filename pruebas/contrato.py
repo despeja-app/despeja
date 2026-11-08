@@ -57,7 +57,7 @@ PLATAFORMAS_HOST = {"tauri": "escritorio/src/pieza/host.rs", "mac": "app/Sources
 DEL_HOST = {"listo", "config", "abrirEnlace", "copiar"}
 DEL_HOST_ACTUALIZACIONES = {"buscarActualizacion", "actualizar"}
 #: Respuestas que el host manda solo si la interfaz pidió algo que la app quizás no usa.
-RESPUESTAS_OPCIONALES = {"copiado": "copiar", "archivoCambiado": None, "soltados": None,
+RESPUESTAS_OPCIONALES = {"copiado": "copiar", "archivoCambiado": None, "soltados": None, "soltando": None,
                          "error": None}   # host-ios: una acción que el iPhone no atiende (la interfaz puede mostrarlo o no)
 #: Señales de que un archivo arma el comando de una IA (eso es de bin/ia.py, pieza «ia»).
 COMANDO_IA = re.compile(r'"--disallowedTools"|"--strict-mcp-config"|"--skip-git-repo-check"|["\'](claude|codex|gemini|agy)["\']\s*,\s*\[')
@@ -312,6 +312,8 @@ class Contrato:
                     break
                 self.funciones |= claves(bloque(texto[i:], "host.responder({"))
                 i += 1
+            # Lo que la app le pide a la página y espera (host-tauri: pedir) también queda en window.<App>.
+            self.funciones |= set(re.findall(r'host\.atender\(\s*"(\w+)"', sin_comentarios(texto)))
         if not self.funciones:
             self.problema("host-ui", "responder", f"ui/: no encuentro host.responder({{…}}): las respuestas quedan en window.{self.global_}")
 
@@ -401,7 +403,8 @@ class Contrato:
             interna = bloque(self.leer("escritorio/src/pieza/host.rs") or "", "fn interna(")
             del_host = set(re.findall(r'^\s*"(\w+)"(?:\s+if\s[^=]*)?\s*=>', interna, re.M))
             con_act = bool(re.search(r"^\s*actualizaciones:\s", sin_comentarios(propio), re.M))
-            llama = set(re.findall(r'llamar\("(\w+)"', sin_comentarios(propio + "\n" + host)))
+            # `h.pedir("x", …)` también llama window.<App>.x (la página lo atiende con host.atender).
+            llama = set(re.findall(r'(?:llamar|pedir)\("(\w+)"', sin_comentarios(propio + "\n" + host)))
             etiqueta = "Mac/Windows/Linux"
         elif nombre == "escritorio":
             main = self.leer("escritorio/src/main.js") or ""
