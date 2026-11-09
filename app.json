@@ -1,7 +1,7 @@
 {
  "nombre": "Despeja",
  "id": "despeja",
- "version": "0.3.1",
+ "version": "0.4.0",
  "repo": "despeja-app/despeja",
  "datos": "sistema",
  "icono": "docs/favicon.svg",
