@@ -76,7 +76,7 @@
   const gb = (b) => new Intl.NumberFormat(i18n.idioma, { maximumFractionDigits: (b || 0) >= 1e10 ? 0 : 1 }).format((b || 0) / 1e9);
   const tamano = (b) => (b || 0) >= 1e9 ? Tp("{n} GB", { n: gb(b) }) : Tp("{n} MB", { n: new Intl.NumberFormat(i18n.idioma, { maximumFractionDigits: 0 }).format((b || 0) / 1e6) });
   const entero = (n) => new Intl.NumberFormat(i18n.idioma).format(n || 0);
-  const barra = (titulo) => `<header class="barra"><h1 data-sin-traducir>${esc(titulo || NOMBRE)}</h1>
+  const barra = (titulo) => `<header class="barra${enIphone ? "" : " pz-zona-oscura"}"><h1 data-sin-traducir>${esc(titulo || NOMBRE)}</h1>
       <button type="button" class="pz-boton pz-chico boton-ajustes" id="abrir-ajustes">Ajustes</button></header>`;
   // iPhone: tres pestañas abajo, al alcance del pulgar
   const TABS = [["limpiar", "Limpiar"], ["respaldo", "Respaldo"], ["orden", "Orden"]];
@@ -356,7 +356,7 @@
           <span class="check" aria-hidden="true"></span></button>
         ${x.video ? `<button type="button" class="cuadro-ver" data-video="${esc(x.id)}" aria-label="${esc(Tp("Ver el video"))}" data-sin-traducir>▶</button>`
           : `<button type="button" class="cuadro-ver" data-ver="${esc(x.id)}" aria-label="${esc(Tp("Ver en grande"))}" data-sin-traducir>⤢</button>`}</li>`).join("");
-    return `<header class="barra chica"><button type="button" class="pz-boton pz-chico" id="volver" data-sin-traducir>‹ ${esc(Tp("Volver"))}</button>
+    return `<header class="barra chica${enIphone ? "" : " pz-zona-oscura"}"><button type="button" class="pz-boton pz-chico" id="volver" data-sin-traducir>‹ ${esc(Tp("Volver"))}</button>
         <h1 data-sin-traducir>${esc(Tp(def[1]))}</h1><span></span></header>
       <main class="contenido grupo">
         <p class="suave">${esc(def[2])}</p>
@@ -385,7 +385,7 @@
     const x = E.items[E.uno];
     const img = E.grande && E.grande.id === x.id && E.grande.img ? E.grande.img : x.img;
     const ahorro = esAhorro(E.grupo);
-    return `<header class="barra chica"><button type="button" class="pz-boton pz-chico" id="uno-salir" data-sin-traducir>‹ ${esc(Tp("Cuadrícula"))}</button>
+    return `<header class="barra chica${enIphone ? "" : " pz-zona-oscura"}"><button type="button" class="pz-boton pz-chico" id="uno-salir" data-sin-traducir>‹ ${esc(Tp("Cuadrícula"))}</button>
         <h1 data-sin-traducir>${esc(Tp("{i} de {t}", { i: entero(E.uno + 1), t: entero(E.totalGrupo) }))}</h1><span></span></header>
       <main class="contenido uno">
         <div class="tarjeta-uno${x.marcada ? " marcada" : ""}" id="tarjeta-uno" data-sin-traducir>

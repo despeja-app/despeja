@@ -7,6 +7,7 @@ Lo que cambia para quien usa Despeja, en palabras simples. Las descargas de cada
 ## Sin publicar · Unreleased
 <!-- Una línea por cambio que se nota, en lenguaje de persona («Ahora puedes…»), en español · *e inglés*. Al publicar una
 versión (subir «version» en app.json), estas líneas pasan a «## X.Y.Z». -->
+- Despeja tiene el estilo nuevo de la familia en el Mac: barra de arriba oscura y fondo cálido. En el iPhone sigue al estilo iOS. · *Despeja has the family's new look on the Mac: a dark top bar and a warm background. On the iPhone it keeps the iOS style.*
 
 ## 0.4.0
 - La app de Mac es más liviana: ahora está hecha con Rust y Tauri, sobre el navegador del sistema. Todo sigue igual: tus
