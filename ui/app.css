@@ -4,10 +4,6 @@
 :root {
   --acento-claro: #0b6e99;  --acento-oscuro: #63bde0;          /* cielo de cordillera */
   --sobre-acento-claro: #ffffff; --sobre-acento-oscuro: #06202b;
-  --fondo-claro: #eef2f3;   --fondo-oscuro: #0d161b;
-  --panel-claro: #ffffff;   --panel-oscuro: #15212a;
-  --panel-2-claro: #e6ecee; --panel-2-oscuro: #1c2b35;
-  --linea-claro: #d6dee2;   --linea-oscuro: #263843;
   --cifras: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, sans-serif;
   --tabbar: calc(56px + env(safe-area-inset-bottom));
 }
@@ -26,6 +22,9 @@ body { margin: 0; background: var(--fondo); color: var(--texto); font: 15px/1.45
   padding: calc(10px + env(safe-area-inset-top)) 16px 10px; background: color-mix(in srgb, var(--fondo) 88%, transparent);
   backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px); }
 .barra h1 { font-size: 17px; font-weight: 650; }
+/* En el Mac la barra de arriba es oscura (.pz-zona-oscura de «componentes»), como en toda la familia; en el iPhone, al estilo iOS. */
+html:not(.iphone) .barra.pz-zona-oscura { background: var(--barra-lateral); -webkit-backdrop-filter: none; backdrop-filter: none; padding-block: calc(12px + env(safe-area-inset-top)) 12px; margin-bottom: 8px; }
+html:not(.iphone) .barra h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
 .iphone .barra h1 { font-size: 28px; font-weight: 700; letter-spacing: -.01em; }
 .iphone .barra { padding-top: calc(6px + env(safe-area-inset-top)); }
 .iphone .contenido.grupo .barra h1, .iphone .barra.chica h1 { font-size: 17px; }
