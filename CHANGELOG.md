@@ -5,6 +5,8 @@ Lo que cambia para quien usa Despeja, en palabras simples. Las descargas de cada
 *What changes for people using Despeja, in plain words. Downloads for each version are in Releases.*
 
 ## Sin publicar · Unreleased
+
+## 0.5.0 · 2026-11-09
 <!-- Una línea por cambio que se nota, en lenguaje de persona («Ahora puedes…»), en español · *e inglés*. Al publicar una
 versión (subir «version» en app.json), estas líneas pasan a «## X.Y.Z». -->
 - Despeja tiene el estilo nuevo de la familia en el Mac: barra de arriba oscura y fondo cálido. En el iPhone sigue al estilo iOS. · *Despeja has the family's new look on the Mac: a dark top bar and a warm background. On the iPhone it keeps the iOS style.*
